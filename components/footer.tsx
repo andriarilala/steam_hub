@@ -13,10 +13,13 @@ export function Footer() {
           {/* Brand */}
           <div>
             <div className="flex items-center gap-2 mb-4">
-              <div className="w-8 h-8 bg-secondary rounded-sm flex items-center justify-center">
-                <span className="text-primary font-bold">PA</span>
+              <div className="flex items-center justify-center">
+                <img
+  src="/logo.png"
+  alt="Logo"
+  className="h-12 w-auto self-center"
+/>
               </div>
-              <span className="font-bold text-lg">PASS AVENIR</span>
             </div>
             <p className="text-sm text-primary-foreground/70">{t("footer.tagline")}</p>
           </div>

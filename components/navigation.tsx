@@ -25,12 +25,13 @@ export function Navigation() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           {/* Logo */}
-          <Link href="/" className="flex items-center gap-2">
-            <div className="w-8 h-8 bg-primary rounded-sm flex items-center justify-center">
-              <span className="text-primary-foreground font-bold text-lg">PA</span>
-            </div>
-            <span className="font-bold text-lg hidden sm:inline text-foreground">PASS AVENIR</span>
-          </Link>
+          <div className="flex items-center justify-center">
+            <img
+  src="/logo.png"
+  alt="Logo"
+  className="h-12 w-auto self-center"
+/>
+          </div>
 
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center gap-8">

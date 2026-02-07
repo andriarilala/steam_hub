@@ -106,7 +106,11 @@ export default function SignUpPage() {
           {/* Header */}
           <div className="text-center mb-8">
             <div className="w-16 h-16 bg-primary rounded-lg flex items-center justify-center mx-auto mb-4">
-              <span className="text-primary-foreground font-bold text-2xl">PA</span>
+              <img
+  src="/logo.png"
+  alt="Logo"
+  className="h-12 w-auto self-center"
+/>
             </div>
             <h1 className="text-3xl font-bold text-foreground mb-2">{t("auth.signUpTitle")}</h1>
             <p className="text-foreground/70">{t("auth.signUpSubtitle")}</p>
