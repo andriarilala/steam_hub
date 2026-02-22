@@ -44,7 +44,7 @@ const botResponses: Record<string, Message> = {
   registration: {
     id: "",
     type: "bot",
-    text: "Great! Registration is now open for PASS AVENIR 2025. We offer several ticket types:\n\n- Student Pass: $25 USD\n- Standard Pass: $50 USD\n- VIP Pass: $150 USD\n- Virtual Pass: $20 USD\n\nWould you like to register now or learn more about each ticket type?",
+    text: "Great! Registration is now open for PASS AVENIR 2025. We offer several ticket types:\n\n- Student Pass: 3000 AR\n- Standard Pass: 3000 AR\n- VIP Pass: 3000 AR\n- Virtual Pass: 3000 AR\n\nWould you like to register now or learn more about each ticket type?",
     options: [
       { id: "1", label: "Register Now", action: "register_now" },
       { id: "2", label: "Ticket Details", action: "ticket_details" },

@@ -1,5 +1,6 @@
 "use client"
 
+import { SessionProvider } from "next-auth/react"
 import { LanguageProvider } from "@/lib/language-context"
 import { AuthProvider } from "@/lib/auth-context"
 import { SponsorProvider } from "@/lib/sponsor-context"
@@ -12,20 +13,22 @@ import type { ReactNode } from "react"
 
 export function Providers({ children }: { children: ReactNode }) {
   return (
-    <AuthProvider>
-      <SponsorProvider>
-        <MessagingProvider>
-          <StripeProvider>
-            <CRMProvider>
-              <AnalyticsProvider>
-                <ForumsProvider>
-                  <LanguageProvider>{children}</LanguageProvider>
-                </ForumsProvider>
-              </AnalyticsProvider>
-            </CRMProvider>
-          </StripeProvider>
-        </MessagingProvider>
-      </SponsorProvider>
-    </AuthProvider>
+    <SessionProvider>
+      <AuthProvider>
+        <SponsorProvider>
+          <MessagingProvider>
+            <StripeProvider>
+              <CRMProvider>
+                <AnalyticsProvider>
+                  <ForumsProvider>
+                    <LanguageProvider>{children}</LanguageProvider>
+                  </ForumsProvider>
+                </AnalyticsProvider>
+              </CRMProvider>
+            </StripeProvider>
+          </MessagingProvider>
+        </SponsorProvider>
+      </AuthProvider>
+    </SessionProvider>
   )
 }

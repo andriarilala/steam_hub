@@ -69,7 +69,7 @@ export function ConnectionMatcher() {
   const [currentIndex, setCurrentIndex] = useState(0)
   const [liked, setLiked] = useState<string[]>([])
 
-  if (connections.length === 0) {
+  if (connections.length === 0 || currentIndex >= connections.length) {
     return (
       <div className="text-center py-12">
         <p className="text-foreground/70 mb-4">No more suggestions for today</p>
@@ -82,11 +82,11 @@ export function ConnectionMatcher() {
 
   const handleLike = () => {
     setLiked([...liked, currentConnection.id])
-    setCurrentIndex(currentIndex + 1)
+    setCurrentIndex((i) => Math.min(i + 1, connections.length))
   }
 
   const handlePass = () => {
-    setCurrentIndex(currentIndex + 1)
+    setCurrentIndex((i) => Math.min(i + 1, connections.length))
   }
 
   return (
