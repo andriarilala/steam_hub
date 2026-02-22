@@ -37,7 +37,9 @@ export default function AgendaPage() {
 
   const filteredSessions = sessions.filter((session) => {
     const themeValue = session.theme ?? session.type ?? ""
-    const themeMatch = selectedTheme === "all" || themeValue === selectedTheme
+    const themeMatch =
+      selectedTheme === "all" || themeValue === selectedTheme
+
     const audienceMatch =
       selectedAudience === "all" ||
       (session.audience?.includes(selectedAudience) ?? false)
@@ -92,7 +94,9 @@ export default function AgendaPage() {
                         : "bg-muted text-foreground hover:bg-border"
                       }`}
                   >
-                    {theme === "all" ? t("agenda.allThemes") : theme}
+                    {theme === "all"
+                      ? t("agenda.allThemes")
+                      : theme}
                   </button>
                 ))}
               </div>
@@ -124,6 +128,7 @@ export default function AgendaPage() {
                 ))}
               </div>
             </div>
+
           </div>
         </div>
       </section>
@@ -209,15 +214,18 @@ function SessionCard({ session }: SessionCardProps) {
             )}
           </div>
 
-          {isExpanded && (
+          {isExpanded && session.expectedOutcomes?.length ? (
             <div className="mt-4 pt-4 border-t border-border">
-              {session.expectedOutcomes?.map((outcome, i) => (
+              <p className="text-sm font-bold mb-2">
+                {t("agenda.outcomes")}
+              </p>
+              {session.expectedOutcomes.map((outcome, i) => (
                 <p key={i} className="text-sm text-foreground/70">
                   → {outcome}
                 </p>
               ))}
             </div>
-          )}
+          ) : null}
         </div>
 
         <button
