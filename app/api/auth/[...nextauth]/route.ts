@@ -85,11 +85,9 @@ async function seedDemoData() {
 }
 
 // trigger seeding asynchronously (errors logged)
-if (process.env.NODE_ENV === "development") {
-  seedDemoData().catch((e) => {
-    console.error("Error seeding demo data", e);
-  });
-}
+seedDemoData().catch((e) => {
+  console.error("Error seeding demo data", e);
+});
 
 // read secrets from environment variables
 // make sure to define NEXTAUTH_URL as well (e.g. http://localhost:3000)
