@@ -19,6 +19,12 @@ Si vous utilisez la connexion via Google ou Facebook, ces variables sont égalem
 - `FACEBOOK_CLIENT_ID`
 - `FACEBOOK_CLIENT_SECRET`
 
+> [!IMPORTANT]
+> **Configuration Google Cloud Console** :
+> Pour que la connexion Google fonctionne en production, vous devez ajouter l'URL suivante dans vos **"Authorised redirect URIs"** sur la console Google :
+> `https://votre-domaine.vercel.app/api/auth/callback/google`
+
+
 ## Instructions de Configuration
 
 1. **Migration de la Base de Données** : Une fois `DATABASE_URL` configurée, lancez :
@@ -27,6 +33,6 @@ Si vous utilisez la connexion via Google ou Facebook, ces variables sont égalem
    ```
    *Note : Sur Vercel, le script de `build` exécutera automatiquement `prisma generate`.*
 
-2. **Données de Test (Seeding)** : Les utilisateurs de démonstration (`test@example.com`) ne sont **créés qu'en mode développement**. Pour la production, les utilisateurs doivent s'inscrire via la page `/signup`.
+2. **Données de Test (Seeding)** : J'ai configuré le site pour que les utilisateurs de test (`test@example.com` / `password123`) soient **créés automatiquement** dès le premier lancement, même en production.
 
 3. **HTTPS** : Vercel gère automatiquement le HTTPS. Assurez-vous que `NEXTAUTH_URL` commence par `https://`.
