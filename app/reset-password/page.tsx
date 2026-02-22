@@ -1,6 +1,6 @@
 "use client"
 
-import React, { useState, useEffect } from "react"
+import React, { useState, useEffect, Suspense } from "react"
 import { useRouter, useSearchParams } from "next/navigation"
 import Link from "next/link"
 import { Navigation } from "@/components/navigation"
@@ -8,7 +8,7 @@ import { Footer } from "@/components/footer"
 import { useLanguage } from "@/lib/language-context"
 import { Lock, Eye, EyeOff } from "lucide-react"
 
-export default function ResetPasswordPage() {
+function ResetPasswordContent() {
   const { t } = useLanguage()
   const router = useRouter()
   const params = useSearchParams()
@@ -30,32 +30,48 @@ export default function ResetPasswordPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setError("")
+
     if (!password || !confirm) {
       setError(t("auth.errorRequired"))
       return
     }
+
     if (password !== confirm) {
       setError(t("auth.errorPasswordMatch"))
       return
     }
+
     if (password.length < 8) {
       setError(t("auth.errorPasswordLength"))
       return
     }
+
     if (!token) return
 
     setIsSubmitting(true)
-    const res = await fetch("/api/auth/reset-password", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ token, password }),
-    })
-    setIsSubmitting(false)
-    if (res.ok) {
-      setSuccess(true)
-    } else {
-      setError(t("auth.invalidToken"))
+
+    try {
+      const res = await fetch("/api/auth/reset-password", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ token, password }),
+      })
+
+      if (res.ok) {
+        setSuccess(true)
+
+        // Optionnel : redirection après succès
+        setTimeout(() => {
+          router.push("/signin")
+        }, 2000)
+      } else {
+        setError(t("auth.invalidToken"))
+      }
+    } catch (err) {
+      setError("Server error")
     }
+
+    setIsSubmitting(false)
   }
 
   return (
@@ -117,7 +133,7 @@ export default function ResetPasswordPage() {
                   id="confirm"
                   value={confirm}
                   onChange={(e) => setConfirm(e.target.value)}
-                  className="w-full pl-3 pr-3 py-3 bg-muted border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/50 text-foreground"
+                  className="w-full px-3 py-3 bg-muted border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/50 text-foreground"
                   placeholder="********"
                 />
               </div>
@@ -125,7 +141,7 @@ export default function ResetPasswordPage() {
               <button
                 type="submit"
                 disabled={isSubmitting || !token}
-                className="w-full bg-primary text-primary-foreground py-3 rounded-lg font-medium hover:opacity-90 transition-opacity disabled:opacity-50"
+                className="w-full bg-primary text-primary-foreground py-3 rounded-lg font-medium hover:opacity-90 transition-opacity disabled:opacity-50 flex items-center justify-center"
               >
                 {isSubmitting ? (
                   <span className="w-5 h-5 border-2 border-primary-foreground/30 border-t-primary-foreground rounded-full animate-spin" />
@@ -145,5 +161,13 @@ export default function ResetPasswordPage() {
       </main>
       <Footer />
     </div>
+  )
+}
+
+export default function ResetPasswordPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen flex items-center justify-center">Loading...</div>}>
+      <ResetPasswordContent />
+    </Suspense>
   )
 }
