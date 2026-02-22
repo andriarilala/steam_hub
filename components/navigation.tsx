@@ -5,10 +5,12 @@ import Link from "next/link"
 import { Menu, X } from "lucide-react"
 import { useLanguage } from "@/lib/language-context"
 import { LanguageSwitcher } from "./language-switcher"
+import { useAuth } from "@/lib/auth-context"
 
 export function Navigation() {
   const [isOpen, setIsOpen] = useState(false)
   const { t } = useLanguage()
+  const { isAuthenticated, signOut } = useAuth()
 
   const navItems = [
     { href: "/", label: "nav.home" },
@@ -27,10 +29,10 @@ export function Navigation() {
           {/* Logo */}
           <div className="flex items-center justify-center">
             <img
-  src="/logo.png"
-  alt="Logo"
-  className="h-12 w-auto self-center"
-/>
+              src="/logo.png"
+              alt="Logo"
+              className="h-12 w-auto self-center"
+            />
           </div>
 
           {/* Desktop Navigation */}
@@ -48,12 +50,23 @@ export function Navigation() {
 
           <div className="hidden sm:flex items-center gap-3">
             <LanguageSwitcher />
-            <Link href="/signin" className="text-sm font-medium text-foreground hover:text-primary transition-colors">
-              {t("nav.signIn")}
-            </Link>
-            <Link href="/register" className="bg-primary text-primary-foreground px-4 py-2 rounded-sm font-medium hover:opacity-90 transition-opacity">
-              {t("nav.register")}
-            </Link>
+            {isAuthenticated ? (
+              <button
+                onClick={() => signOut()}
+                className="bg-primary text-primary-foreground px-4 py-2 rounded-sm font-medium hover:opacity-90 transition-opacity"
+              >
+                {t("dashboard.signOut")}
+              </button>
+            ) : (
+              <>
+                <Link href="/signin" className="text-sm font-medium text-foreground hover:text-primary transition-colors">
+                  {t("nav.signIn")}
+                </Link>
+                <Link href="/register" className="bg-primary text-primary-foreground px-4 py-2 rounded-sm font-medium hover:opacity-90 transition-opacity">
+                  {t("nav.register")}
+                </Link>
+              </>
+            )}
           </div>
 
           {/* Mobile Menu Button */}
@@ -77,20 +90,34 @@ export function Navigation() {
             ))}
             <div className="px-4 py-3 gap-2 flex flex-col">
               <LanguageSwitcher />
-              <Link
-                href="/signin"
-                className="flex-1 text-sm font-medium border border-primary text-primary px-4 py-2 rounded-sm hover:bg-primary/5 transition-colors text-center"
-                onClick={() => setIsOpen(false)}
-              >
-                {t("nav.signIn")}
-              </Link>
-              <Link
-                href="/register"
-                className="flex-1 bg-primary text-primary-foreground px-4 py-2 rounded-sm font-medium hover:opacity-90 transition-opacity text-center"
-                onClick={() => setIsOpen(false)}
-              >
-                {t("nav.register")}
-              </Link>
+              {isAuthenticated ? (
+                <button
+                  onClick={() => {
+                    signOut()
+                    setIsOpen(false)
+                  }}
+                  className="w-full bg-primary text-primary-foreground px-4 py-2 rounded-sm font-medium hover:opacity-90 transition-opacity text-center"
+                >
+                  {t("dashboard.signOut")}
+                </button>
+              ) : (
+                <>
+                  <Link
+                    href="/signin"
+                    className="flex-1 text-sm font-medium border border-primary text-primary px-4 py-2 rounded-sm hover:bg-primary/5 transition-colors text-center"
+                    onClick={() => setIsOpen(false)}
+                  >
+                    {t("nav.signIn")}
+                  </Link>
+                  <Link
+                    href="/register"
+                    className="flex-1 bg-primary text-primary-foreground px-4 py-2 rounded-sm font-medium hover:opacity-90 transition-opacity text-center"
+                    onClick={() => setIsOpen(false)}
+                  >
+                    {t("nav.register")}
+                  </Link>
+                </>
+              )}
             </div>
           </div>
         )}
