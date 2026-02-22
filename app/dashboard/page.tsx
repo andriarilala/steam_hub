@@ -5,25 +5,27 @@ import { useRouter } from "next/navigation"
 import Link from "next/link"
 import Image from "next/image"
 import {
-  User,
-  Calendar,
+  LayoutDashboard,
   Users,
+  Calendar,
   Briefcase,
-  MessageSquare,
-  Bell,
   Settings,
+  HelpCircle,
   LogOut,
+  Search,
   ChevronRight,
+  Bell,
+  Moon,
+  RotateCcw,
+  Globe,
   Star,
+  Plus,
+  MoreVertical,
   TrendingUp,
-  BookOpen,
-  Award,
+  MessageSquare
 } from "lucide-react"
-import { Navigation } from "@/components/navigation"
-import { Footer } from "@/components/footer"
 import { useAuth } from "@/lib/auth-context"
 import { useLanguage } from "@/lib/language-context"
-import { ConnectionMatcher } from "@/components/connection-matcher"
 
 export default function DashboardPage() {
   const router = useRouter()
@@ -35,26 +37,6 @@ export default function DashboardPage() {
     recommendedConnections: { id: string; name: string; role: string; image: string }[]
     stats: { sessionsAttended: number; connectionsCount: number; messagesCount: number; opportunitiesSaved: number }
   } | null>(null)
-
-  // countdown to next event (hook placed before conditional returns)
-  const [countdown, setCountdown] = useState({ days: 0, hours: 0, minutes: 0, seconds: 0 });
-  useEffect(() => {
-    if (!dashboardData) return;
-    const target = dashboardData.upcomingEvents[0]
-      ? new Date(dashboardData.upcomingEvents[0].date)
-      : new Date("2025-03-15T00:00:00Z");
-    const tick = () => {
-      const diff = target.getTime() - Date.now();
-      const d = Math.max(0, Math.floor(diff / (1000 * 60 * 60 * 24)));
-      const h = Math.max(0, Math.floor(diff / (1000 * 60 * 60)) % 24);
-      const m = Math.max(0, Math.floor(diff / (1000 * 60)) % 60);
-      const s = Math.max(0, Math.floor(diff / 1000) % 60);
-      setCountdown({ days: d, hours: h, minutes: m, seconds: s });
-    };
-    tick();
-    const iv = setInterval(tick, 1000);
-    return () => clearInterval(iv);
-  }, [dashboardData]);
 
   useEffect(() => {
     if (!isLoading && !isAuthenticated) {
@@ -75,361 +57,268 @@ export default function DashboardPage() {
 
   if (isLoading || !dashboardData) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
-        <div className="w-8 h-8 border-4 border-primary/30 border-t-primary rounded-full animate-spin" />
+      <div className="min-h-screen bg-[#0B0C0E] flex items-center justify-center dark">
+        <div className="w-8 h-8 border-4 border-[#B6FF33]/30 border-t-[#B6FF33] rounded-full animate-spin" />
       </div>
     )
   }
 
-  if (!user) {
-    return null
-  }
-
-  const profileCompletionPercentage = Math.floor(
-    ([
-      (user as any).name,
-      (user as any).emailVerified,
-      (user as any).organization,
-      (user as any).bio,
-      (user as any).image,
-    ].filter(Boolean).length / 5) * 100
-  );
-
-  const handleSignOut = () => {
-    signOut()
-    router.push("/")
-  }
-
-  const quickActions = [
-    { icon: Calendar, label: t("dashboard.viewAgenda"), href: "/agenda", color: "bg-blue-500" },
-    { icon: Users, label: t("dashboard.findConnections"), href: "/community", color: "bg-green-500" },
-    { icon: Briefcase, label: t("dashboard.exploreOpportunities"), href: "/partners", color: "bg-amber-500" },
-    { icon: BookOpen, label: t("dashboard.accessContent"), href: "/community", color: "bg-purple-500" },
-  ]
-
-  const upcomingSessions = dashboardData.upcomingEvents.map((e) => ({
-    title: e.title,
-    time: new Date(e.date).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
-    date: new Date(e.date).toLocaleDateString(undefined, { month: "short", day: "numeric" }),
-    type: e.type || "",
-  }))
-
-  const recommendedConnectionsList = dashboardData.recommendedConnections.map((c) => ({
-    name: c.name,
-    role: c.role,
-    avatar: c.image,
-  }))
+  if (!user) return null
 
   return (
-    <div className="min-h-screen bg-background">
-      <Navigation />
-
-      <main className="pt-20 pb-16">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          {/* Welcome Header */}
-          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-4 pt-4">
-            <div>
-              <h1 className="text-3xl font-bold text-foreground">
-                {t("dashboard.welcome")}, {user.name}!
-              </h1>
-              <p className="text-foreground/70 mt-1">{t("dashboard.subtitle")}</p>
-            </div>
-          </div>
-          {/* Mission / vision section */}
-          <div className="bg-card border border-border rounded-xl p-6 mb-8">
-            <h2 className="text-xl font-semibold text-foreground mb-2">
-              {t("dashboard.missionTitle")}
-            </h2>
-            <p className="text-foreground/70">{t("dashboard.missionDesc")}</p>
-            <Link href="/partners" className="inline-block mt-4 text-primary hover:underline">
-              {t("dashboard.sponsorHub")}
-            </Link>
-          </div>
-
-          <div className="grid lg:grid-cols-3 gap-8">
-            {/* Main Content */}
-            <div className="lg:col-span-2 space-y-8">
-              {/* Profile Card */}
-              <div className="bg-card border border-border rounded-xl p-6">
-                <div className="flex items-start gap-4">
-                  <div className="w-20 h-20 bg-primary/10 rounded-xl flex items-center justify-center">
-                    {user.avatar ? (
-                      <Image src={user.avatar || "/placeholder.svg"} alt={user.name} width={80} height={80} className="rounded-xl" />
-                    ) : (
-                      <User className="w-10 h-10 text-primary" />
-                    )}
-                  </div>
-                  <div className="flex-1">
-                    <div className="flex items-center gap-2 mb-1">
-                      <h2 className="text-xl font-bold text-foreground">{user.name}</h2>
-                      <span className="px-2 py-0.5 bg-primary/10 text-primary text-xs font-medium rounded-full capitalize">
-                        {user.role}
-                      </span>
-                    </div>
-                    <p className="text-foreground/70 text-sm">{user.email}</p>
-                    {user.organization && <p className="text-foreground/50 text-sm">{user.organization}</p>}
-                    <div className="flex items-center gap-4 mt-3">
-                      <div className="flex items-center gap-1 text-sm text-foreground/70">
-                        <Users className="w-4 h-4" />
-                        <span>{dashboardData.stats.connectionsCount} {t("dashboard.connections")}</span>
-                      </div>
-                      <div className="flex items-center gap-1 text-sm text-foreground/70">
-                        <Award className="w-4 h-4" />
-                        <span>{t("dashboard.memberSince")} 2025</span>
-                      </div>
-                    </div>
-                  </div>
-                  <Link
-                    href="/profile/edit"
-                    className="px-4 py-2 border border-border rounded-lg text-sm font-medium hover:bg-muted transition-colors"
-                  >
-                    {t("dashboard.editProfile")}
-                  </Link>
-                </div>
-
-                {/* Profile Completion */}
-                <div className="mt-6 pt-6 border-t border-border">
-                  <div className="flex items-center justify-between mb-2">
-                    <span className="text-sm font-medium text-foreground">{t("dashboard.profileCompletion")}</span>
-                    <span className="text-sm font-medium text-primary">{profileCompletionPercentage}%</span>
-                  </div>
-                  <div className="h-2 bg-muted rounded-full overflow-hidden">
-                    <div className="h-full bg-primary rounded-full" style={{ width: `${profileCompletionPercentage}%` }} />
-                  </div>
-                  <p className="text-xs text-foreground/50 mt-2">{t("dashboard.completeProfile")}</p>
-                </div>
+    <div className="dark">
+      <div className="min-h-screen bg-background text-foreground flex overflow-hidden">
+        {/* --- Sidebar Gauche --- */}
+        <aside className="w-64 bg-card border-r border-border flex flex-col hidden lg:flex">
+          <div className="p-6 flex-1">
+            <div className="flex items-center gap-2 mb-8">
+              <div className="w-8 h-8 rounded-full bg-primary flex items-center justify-center">
+                <span className="text-primary-foreground font-bold text-xs">PH</span>
               </div>
-
-              {/* Quick Actions */}
-              <div>
-                <h3 className="text-lg font-semibold text-foreground mb-4">{t("dashboard.quickActions")}</h3>
-                <div className="grid sm:grid-cols-2 gap-4">
-                  {quickActions.map((action) => (
-                    <Link
-                      key={action.label}
-                      href={action.href}
-                      className="flex items-center gap-4 p-4 bg-card border border-border rounded-xl hover:border-primary/50 transition-colors group"
-                    >
-                      <div className={`w-12 h-12 ${action.color} rounded-lg flex items-center justify-center`}>
-                        <action.icon className="w-6 h-6 text-white" />
-                      </div>
-                      <span className="font-medium text-foreground group-hover:text-primary transition-colors">
-                        {action.label}
-                      </span>
-                      <ChevronRight className="w-5 h-5 text-foreground/30 ml-auto group-hover:text-primary transition-colors" />
-                    </Link>
-                  ))}
-                </div>
-              </div>
-
-              {/* Upcoming Sessions */}
-              <div>
-                <div className="flex items-center justify-between mb-4">
-                  <h3 className="text-lg font-semibold text-foreground">{t("dashboard.upcomingSessions")}</h3>
-                  <Link href="/agenda" className="text-sm text-primary hover:underline">
-                    {t("dashboard.viewAll")}
-                  </Link>
-                </div>
-                <div className="space-y-3">
-                  {upcomingSessions.map((session, index) => (
-                    <div
-                      key={index}
-                      className="flex items-center gap-4 p-4 bg-card border border-border rounded-xl"
-                    >
-                      <div className="text-center">
-                        <p className="text-xs text-foreground/50">{session.date}</p>
-                        <p className="text-lg font-bold text-primary">{session.time}</p>
-                      </div>
-                      <div className="flex-1">
-                        <p className="font-medium text-foreground">{session.title}</p>
-                        <span className="text-xs px-2 py-0.5 bg-muted rounded-full text-foreground/70">
-                          {session.type}
-                        </span>
-                      </div>
-                      <button className="p-2 hover:bg-muted rounded-lg transition-colors">
-                        <Star className="w-5 h-5 text-foreground/30 hover:text-amber-500" />
-                      </button>
-                    </div>
-                  ))}
-                </div>
-              </div>
+              <span className="font-bold text-lg tracking-tight">PASS AVENIR</span>
             </div>
 
-            {/* Sidebar */}
-            <div className="space-y-8">
-              {/* Stats */}
-              <div className="bg-card border border-border rounded-xl p-6">
-                <h3 className="font-semibold text-foreground mb-4">{t("dashboard.yourStats")}</h3>
-                <div className="space-y-4">
-                  <div className="flex items-center justify-between">
-                    <span className="text-foreground/70">{t("dashboard.sessionsAttended")}</span>
-                    <span className="font-bold text-foreground">{dashboardData.stats.sessionsAttended}</span>
+            <div className="relative mb-6">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-foreground/30 w-4 h-4" />
+              <input
+                type="text"
+                placeholder="Search..."
+                className="w-full bg-background/20 border border-border rounded-lg py-2 pl-10 pr-4 text-sm focus:outline-none focus:border-primary/50 transition-colors"
+              />
+              <span className="absolute right-2 top-1/2 -translate-y-1/2 text-[10px] bg-foreground/10 px-1 rounded text-foreground/40">⌘ K</span>
+            </div>
+
+            <nav className="space-y-1">
+              <p className="px-3 text-[10px] font-bold text-foreground/20 uppercase tracking-widest mb-2">Dashboards</p>
+              <NavItem icon={LayoutDashboard} label="Overview" active />
+              <NavItem icon={Users} label="Community" />
+              <NavItem icon={Calendar} label="Agenda" />
+              <NavItem icon={Briefcase} label="Opportunities" />
+            </nav>
+
+            <nav className="space-y-1 mt-8">
+              <p className="px-3 text-[10px] font-bold text-foreground/20 uppercase tracking-widest mb-2">Settings</p>
+              <NavItem icon={MessageSquare} label="Messages" />
+              <NavItem icon={Settings} label="Settings" />
+              <NavItem icon={HelpCircle} label="Help Centre" />
+            </nav>
+          </div>
+
+          <div className="p-6 border-t border-border mt-auto">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="w-10 h-10 rounded-full bg-foreground/10 overflow-hidden">
+                <Image src={user.image || "/placeholder.svg"} alt={user.name || "User"} width={40} height={40} />
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="text-sm font-bold truncate">{user.name}</p>
+                <p className="text-[10px] text-foreground/40 truncate capitalize">{user.role}</p>
+              </div>
+            </div>
+            <button
+              onClick={() => signOut()}
+              className="w-full flex items-center gap-2 text-foreground/40 hover:text-foreground text-sm transition-colors py-2"
+            >
+              <LogOut className="w-4 h-4" />
+              Logout
+            </button>
+          </div>
+        </aside>
+
+        {/* --- Contenu Central --- */}
+        <main className="flex-1 overflow-y-auto bg-background">
+          {/* Header */}
+          <header className="h-16 border-b border-border flex items-center justify-between px-8 sticky top-0 bg-background/80 backdrop-blur-md z-10">
+            <div className="flex items-center gap-2 text-sm">
+              <LayoutDashboard className="w-4 h-4 text-foreground/30" />
+              <span className="text-foreground/30">/</span>
+              <span className="text-foreground/30">Dashboards</span>
+              <span className="text-foreground/30">/</span>
+              <span className="font-medium text-foreground/80">Overview</span>
+            </div>
+
+            <div className="flex items-center gap-6">
+              <div className="flex items-center gap-4 text-foreground/40">
+                <Moon className="w-4 h-4 cursor-pointer hover:text-foreground" />
+                <RotateCcw className="w-4 h-4 cursor-pointer hover:text-foreground" />
+                <Bell className="w-4 h-4 cursor-pointer hover:text-foreground" />
+                <Globe className="w-4 h-4 cursor-pointer hover:text-foreground" />
+              </div>
+            </div>
+          </header>
+
+          <div className="p-8">
+            <div className="flex items-center justify-between mb-8">
+              <h1 className="text-2xl font-bold">Overview</h1>
+              <button className="flex items-center gap-2 bg-card border border-border text-xs px-3 py-1.5 rounded-lg hover:bg-foreground/5 transition-colors">
+                Today <ChevronRight className="w-3 h-3 rotate-90" />
+              </button>
+            </div>
+
+            {/* Stat Cards */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+              <StatCard title="Connections" value={dashboardData.stats.connectionsCount.toString()} trend="+8%" trendDir="up" />
+              <StatCard title="Sessions" value={dashboardData.stats.sessionsAttended.toString()} trend="+2" trendDir="up" />
+              <StatCard title="Opportunities" value={dashboardData.stats.opportunitiesSaved.toString()} trend="71%" trendDir="neutral" />
+              <StatCard title="Messages" value={dashboardData.stats.messagesCount.toString()} trend="11%" trendDir="up" />
+            </div>
+
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+              {/* Weekly Activity */}
+              <div className="bg-card rounded-2xl p-6 border border-border">
+                <div className="flex items-center justify-between mb-6">
+                  <h2 className="font-bold">Weekly Activity</h2>
+                  <MoreVertical className="w-4 h-4 text-foreground/30" />
+                </div>
+                <div className="flex items-center gap-8 mb-8">
+                  <div className="relative w-32 h-32">
+                    <svg className="w-full h-full" viewBox="0 0 100 100">
+                      <circle className="text-foreground/5" strokeWidth="10" stroke="currentColor" fill="transparent" r="40" cx="50" cy="50" />
+                      <circle className="text-primary" strokeWidth="10" strokeDasharray="251.2" strokeDashoffset="60" strokeLinecap="round" stroke="currentColor" fill="transparent" r="40" cx="50" cy="50" />
+                    </svg>
+                    <div className="absolute inset-0 flex flex-col items-center justify-center">
+                      <span className="text-xl font-bold">85%</span>
+                      <span className="text-[10px] text-foreground/30 uppercase">Active</span>
+                    </div>
                   </div>
-                  <div className="flex items-center justify-between">
-                    <span className="text-foreground/70">{t("dashboard.connectionsCount")}</span>
-                    <span className="font-bold text-foreground">{dashboardData.stats.connectionsCount}</span>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <span className="text-foreground/70">{t("dashboard.messagesCount")}</span>
-                    <span className="font-bold text-foreground">{dashboardData.stats.messagesCount}</span>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <span className="text-foreground/70">{t("dashboard.opportunitiesSaved")}</span>
-                    <span className="font-bold text-foreground">{dashboardData.stats.opportunitiesSaved}</span>
+                  <div className="space-y-4 text-sm text-foreground/60">
+                    <div className="flex items-center gap-2"><div className="w-2 h-2 rounded-full bg-primary" /> Events (60%)</div>
+                    <div className="flex items-center gap-2"><div className="w-2 h-2 rounded-full bg-primary/50" /> Community (25%)</div>
+                    <div className="flex items-center gap-2"><div className="w-2 h-2 rounded-full bg-foreground/10" /> Tasks (15%)</div>
                   </div>
                 </div>
               </div>
 
-              {/* Recommended Connections */}
-              <div className="bg-card border border-border rounded-xl p-6">
-                <div className="flex items-center justify-between mb-4">
-                  <h3 className="font-semibold text-foreground">{t("dashboard.recommendedConnections")}</h3>
-                  <TrendingUp className="w-5 h-5 text-primary" />
+              {/* Connection List */}
+              <div className="bg-card rounded-2xl p-6 border border-border">
+                <div className="flex items-center justify-between mb-6">
+                  <h2 className="font-bold">Recommended Connections</h2>
+                  <MoreVertical className="w-4 h-4 text-foreground/30" />
                 </div>
                 <div className="space-y-4">
-                  {recommendedConnectionsList.map((person, index) => (
-                    <div key={index} className="flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-full overflow-hidden bg-muted">
-                        <Image src={person.avatar || "/placeholder.svg"} alt={person.name} width={40} height={40} className="object-cover" />
+                  {dashboardData.recommendedConnections.slice(0, 3).map((conn) => (
+                    <div key={conn.id} className="flex items-center gap-3">
+                      <div className="w-10 h-10 rounded-full overflow-hidden bg-foreground/5">
+                        <Image src={conn.image || "/placeholder.svg"} alt={conn.name} width={40} height={40} />
                       </div>
                       <div className="flex-1 min-w-0">
-                        <p className="font-medium text-foreground text-sm truncate">{person.name}</p>
-                        <p className="text-xs text-foreground/50 truncate">{person.role}</p>
+                        <p className="text-sm font-bold truncate">{conn.name}</p>
+                        <p className="text-xs text-foreground/40 truncate">{conn.role}</p>
                       </div>
-                      <button className="px-3 py-1 border border-primary text-primary text-xs font-medium rounded-lg hover:bg-primary/5 transition-colors">
-                        {t("dashboard.connect")}
-                      </button>
+                      <button className="px-3 py-1 bg-primary text-primary-foreground text-[10px] font-bold rounded-lg hover:bg-primary/90 transition-colors">Connect</button>
                     </div>
                   ))}
                 </div>
-                <Link
-                  href="/community"
-                  className="block text-center text-sm text-primary hover:underline mt-4"
-                >
-                  {t("dashboard.viewMore")}
-                </Link>
               </div>
+            </div>
 
-              {/* Event Countdown */}
-              <div className="bg-primary/5 border border-primary/20 rounded-xl p-6">
-                <h3 className="font-semibold text-foreground mb-2">{t("dashboard.eventCountdown")}</h3>
-                <p className="text-foreground/70 text-sm mb-4">PASS AVENIR Summit 2025</p>
-                <div className="grid grid-cols-4 gap-2 text-center">
-                  <div className="bg-background rounded-lg p-2">
-                    <p className="text-2xl font-bold text-primary">{countdown.days}</p>
-                    <p className="text-xs text-foreground/50">{t("dashboard.days")}</p>
-                  </div>
-                  <div className="bg-background rounded-lg p-2">
-                    <p className="text-2xl font-bold text-primary">{countdown.hours}</p>
-                    <p className="text-xs text-foreground/50">{t("dashboard.hours")}</p>
-                  </div>
-                  <div className="bg-background rounded-lg p-2">
-                    <p className="text-2xl font-bold text-primary">{countdown.minutes}</p>
-                    <p className="text-xs text-foreground/50">{t("dashboard.minutes")}</p>
-                  </div>
-                  <div className="bg-background rounded-lg p-2">
-                    <p className="text-2xl font-bold text-primary">{countdown.seconds}</p>
-                    <p className="text-xs text-foreground/50">{t("dashboard.seconds")}</p>
-                  </div>
-                </div>
+            {/* Agenda Preview */}
+            <div className="mt-8 bg-card rounded-2xl p-6 border border-border">
+              <div className="flex items-center justify-between mb-6">
+                <h2 className="font-bold">Upcoming Agenda</h2>
+                <button className="flex items-center gap-1 text-xs text-primary font-bold uppercase tracking-widest">
+                  View Full <ChevronRight className="w-3 h-3" />
+                </button>
               </div>
+              <table className="w-full text-left text-sm">
+                <thead>
+                  <tr className="text-foreground/20 border-b border-border">
+                    <th className="pb-4 font-bold uppercase text-[10px]">Event Name</th>
+                    <th className="pb-4 font-bold uppercase text-[10px]">Type</th>
+                    <th className="pb-4 font-bold uppercase text-[10px] text-right">Date</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-border">
+                  {dashboardData.upcomingEvents.slice(0, 3).map((event, i) => (
+                    <tr key={i} className="group">
+                      <td className="py-4 font-medium text-foreground/80 group-hover:text-foreground transition-colors">{event.title}</td>
+                      <td className="py-4 text-foreground/40">{event.type || "Workshop"}</td>
+                      <td className="py-4 text-right text-foreground/60">{new Date(event.date).toLocaleDateString()}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
             </div>
           </div>
+        </main>
 
-          {/* Connection Matcher Section */}
-          <div className="mt-12">
-            <div className="flex items-center justify-between mb-6">
-              <div>
-                <h2 className="text-2xl font-bold text-foreground">Discover Connections</h2>
-                <p className="text-foreground/70">Find perfect matches based on your interests and goals</p>
-              </div>
-              <Link href="/community" className="text-primary font-medium hover:underline flex items-center gap-2">
-                View All <ChevronRight className="w-4 h-4" />
-              </Link>
+        {/* --- Sidebar Droite --- */}
+        <aside className="w-80 bg-card border-l border-border flex flex-col hidden xl:flex">
+          <div className="p-8">
+            <h2 className="font-bold mb-6">Notifications</h2>
+            <div className="space-y-6">
+              <NotificationItem icon={Users} text="56 New users registered" time="Just now" color="text-primary" />
+              <NotificationItem icon={Calendar} text="Session starting in 15m" time="59m ago" color="text-amber-500" />
+              <NotificationItem icon={Star} text="New badge earned" time="12h ago" color="text-primary" />
             </div>
-            <div className="bg-card rounded-lg border border-border p-8">
-              <ConnectionMatcher
-            initialSuggestions={dashboardData.recommendedConnections.map(c => ({
-              id: c.id,
-              name: c.name,
-              role: c.role,
-              image: c.image,
-              interests: [],
-            }))}
-            onConnect={(id) => {
-              setDashboardData((prev) => {
-                if (!prev) return prev;
-                const recs = prev.recommendedConnections.filter((r) => r.id !== id);
-                return {
-                  ...prev,
-                  recommendedConnections: recs,
-                  stats: { ...prev.stats, connectionsCount: prev.stats.connectionsCount + 1 },
-                };
-              });
-            }}
-          />
+
+            <div className="mt-12">
+              <h2 className="font-bold mb-6">Recent Activity</h2>
+              <div className="space-y-6 relative before:absolute before:left-[11px] before:top-2 before:bottom-2 before:w-[1px] before:bg-foreground/5">
+                <ActivityItem dotColor="bg-primary" label="Profile updated" time="Just now" />
+                <ActivityItem dotColor="bg-foreground/20" label="Joined Community" time="4h ago" />
+                <ActivityItem dotColor="bg-foreground/20" label="Event registered" time="1d ago" />
+              </div>
+            </div>
+
+            <div className="mt-12 bg-gradient-to-br from-card to-background border border-border rounded-2xl p-6 text-center">
+              <div className="w-16 h-16 bg-primary/10 border border-primary/20 rounded-full flex items-center justify-center mx-auto mb-4">
+                <TrendingUp className="w-8 h-8 text-primary" />
+              </div>
+              <h3 className="font-bold text-lg mb-2">Upgrade Profile</h3>
+              <p className="text-xs text-foreground/40 mb-6 leading-relaxed">Boost your visibility and get recommended to top institutions.</p>
+              <button className="w-full bg-primary text-primary-foreground py-3 rounded-xl font-bold text-sm hover:scale-[1.02] transition-transform">Get Started</button>
             </div>
           </div>
+        </aside>
+      </div>
+    </div>
+  )
+}
 
-          {/* Stats Cards */}
-          <div className="mt-12 grid grid-cols-1 md:grid-cols-4 gap-4">
-            <div className="bg-card border border-border rounded-lg p-6">
-              <div className="flex items-center justify-between mb-3">
-                <Star className="w-5 h-5 text-secondary" />
-                <span className="text-sm text-foreground/70">This Month</span>
-              </div>
-              <p className="text-3xl font-bold text-foreground mb-1">8</p>
-              <p className="text-sm text-foreground/70">New Connections</p>
-            </div>
+function NavItem({ icon: Icon, label, active = false }: { icon: any, label: string, active?: boolean }) {
+  return (
+    <div className={`flex items-center gap-3 px-3 py-2 rounded-lg cursor-pointer transition-colors ${active ? "bg-primary text-primary-foreground" : "text-foreground/40 hover:bg-foreground/5 hover:text-foreground"}`}>
+      <Icon className="w-4 h-4" />
+      <span className="text-sm font-bold">{label}</span>
+    </div>
+  )
+}
 
-            <div className="bg-card border border-border rounded-lg p-6">
-              <div className="flex items-center justify-between mb-3">
-                <TrendingUp className="w-5 h-5 text-secondary" />
-                <span className="text-sm text-foreground/70">This Month</span>
-              </div>
-              <p className="text-3xl font-bold text-foreground mb-1">15</p>
-              <p className="text-sm text-foreground/70">Profile Views</p>
-            </div>
+function StatCard({ title, value, trend, trendDir }: { title: string, value: string, trend: string, trendDir: "up" | "down" | "neutral" }) {
+  return (
+    <div className="bg-card border border-border p-6 rounded-2xl">
+      <p className="text-xs text-foreground/40 font-bold uppercase tracking-widest mb-2">{title}</p>
+      <h3 className="text-2xl font-bold mb-3">{value}</h3>
+      <div className={`flex items-center gap-1 text-[10px] font-bold ${trendDir === "up" ? "text-primary" : "text-foreground/30"}`}>
+        <ChevronRight className={`w-3 h-3 ${trendDir === "up" ? "-rotate-90" : ""}`} />
+        {trend} vs last month
+      </div>
+    </div>
+  )
+}
 
-            <div className="bg-card border border-border rounded-lg p-6">
-              <div className="flex items-center justify-between mb-3">
-                <Award className="w-5 h-5 text-secondary" />
-                <span className="text-sm text-foreground/70">Achievements</span>
-              </div>
-              <p className="text-3xl font-bold text-foreground mb-1">3</p>
-              <p className="text-sm text-foreground/70">Badges Earned</p>
-            </div>
+function NotificationItem({ icon: Icon, text, time, color }: { icon: any, text: string, time: string, color: string }) {
+  return (
+    <div className="flex gap-4">
+      <div className={`w-8 h-8 rounded-lg bg-foreground/5 flex items-center justify-center shrink-0`}>
+        <Icon className={`w-4 h-4 ${color}`} />
+      </div>
+      <div className="min-w-0">
+        <p className="text-xs font-bold leading-snug mb-1">{text}</p>
+        <p className="text-[10px] text-foreground/30">{time}</p>
+      </div>
+    </div>
+  )
+}
 
-            <div className="bg-card border border-border rounded-lg p-6">
-              <div className="flex items-center justify-between mb-3">
-                <MessageSquare className="w-5 h-5 text-secondary" />
-                <span className="text-sm text-foreground/70">Total</span>
-              </div>
-              <p className="text-3xl font-bold text-foreground mb-1">24</p>
-              <p className="text-sm text-foreground/70">Conversations</p>
-            </div>
-          </div>
-
-          {/* Profile Completion */}
-          <div className="mt-8 bg-secondary/5 border border-secondary/20 rounded-lg p-6">
-            <div className="flex items-center justify-between mb-4">
-              <div>
-                <h3 className="font-bold text-foreground mb-1">Complete Your Profile</h3>
-                <p className="text-sm text-foreground/70">Add more details to increase visibility and match quality</p>
-              </div>
-              <Link href="/profile" className="px-4 py-2 bg-secondary text-secondary-foreground rounded-lg font-medium hover:opacity-90 transition-opacity">
-                Complete
-              </Link>
-            </div>
-            <div className="w-full bg-muted rounded-full h-2">
-              <div className="bg-secondary h-2 rounded-full" style={{ width: "65%" }}></div>
-            </div>
-            <p className="text-xs text-foreground/70 mt-2">65% Complete</p>
-          </div>
-        </div>
-      </main>
-
-      <Footer />
+function ActivityItem({ dotColor, label, time }: { dotColor: string, label: string, time: string }) {
+  return (
+    <div className="flex items-center gap-4 relative z-0">
+      <div className={`w-6 h-6 rounded-full border-4 border-card ${dotColor} flex items-center justify-center shrink-0`} />
+      <div className="flex-1 min-w-0">
+        <p className="text-[11px] font-bold">{label}</p>
+        <p className="text-[10px] text-foreground/30">{time}</p>
+      </div>
     </div>
   )
 }

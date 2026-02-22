@@ -23,6 +23,7 @@ model User {
   // connections relations
   connections           UserConnection[] @relation("connections")
   connectedTo           UserConnection[] @relation("connectedTo")
+  organization          String?
   createdAt             DateTime @default(now())
   updatedAt             DateTime @updatedAt
 }

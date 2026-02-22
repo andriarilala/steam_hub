@@ -238,13 +238,12 @@ export default function RegisterPage() {
                 <div key={s.num} className="flex items-center">
                   <div className="flex flex-col items-center">
                     <div
-                      className={`w-10 h-10 rounded-full flex items-center justify-center font-medium ${
-                        s.num < step
+                      className={`w-10 h-10 rounded-full flex items-center justify-center font-medium ${s.num < step
                           ? "bg-primary text-primary-foreground"
                           : s.num === step
-                          ? "bg-primary text-primary-foreground"
-                          : "bg-muted text-foreground/50"
-                      }`}
+                            ? "bg-primary text-primary-foreground"
+                            : "bg-muted text-foreground/50"
+                        }`}
                     >
                       {s.num < step ? <Check className="w-5 h-5" /> : s.num}
                     </div>
@@ -253,9 +252,8 @@ export default function RegisterPage() {
                     </span>
                   </div>
                   {index < 1 && (
-                    <div className={`w-16 sm:w-24 h-0.5 mx-2 ${
-                      s.num < step ? "bg-primary" : "bg-border"
-                    }`} />
+                    <div className={`w-16 sm:w-24 h-0.5 mx-2 ${s.num < step ? "bg-primary" : "bg-border"
+                      }`} />
                   )}
                 </div>
               )
@@ -275,11 +273,10 @@ export default function RegisterPage() {
                   <div
                     key={ticket.type}
                     onClick={() => handleTicketSelect(ticket.type)}
-                    className={`relative bg-card border rounded-xl p-6 cursor-pointer transition-all ${
-                      selectedTicket === ticket.type
+                    className={`relative bg-card border rounded-xl p-6 cursor-pointer transition-all ${selectedTicket === ticket.type
                         ? "border-primary ring-2 ring-primary/20"
                         : "border-border hover:border-primary/50"
-                    } ${ticket.popular ? "ring-2 ring-amber-500/20" : ""}`}
+                      } ${ticket.popular ? "ring-2 ring-amber-500/20" : ""}`}
                   >
                     {ticket.popular && (
                       <div className="absolute -top-3 left-1/2 -translate-x-1/2">
