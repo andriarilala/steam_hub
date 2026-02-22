@@ -14,14 +14,14 @@ async function seedDemoData() {
   // users
   const users = [
     {
-      email: "test@example.com",
-      name: "Test User",
-      password: "password123",
+      email: "andriarilala04@gmail.com",
+      name: "Andriarilala User",
+      password: "PassAvenir2025!",
     },
     {
-      email: "second@example.com",
-      name: "Second User",
-      password: "Password123!",
+      email: "ainafandresena9@gmail.com",
+      name: "Aina User",
+      password: "PassAvenir2025!",
     },
   ];
   for (const u of users) {
