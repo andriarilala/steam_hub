@@ -1,6 +1,6 @@
 "use client"
 
-import React from "react"
+import React, { useEffect } from "react"
 
 import { useState } from "react"
 import Link from "next/link"
@@ -21,10 +21,19 @@ const roles: { value: UserRole; labelKey: string; descKey: string }[] = [
 
 export default function SignUpPage() {
   const router = useRouter()
-  const { signUp, signInWithProvider, isLoading } = useAuth()
+  const { signUp, signInWithProvider, isLoading, isAuthenticated } = useAuth()
+  const googleEnabled = Boolean(process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID)
+  const facebookEnabled = Boolean(process.env.NEXT_PUBLIC_FACEBOOK_CLIENT_ID)
   const { t } = useLanguage()
   
   const [step, setStep] = useState(1)
+
+  // redirect if already signed in
+  useEffect(() => {
+    if (isAuthenticated) {
+      router.push("/dashboard")
+    }
+  }, [isAuthenticated, router])
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -67,13 +76,15 @@ export default function SignUpPage() {
       return
     }
     const cleanEmail = formData.email.trim().toLowerCase()
+    const cleanPassword = formData.password.trim()
+    const cleanConfirm = formData.confirmPassword.trim()
     
-    if (formData.password !== formData.confirmPassword) {
+    if (cleanPassword !== cleanConfirm) {
       setError(t("auth.errorPasswordMatch"))
       return
     }
     
-    if (formData.password.length < 8) {
+    if (cleanPassword.length < 8) {
       setError(t("auth.errorPasswordLength"))
       return
     }
@@ -85,7 +96,7 @@ export default function SignUpPage() {
     
     const success = await signUp({
       email: cleanEmail,
-      password: formData.password,
+      password: cleanPassword,
       name: formData.name,
       role: formData.role,
       organization: formData.organization,
@@ -121,10 +132,9 @@ export default function SignUpPage() {
             <div className="space-y-3 mb-8">
               <button
                 type="button"
-                disabled={isLoading}
-                onClick={async () => {
-                  const ok = await signInWithProvider("google")
-                  if (ok) router.push("/dashboard")
+                disabled={isLoading || !googleEnabled}
+                onClick={() => {
+                  signInWithProvider("google").catch(() => {})
                 }}
                 className="w-full border border-border py-3 rounded-lg font-medium hover:bg-muted transition-colors flex items-center justify-center gap-3 disabled:opacity-50"
               >
@@ -139,10 +149,9 @@ export default function SignUpPage() {
               </button>
               <button
                 type="button"
-                disabled={isLoading}
-                onClick={async () => {
-                  const ok = await signInWithProvider("facebook")
-                  if (ok) router.push("/dashboard")
+                disabled={isLoading || !facebookEnabled}
+                onClick={() => {
+                  signInWithProvider("facebook").catch(() => {})
                 }}
                 className="w-full border border-border py-3 rounded-lg font-medium hover:bg-muted transition-colors flex items-center justify-center gap-3 disabled:opacity-50"
               >

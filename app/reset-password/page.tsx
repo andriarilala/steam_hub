@@ -1,122 +1,149 @@
 "use client"
 
-import React from "react"
-
-import { useState } from "react"
+import React, { useState, useEffect } from "react"
+import { useRouter, useSearchParams } from "next/navigation"
 import Link from "next/link"
 import { Navigation } from "@/components/navigation"
 import { Footer } from "@/components/footer"
 import { useLanguage } from "@/lib/language-context"
-import { Mail, CheckCircle, ArrowLeft } from "lucide-react"
+import { Lock, Eye, EyeOff } from "lucide-react"
 
 export default function ResetPasswordPage() {
   const { t } = useLanguage()
-  const [email, setEmail] = useState("")
-  const [submitted, setSubmitted] = useState(false)
-  const [loading, setLoading] = useState(false)
+  const router = useRouter()
+  const params = useSearchParams()
+  const token = params?.get("token")
+
+  const [password, setPassword] = useState("")
+  const [confirm, setConfirm] = useState("")
+  const [show, setShow] = useState(false)
+  const [error, setError] = useState("")
+  const [success, setSuccess] = useState(false)
+  const [isSubmitting, setIsSubmitting] = useState(false)
+
+  useEffect(() => {
+    if (!token) {
+      setError(t("auth.invalidToken"))
+    }
+  }, [token, t])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    setLoading(true)
+    setError("")
+    if (!password || !confirm) {
+      setError(t("auth.errorRequired"))
+      return
+    }
+    if (password !== confirm) {
+      setError(t("auth.errorPasswordMatch"))
+      return
+    }
+    if (password.length < 8) {
+      setError(t("auth.errorPasswordLength"))
+      return
+    }
+    if (!token) return
 
-    // Simulate API call
-    await new Promise((resolve) => setTimeout(resolve, 1500))
-
-    setSubmitted(true)
-    setLoading(false)
+    setIsSubmitting(true)
+    const res = await fetch("/api/auth/reset-password", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ token, password }),
+    })
+    setIsSubmitting(false)
+    if (res.ok) {
+      setSuccess(true)
+    } else {
+      setError(t("auth.invalidToken"))
+    }
   }
 
   return (
-    <main className="min-h-screen bg-background flex flex-col">
+    <div className="min-h-screen bg-background">
       <Navigation />
+      <main className="pt-24 pb-16">
+        <div className="max-w-md mx-auto px-4">
+          <div className="text-center mb-8">
+            <h1 className="text-3xl font-bold text-foreground mb-2">
+              {t("auth.resetPasswordTitle")}
+            </h1>
+            <p className="text-foreground/70">
+              {t("auth.resetPasswordSubtitle")}
+            </p>
+          </div>
 
-      <div className="flex-1 flex items-center justify-center px-4 sm:px-6 lg:px-8">
-        <div className="w-full max-w-md">
-          <div className="bg-card border border-border rounded-lg p-8">
-            {!submitted ? (
-              <>
-                <h1 className="text-3xl font-bold text-foreground mb-2 text-center">Reset Your Password</h1>
-                <p className="text-foreground/70 text-center mb-8">
-                  Enter your email address and we'll send you a link to reset your password.
-                </p>
-
-                <form onSubmit={handleSubmit} className="space-y-6">
-                  <div>
-                    <label htmlFor="email" className="block text-sm font-bold text-foreground mb-2">
-                      Email Address
-                    </label>
-                    <input
-                      id="email"
-                      type="email"
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                      required
-                      className="w-full px-4 py-3 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary text-foreground"
-                      placeholder="you@example.com"
-                    />
-                  </div>
-
-                  <button
-                    type="submit"
-                    disabled={loading}
-                    className="w-full bg-primary text-primary-foreground px-4 py-3 rounded-lg font-bold hover:opacity-90 transition-opacity disabled:opacity-50"
-                  >
-                    {loading ? "Sending..." : "Send Reset Link"}
-                  </button>
-                </form>
-
-                <Link href="/signin" className="flex items-center justify-center gap-2 mt-6 text-primary hover:underline font-medium">
-                  <ArrowLeft className="w-4 h-4" />
-                  Back to Sign In
-                </Link>
-              </>
-            ) : (
-              <>
-                <div className="text-center">
-                  <CheckCircle className="w-16 h-16 text-green-500 mx-auto mb-4" />
-                  <h1 className="text-3xl font-bold text-foreground mb-2">Check Your Email</h1>
-                  <p className="text-foreground/70 mb-6">
-                    We've sent a password reset link to <span className="font-semibold">{email}</span>
-                  </p>
-                  <p className="text-sm text-foreground/60 mb-8">
-                    Click the link in your email to reset your password. The link expires in 24 hours.
-                  </p>
-
-                  <div className="bg-primary/5 border border-primary/20 rounded-lg p-4 mb-8 text-sm text-foreground/70">
-                    <p className="mb-3">Didn't receive the email?</p>
-                    <ul className="list-disc list-inside space-y-1">
-                      <li>Check your spam or junk folder</li>
-                      <li>Make sure you entered the correct email</li>
-                      <li>Wait a few minutes and try again</li>
-                    </ul>
-                  </div>
-
-                  <button
-                    onClick={() => {
-                      setSubmitted(false)
-                      setEmail("")
-                    }}
-                    className="text-primary hover:underline font-medium mb-4"
-                  >
-                    Try Another Email
-                  </button>
-
-                  <Link href="/" className="block text-primary hover:underline font-medium">
-                    Back to Home
-                  </Link>
+          {success ? (
+            <div className="bg-green-500/10 border border-green-500/20 text-green-700 px-4 py-3 rounded-lg text-sm">
+              {t("auth.resetSuccess")}
+            </div>
+          ) : (
+            <form onSubmit={handleSubmit} className="space-y-6">
+              {error && (
+                <div className="bg-destructive/10 border border-destructive/20 text-destructive px-4 py-3 rounded-lg text-sm">
+                  {error}
                 </div>
-              </>
-            )}
-          </div>
+              )}
 
-          {/* Help Section */}
-          <div className="mt-8 text-center text-sm text-foreground/60">
-            <p>Need help? Contact our support team at support@passavenir.com</p>
-          </div>
+              <div>
+                <label htmlFor="password" className="block text-sm font-medium text-foreground mb-2">
+                  {t("auth.newPassword")}
+                </label>
+                <div className="relative">
+                  <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-foreground/40" />
+                  <input
+                    type={show ? "text" : "password"}
+                    id="password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    className="w-full pl-10 pr-12 py-3 bg-muted border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/50 text-foreground"
+                    placeholder="********"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShow(!show)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-foreground/40 hover:text-foreground"
+                  >
+                    {show ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                  </button>
+                </div>
+              </div>
+
+              <div>
+                <label htmlFor="confirm" className="block text-sm font-medium text-foreground mb-2">
+                  {t("auth.confirmPassword")}
+                </label>
+                <input
+                  type={show ? "text" : "password"}
+                  id="confirm"
+                  value={confirm}
+                  onChange={(e) => setConfirm(e.target.value)}
+                  className="w-full pl-3 pr-3 py-3 bg-muted border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/50 text-foreground"
+                  placeholder="********"
+                />
+              </div>
+
+              <button
+                type="submit"
+                disabled={isSubmitting || !token}
+                className="w-full bg-primary text-primary-foreground py-3 rounded-lg font-medium hover:opacity-90 transition-opacity disabled:opacity-50"
+              >
+                {isSubmitting ? (
+                  <span className="w-5 h-5 border-2 border-primary-foreground/30 border-t-primary-foreground rounded-full animate-spin" />
+                ) : (
+                  t("auth.resetPassword")
+                )}
+              </button>
+            </form>
+          )}
+
+          <p className="text-center mt-8 text-foreground/70">
+            <Link href="/signin" className="text-primary font-medium hover:underline">
+              {t("auth.backToSignIn")}
+            </Link>
+          </p>
         </div>
-      </div>
-
+      </main>
       <Footer />
-    </main>
+    </div>
   )
 }

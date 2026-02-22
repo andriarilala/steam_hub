@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect } from "react"
+import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
 import Image from "next/image"
@@ -30,13 +30,50 @@ export default function DashboardPage() {
   const { user, isAuthenticated, isLoading, signOut } = useAuth()
   const { t } = useLanguage()
 
+  const [dashboardData, setDashboardData] = useState<{
+    upcomingEvents: { title: string; description?: string; date: string; type?: string }[]
+    recommendedConnections: { id: string; name: string; role: string; image: string }[]
+    stats: { sessionsAttended: number; connectionsCount: number; messagesCount: number; opportunitiesSaved: number }
+  } | null>(null)
+
+  // countdown to next event (hook placed before conditional returns)
+  const [countdown, setCountdown] = useState({ days: 0, hours: 0, minutes: 0, seconds: 0 });
+  useEffect(() => {
+    if (!dashboardData) return;
+    const target = dashboardData.upcomingEvents[0]
+      ? new Date(dashboardData.upcomingEvents[0].date)
+      : new Date("2025-03-15T00:00:00Z");
+    const tick = () => {
+      const diff = target.getTime() - Date.now();
+      const d = Math.max(0, Math.floor(diff / (1000 * 60 * 60 * 24)));
+      const h = Math.max(0, Math.floor(diff / (1000 * 60 * 60)) % 24);
+      const m = Math.max(0, Math.floor(diff / (1000 * 60)) % 60);
+      const s = Math.max(0, Math.floor(diff / 1000) % 60);
+      setCountdown({ days: d, hours: h, minutes: m, seconds: s });
+    };
+    tick();
+    const iv = setInterval(tick, 1000);
+    return () => clearInterval(iv);
+  }, [dashboardData]);
+
   useEffect(() => {
     if (!isLoading && !isAuthenticated) {
       router.push("/signin")
     }
   }, [isLoading, isAuthenticated, router])
 
-  if (isLoading) {
+  useEffect(() => {
+    if (isAuthenticated) {
+      fetch("/api/dashboard")
+        .then((res) => res.json())
+        .then((data) => {
+          setDashboardData(data)
+        })
+        .catch((err) => console.error("failed to load dashboard data", err))
+    }
+  }, [isAuthenticated])
+
+  if (isLoading || !dashboardData) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="w-8 h-8 border-4 border-primary/30 border-t-primary rounded-full animate-spin" />
@@ -47,6 +84,16 @@ export default function DashboardPage() {
   if (!user) {
     return null
   }
+
+  const profileCompletionPercentage = Math.floor(
+    ([
+      (user as any).name,
+      (user as any).emailVerified,
+      (user as any).organization,
+      (user as any).bio,
+      (user as any).image,
+    ].filter(Boolean).length / 5) * 100
+  );
 
   const handleSignOut = () => {
     signOut()
@@ -60,17 +107,18 @@ export default function DashboardPage() {
     { icon: BookOpen, label: t("dashboard.accessContent"), href: "/community", color: "bg-purple-500" },
   ]
 
-  const upcomingSessions = [
-    { title: "Opening Keynote: Africa's Digital Future", time: "9:00 AM", date: "Mar 15", type: "Keynote" },
-    { title: "Workshop: Building Your Personal Brand", time: "2:00 PM", date: "Mar 15", type: "Workshop" },
-    { title: "Networking: Tech Leaders Meetup", time: "5:00 PM", date: "Mar 15", type: "Networking" },
-  ]
+  const upcomingSessions = dashboardData.upcomingEvents.map((e) => ({
+    title: e.title,
+    time: new Date(e.date).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
+    date: new Date(e.date).toLocaleDateString(undefined, { month: "short", day: "numeric" }),
+    type: e.type || "",
+  }))
 
-  const recommendedConnections = [
-    { name: "Sarah Johnson", role: "Software Engineer at Google", avatar: "/networking-professionals-conference.jpg" },
-    { name: "Michael Chen", role: "Startup Founder", avatar: "/startup-pitch-competition.jpg" },
-    { name: "Amina Diallo", role: "HR Director at Microsoft", avatar: "/women-leadership-panel.jpg" },
-  ]
+  const recommendedConnectionsList = dashboardData.recommendedConnections.map((c) => ({
+    name: c.name,
+    role: c.role,
+    avatar: c.image,
+  }))
 
   return (
     <div className="min-h-screen bg-background">
@@ -79,31 +127,23 @@ export default function DashboardPage() {
       <main className="pt-20 pb-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           {/* Welcome Header */}
-          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-8 pt-4">
+          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-4 pt-4">
             <div>
               <h1 className="text-3xl font-bold text-foreground">
                 {t("dashboard.welcome")}, {user.name}!
               </h1>
               <p className="text-foreground/70 mt-1">{t("dashboard.subtitle")}</p>
             </div>
-            <div className="flex items-center gap-3">
-              <button className="p-2 rounded-lg border border-border hover:bg-muted transition-colors relative">
-                <Bell className="w-5 h-5" />
-                <span className="absolute -top-1 -right-1 w-4 h-4 bg-primary text-primary-foreground text-xs rounded-full flex items-center justify-center">
-                  3
-                </span>
-              </button>
-              <button className="p-2 rounded-lg border border-border hover:bg-muted transition-colors">
-                <Settings className="w-5 h-5" />
-              </button>
-              <button
-                onClick={handleSignOut}
-                className="flex items-center gap-2 px-4 py-2 rounded-lg border border-border hover:bg-muted transition-colors"
-              >
-                <LogOut className="w-4 h-4" />
-                <span className="hidden sm:inline">{t("dashboard.signOut")}</span>
-              </button>
-            </div>
+          </div>
+          {/* Mission / vision section */}
+          <div className="bg-card border border-border rounded-xl p-6 mb-8">
+            <h2 className="text-xl font-semibold text-foreground mb-2">
+              {t("dashboard.missionTitle")}
+            </h2>
+            <p className="text-foreground/70">{t("dashboard.missionDesc")}</p>
+            <Link href="/partners" className="inline-block mt-4 text-primary hover:underline">
+              {t("dashboard.sponsorHub")}
+            </Link>
           </div>
 
           <div className="grid lg:grid-cols-3 gap-8">
@@ -131,7 +171,7 @@ export default function DashboardPage() {
                     <div className="flex items-center gap-4 mt-3">
                       <div className="flex items-center gap-1 text-sm text-foreground/70">
                         <Users className="w-4 h-4" />
-                        <span>{user.connections || 0} {t("dashboard.connections")}</span>
+                        <span>{dashboardData.stats.connectionsCount} {t("dashboard.connections")}</span>
                       </div>
                       <div className="flex items-center gap-1 text-sm text-foreground/70">
                         <Award className="w-4 h-4" />
@@ -151,10 +191,10 @@ export default function DashboardPage() {
                 <div className="mt-6 pt-6 border-t border-border">
                   <div className="flex items-center justify-between mb-2">
                     <span className="text-sm font-medium text-foreground">{t("dashboard.profileCompletion")}</span>
-                    <span className="text-sm font-medium text-primary">60%</span>
+                    <span className="text-sm font-medium text-primary">{profileCompletionPercentage}%</span>
                   </div>
                   <div className="h-2 bg-muted rounded-full overflow-hidden">
-                    <div className="h-full bg-primary rounded-full" style={{ width: "60%" }} />
+                    <div className="h-full bg-primary rounded-full" style={{ width: `${profileCompletionPercentage}%` }} />
                   </div>
                   <p className="text-xs text-foreground/50 mt-2">{t("dashboard.completeProfile")}</p>
                 </div>
@@ -223,19 +263,19 @@ export default function DashboardPage() {
                 <div className="space-y-4">
                   <div className="flex items-center justify-between">
                     <span className="text-foreground/70">{t("dashboard.sessionsAttended")}</span>
-                    <span className="font-bold text-foreground">0</span>
+                    <span className="font-bold text-foreground">{dashboardData.stats.sessionsAttended}</span>
                   </div>
                   <div className="flex items-center justify-between">
                     <span className="text-foreground/70">{t("dashboard.connectionsCount")}</span>
-                    <span className="font-bold text-foreground">{user.connections || 0}</span>
+                    <span className="font-bold text-foreground">{dashboardData.stats.connectionsCount}</span>
                   </div>
                   <div className="flex items-center justify-between">
                     <span className="text-foreground/70">{t("dashboard.messagesCount")}</span>
-                    <span className="font-bold text-foreground">0</span>
+                    <span className="font-bold text-foreground">{dashboardData.stats.messagesCount}</span>
                   </div>
                   <div className="flex items-center justify-between">
                     <span className="text-foreground/70">{t("dashboard.opportunitiesSaved")}</span>
-                    <span className="font-bold text-foreground">0</span>
+                    <span className="font-bold text-foreground">{dashboardData.stats.opportunitiesSaved}</span>
                   </div>
                 </div>
               </div>
@@ -247,7 +287,7 @@ export default function DashboardPage() {
                   <TrendingUp className="w-5 h-5 text-primary" />
                 </div>
                 <div className="space-y-4">
-                  {recommendedConnections.map((person, index) => (
+                  {recommendedConnectionsList.map((person, index) => (
                     <div key={index} className="flex items-center gap-3">
                       <div className="w-10 h-10 rounded-full overflow-hidden bg-muted">
                         <Image src={person.avatar || "/placeholder.svg"} alt={person.name} width={40} height={40} className="object-cover" />
@@ -276,19 +316,19 @@ export default function DashboardPage() {
                 <p className="text-foreground/70 text-sm mb-4">PASS AVENIR Summit 2025</p>
                 <div className="grid grid-cols-4 gap-2 text-center">
                   <div className="bg-background rounded-lg p-2">
-                    <p className="text-2xl font-bold text-primary">45</p>
+                    <p className="text-2xl font-bold text-primary">{countdown.days}</p>
                     <p className="text-xs text-foreground/50">{t("dashboard.days")}</p>
                   </div>
                   <div className="bg-background rounded-lg p-2">
-                    <p className="text-2xl font-bold text-primary">12</p>
+                    <p className="text-2xl font-bold text-primary">{countdown.hours}</p>
                     <p className="text-xs text-foreground/50">{t("dashboard.hours")}</p>
                   </div>
                   <div className="bg-background rounded-lg p-2">
-                    <p className="text-2xl font-bold text-primary">30</p>
+                    <p className="text-2xl font-bold text-primary">{countdown.minutes}</p>
                     <p className="text-xs text-foreground/50">{t("dashboard.minutes")}</p>
                   </div>
                   <div className="bg-background rounded-lg p-2">
-                    <p className="text-2xl font-bold text-primary">15</p>
+                    <p className="text-2xl font-bold text-primary">{countdown.seconds}</p>
                     <p className="text-xs text-foreground/50">{t("dashboard.seconds")}</p>
                   </div>
                 </div>
@@ -308,7 +348,26 @@ export default function DashboardPage() {
               </Link>
             </div>
             <div className="bg-card rounded-lg border border-border p-8">
-              <ConnectionMatcher />
+              <ConnectionMatcher
+            initialSuggestions={dashboardData.recommendedConnections.map(c => ({
+              id: c.id,
+              name: c.name,
+              role: c.role,
+              image: c.image,
+              interests: [],
+            }))}
+            onConnect={(id) => {
+              setDashboardData((prev) => {
+                if (!prev) return prev;
+                const recs = prev.recommendedConnections.filter((r) => r.id !== id);
+                return {
+                  ...prev,
+                  recommendedConnections: recs,
+                  stats: { ...prev.stats, connectionsCount: prev.stats.connectionsCount + 1 },
+                };
+              });
+            }}
+          />
             </div>
           </div>
 

@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { useLanguage } from "@/lib/language-context"
 import { Heart, X, MapPin, Briefcase, Award, MessageCircle, UserCheck } from "lucide-react"
 
@@ -8,66 +8,29 @@ interface Connection {
   id: string
   name: string
   role: string
-  company: string
-  location: string
   image: string
-  interests: string[]
-  matchScore: number
-  bio: string
+  company?: string
+  location?: string
+  interests?: string[]
+  matchScore?: number
+  bio?: string
 }
 
-const suggestedConnections: Connection[] = [
-  {
-    id: "1",
-    name: "Amara Diallo",
-    role: "Software Engineer",
-    company: "Google Africa",
-    location: "Accra, Ghana",
-    image: "/placeholder.svg",
-    interests: ["Tech", "Startup", "Mentorship"],
-    matchScore: 95,
-    bio: "Passionate about building scalable solutions for African markets. Open to mentoring junior developers.",
-  },
-  {
-    id: "2",
-    name: "Michael Okonkwo",
-    role: "Talent Manager",
-    company: "Accenture",
-    location: "Lagos, Nigeria",
-    image: "/placeholder.svg",
-    interests: ["Recruitment", "Leadership", "Training"],
-    matchScore: 88,
-    bio: "Looking for talented individuals to join our growing team. Experienced in tech recruitment.",
-  },
-  {
-    id: "3",
-    name: "Fatima Razafy",
-    role: "Entrepreneur",
-    company: "SafariHub (Startup)",
-    location: "Addis Ababa, Ethiopia",
-    image: "/placeholder.svg",
-    interests: ["Innovation", "Startup", "Networking"],
-    matchScore: 82,
-    bio: "Building the future of e-commerce in Africa. Always interested in strategic partnerships.",
-  },
-  {
-    id: "4",
-    name: "Dr. Kwesi Mensah",
-    role: "Professor & Mentor",
-    company: "Ashesi University",
-    location: "Berekuso, Ghana",
-    image: "/placeholder.svg",
-    interests: ["Education", "Mentorship", "Research"],
-    matchScore: 79,
-    bio: "Professor of Computer Science dedicated to developing Africa's next generation of innovators.",
-  },
-]
+interface ConnectionMatcherProps {
+  initialSuggestions?: Connection[]
+  onConnect?: (id: string) => void
+}
 
-export function ConnectionMatcher() {
+export function ConnectionMatcher({ initialSuggestions = [], onConnect }: ConnectionMatcherProps) {
   const { t } = useLanguage()
-  const [connections, setConnections] = useState(suggestedConnections)
+  const [connections, setConnections] = useState<Connection[]>(initialSuggestions)
   const [currentIndex, setCurrentIndex] = useState(0)
   const [liked, setLiked] = useState<string[]>([])
+
+  useEffect(() => {
+    setConnections(initialSuggestions)
+    setCurrentIndex(0)
+  }, [initialSuggestions])
 
   if (connections.length === 0 || currentIndex >= connections.length) {
     return (
@@ -80,7 +43,20 @@ export function ConnectionMatcher() {
 
   const currentConnection = connections[currentIndex]
 
-  const handleLike = () => {
+  const handleLike = async () => {
+    // persist connection on the server
+    try {
+      const res = await fetch("/api/connections", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ targetId: currentConnection.id }),
+      })
+      if (res.ok && onConnect) {
+        onConnect(currentConnection.id)
+      }
+    } catch (err) {
+      console.error("failed to save connection", err)
+    }
     setLiked([...liked, currentConnection.id])
     setCurrentIndex((i) => Math.min(i + 1, connections.length))
   }
@@ -126,13 +102,15 @@ export function ConnectionMatcher() {
           <p className="text-foreground/80 mb-4">{currentConnection.bio}</p>
 
           {/* Interests */}
-          <div className="flex flex-wrap gap-2 mb-6">
-            {currentConnection.interests.map((interest) => (
-              <span key={interest} className="bg-primary/10 text-primary px-3 py-1 rounded-full text-xs font-medium">
-                {interest}
-              </span>
-            ))}
-          </div>
+          {currentConnection.interests && currentConnection.interests.length > 0 && (
+            <div className="flex flex-wrap gap-2 mb-6">
+              {currentConnection.interests.map((interest) => (
+                <span key={interest} className="bg-primary/10 text-primary px-3 py-1 rounded-full text-xs font-medium">
+                  {interest}
+                </span>
+              ))}
+            </div>
+          )}
 
           {/* Action Buttons */}
           <div className="flex gap-4">
@@ -157,7 +135,7 @@ export function ConnectionMatcher() {
       {/* Progress */}
       <div className="text-center text-sm text-foreground/60">
         <span>
-          {currentIndex + 1} of {suggestedConnections.length} suggestions
+          {currentIndex + 1} of {connections.length} suggestions
         </span>
       </div>
     </div>

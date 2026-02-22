@@ -1,6 +1,6 @@
 "use client"
 
-import React from "react"
+import React, { useEffect } from "react"
 
 import { useState } from "react"
 import Link from "next/link"
@@ -13,7 +13,9 @@ import { useLanguage } from "@/lib/language-context"
 
 export default function SignInPage() {
   const router = useRouter()
-  const { signIn, signInWithProvider, isLoading } = useAuth()
+  const { signIn, signInWithProvider, isLoading, isAuthenticated } = useAuth()
+  const googleEnabled = Boolean(process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID)
+  const facebookEnabled = Boolean(process.env.NEXT_PUBLIC_FACEBOOK_CLIENT_ID)
   const { t } = useLanguage()
   
   const [email, setEmail] = useState("")
@@ -21,6 +23,13 @@ export default function SignInPage() {
   const [showPassword, setShowPassword] = useState(false)
   const [remember, setRemember] = useState(false)
   const [error, setError] = useState("")
+
+  // redirect if already signed in
+  useEffect(() => {
+    if (isAuthenticated) {
+      router.push("/dashboard")
+    }
+  }, [isAuthenticated, router])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -31,7 +40,8 @@ export default function SignInPage() {
       return
     }
     const cleanEmail = email.trim().toLowerCase()
-    const success = await signIn(cleanEmail, password, remember)
+    const cleanPassword = password.trim()
+    const success = await signIn(cleanEmail, cleanPassword, remember)
     if (success) {
       router.push("/dashboard")
     } else {
@@ -147,12 +157,10 @@ export default function SignInPage() {
           <div className="space-y-3">
             <button
             type="button"
-            disabled={isLoading}
-            onClick={async () => {
+            disabled={isLoading || !googleEnabled}
+            onClick={() => {
               setError("")
-              const ok = await signInWithProvider("google", remember)
-              if (ok) router.push("/dashboard")
-              else setError(t("auth.errorSignIn"))
+              signInWithProvider("google", remember).catch(() => setError(t("auth.errorSignIn")))
             }}
             className="w-full border border-border py-3 rounded-lg font-medium hover:bg-muted transition-colors flex items-center justify-center gap-3 disabled:opacity-50"
           >
@@ -166,12 +174,10 @@ export default function SignInPage() {
           </button>
           <button
             type="button"
-            disabled={isLoading}
-            onClick={async () => {
+            disabled={isLoading || !facebookEnabled}
+            onClick={() => {
               setError("")
-              const ok = await signInWithProvider("facebook", remember)
-              if (ok) router.push("/dashboard")
-              else setError(t("auth.errorSignIn"))
+              signInWithProvider("facebook", remember).catch(() => setError(t("auth.errorSignIn")))
             }}
             className="w-full border border-border py-3 rounded-lg font-medium hover:bg-muted transition-colors flex items-center justify-center gap-3 disabled:opacity-50"
           >
