@@ -85,9 +85,11 @@ async function seedDemoData() {
 }
 
 // trigger seeding asynchronously (errors logged)
-seedDemoData().catch((e) => {
-  console.error("Error seeding demo data", e);
-});
+if (process.env.NODE_ENV === "development") {
+  seedDemoData().catch((e) => {
+    console.error("Error seeding demo data", e);
+  });
+}
 
 // read secrets from environment variables
 // make sure to define NEXTAUTH_URL as well (e.g. http://localhost:3000)
@@ -95,6 +97,9 @@ seedDemoData().catch((e) => {
 // use provided secret or generate a random one in development
 let nextAuthSecret = process.env.NEXTAUTH_SECRET;
 if (!nextAuthSecret) {
+  if (process.env.NODE_ENV === "production") {
+    throw new Error("❌ NEXTAUTH_SECRET is required in production. Please set it in your environment variables.");
+  }
   nextAuthSecret = crypto.randomBytes(32).toString("hex");
   // set it on the environment so NextAuth internal checks pass
   process.env.NEXTAUTH_SECRET = nextAuthSecret;
