@@ -11,6 +11,7 @@ import {
   LogOut,
   ShieldCheck,
   ChevronRight,
+  Ticket,
 } from "lucide-react";
 import { useAuth } from "@/lib/auth-context";
 
@@ -19,6 +20,7 @@ const sidebarLinks = [
   { href: "/admin/users", label: "Users", icon: Users },
   { href: "/admin/events", label: "Events", icon: Calendar },
   { href: "/admin/contacts", label: "Contacts", icon: MessageSquare },
+  { href: "/admin/tickets", label: "Tickets", icon: Ticket },
 ];
 
 export default function AdminLayout({

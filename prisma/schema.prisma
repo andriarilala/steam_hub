@@ -72,12 +72,13 @@ model VerificationToken {
 
 // events for the agenda
 model Event {
-  id          String   @id @default(uuid())
-  title       String
-  description String?
-  date        DateTime
-  type        String?
-  createdAt   DateTime @default(now())
+  id           String        @id @default(uuid())
+  title        String
+  description  String?
+  date         DateTime
+  type         String?
+  createdAt    DateTime      @default(now())
+  ticketOrders TicketOrder[]
 }
 
 // user-to-user connections (many-to-many through this join table)
@@ -122,12 +123,15 @@ model Notification {
 model TicketOrder {
   id         String   @id @default(uuid())
   userId     String
+  eventId    String? // linked event
   ticketType String // "standard" | "vip" | "student" | "virtual"
   quantity   Int      @default(1)
   price      Float
   total      Float
-  status     String   @default("pending") // "pending" | "completed" | "failed"
+  status     String   @default("pending") // "pending" | "completed" | "failed" | "cancelled"
+  qrCode     String   @unique @default(uuid()) // unique token encoded in QR
   createdAt  DateTime @default(now())
 
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user  User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  event Event? @relation(fields: [eventId], references: [id], onDelete: SetNull)
 }

@@ -132,13 +132,13 @@ if (!process.env.NEXTAUTH_URL) {
 export const authOptions = {
   secret: nextAuthSecret,
   logger: {
-    error(code, ...metadata) {
+    error(code: string, ...metadata: unknown[]) {
       console.error("NextAuth error", code, metadata);
     },
-    warn(code) {
+    warn(code: string) {
       console.warn("NextAuth warn", code);
     },
-    debug(code, ...metadata) {
+    debug(code: string, ...metadata: unknown[]) {
       console.debug("NextAuth debug", code, metadata);
     },
   },
@@ -195,7 +195,7 @@ export const authOptions = {
   ],
   // optionally customize pages, callbacks, etc.
   session: {
-    strategy: "jwt",
+    strategy: "jwt" as const,
     maxAge: 30 * 24 * 60 * 60,
   },
   jwt: {
@@ -203,11 +203,19 @@ export const authOptions = {
     maxAge: 30 * 24 * 60 * 60,
   },
   callbacks: {
-    async signIn({ user, account }) {
+    async signIn({ user, account }: { user: any; account: any }) {
       console.log("signIn callback:", { user, account });
       return true;
     },
-    async jwt({ token, user, account }) {
+    async jwt({
+      token,
+      user,
+      account,
+    }: {
+      token: any;
+      user: any;
+      account: any;
+    }) {
       console.log("jwt callback:", { user, account });
       if (user) {
         token.id = user.id;
@@ -215,7 +223,7 @@ export const authOptions = {
       }
       return token;
     },
-    async session({ session, token }) {
+    async session({ session, token }: { session: any; token: any }) {
       console.log("session callback:", { session, token });
       if (session.user) {
         (session.user as any).id = token.id;
@@ -223,14 +231,14 @@ export const authOptions = {
       }
       return session;
     },
-    async redirect({ url, baseUrl }) {
+    async redirect({ url, baseUrl }: { url: string; baseUrl: string }) {
       console.log("redirect callback:", { url, baseUrl });
       // Always redirect authenticated users to dashboard
       return `${baseUrl}/dashboard`;
     },
   },
   events: {
-    async createUser({ user }) {
+    async createUser({ user }: { user: any }) {
       if (!user.role || !user.emailVerified) {
         const data: any = {};
         if (!user.role) data.role = "youth";

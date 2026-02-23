@@ -58,7 +58,11 @@ export default function DashboardPage() {
     if (!isLoading && !isAuthenticated) {
       router.push("/signin");
     }
-  }, [isLoading, isAuthenticated, router]);
+    // redirect admins away from user dashboard
+    if (!isLoading && isAuthenticated && (user?.role as string) === "admin") {
+      router.replace("/admin");
+    }
+  }, [isLoading, isAuthenticated, user, router]);
 
   useEffect(() => {
     if (isAuthenticated) {
