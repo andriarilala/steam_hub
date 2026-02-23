@@ -1,13 +1,15 @@
 "use client";
 
 import { useEffect, useState, useCallback } from "react";
-import { Plus, Pencil, Trash2, RefreshCw, X, Calendar } from "lucide-react";
+import { Plus, Pencil, Trash2, RefreshCw, X, Calendar, MapPin } from "lucide-react";
 
 interface Event {
   id: string;
   title: string;
   description: string | null;
   date: string;
+  time: string | null;
+  location: string | null;
   type: string | null;
   createdAt: string;
 }
@@ -26,6 +28,8 @@ const empty = (): Partial<Event> => ({
   title: "",
   description: "",
   date: "",
+  time: "",
+  location: "",
   type: "Workshop",
 });
 
@@ -86,14 +90,20 @@ export default function AdminEventsPage() {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(form),
     });
-    setSaving(false);
+    let d;
+    try {
+      const text = await res.text();
+      d = text ? JSON.parse(text) : {};
+    } catch (e) {
+      d = { error: "Invalid server response" };
+    }
+
     if (res.ok) {
       showToast(isEdit ? "Event updated" : "Event created");
       closeModal();
       load();
     } else {
-      const d = await res.json();
-      showToast(d.error || "Failed to save");
+      showToast(d.error || `Server error (${res.status})`);
     }
   };
 
@@ -164,11 +174,11 @@ export default function AdminEventsPage() {
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className="block text-xs font-bold text-foreground/50 mb-1.5 uppercase tracking-wider">
-                    Date & Time *
+                    Date *
                   </label>
                   <input
-                    type="datetime-local"
-                    value={form.date || ""}
+                    type="date"
+                    value={form.date ? new Date(form.date).toISOString().split('T')[0] : ""}
                     onChange={(e) =>
                       setForm((f) => ({ ...f, date: e.target.value }))
                     }
@@ -177,22 +187,52 @@ export default function AdminEventsPage() {
                 </div>
                 <div>
                   <label className="block text-xs font-bold text-foreground/50 mb-1.5 uppercase tracking-wider">
-                    Type
+                    Time
                   </label>
-                  <select
-                    value={form.type || "Workshop"}
+                  <input
+                    type="time"
+                    value={form.time || ""}
                     onChange={(e) =>
-                      setForm((f) => ({ ...f, type: e.target.value }))
+                      setForm((f) => ({ ...f, time: e.target.value }))
                     }
                     className="w-full bg-background border border-border rounded-xl py-2.5 px-4 text-sm focus:outline-none focus:border-primary/50 transition-colors"
-                  >
-                    {EVENT_TYPES.map((t) => (
-                      <option key={t} value={t}>
-                        {t}
-                      </option>
-                    ))}
-                  </select>
+                  />
                 </div>
+              </div>
+              <div>
+                <label className="block text-xs font-bold text-foreground/50 mb-1.5 uppercase tracking-wider">
+                  Location / Venue
+                </label>
+                <div className="relative">
+                  <MapPin className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-foreground/30" />
+                  <input
+                    type="text"
+                    value={form.location || ""}
+                    onChange={(e) =>
+                      setForm((f) => ({ ...f, location: e.target.value }))
+                    }
+                    placeholder="e.g. Accra, Ghana or Online"
+                    className="w-full bg-background border border-border rounded-xl py-2.5 pl-11 pr-4 text-sm focus:outline-none focus:border-primary/50 transition-colors"
+                  />
+                </div>
+              </div>
+              <div>
+                <label className="block text-xs font-bold text-foreground/50 mb-1.5 uppercase tracking-wider">
+                  Type
+                </label>
+                <select
+                  value={form.type || "Workshop"}
+                  onChange={(e) =>
+                    setForm((f) => ({ ...f, type: e.target.value }))
+                  }
+                  className="w-full bg-background border border-border rounded-xl py-2.5 px-4 text-sm focus:outline-none focus:border-primary/50 transition-colors"
+                >
+                  {EVENT_TYPES.map((t) => (
+                    <option key={t} value={t}>
+                      {t}
+                    </option>
+                  ))}
+                </select>
               </div>
             </div>
             <div className="px-6 pb-6 flex gap-3 justify-end">
@@ -270,6 +310,9 @@ export default function AdminEventsPage() {
                   <th className="px-6 py-4 text-left font-bold uppercase text-[10px]">
                     Description
                   </th>
+                  <th className="px-6 py-4 text-left font-bold uppercase text-[10px]">
+                    Location
+                  </th>
                   <th className="px-6 py-4 text-right font-bold uppercase text-[10px]">
                     Actions
                   </th>
@@ -290,10 +333,17 @@ export default function AdminEventsPage() {
                       </span>
                     </td>
                     <td className="px-6 py-4 text-xs text-foreground/50">
-                      {new Date(ev.date).toLocaleString()}
+                      <div>{new Date(ev.date).toLocaleDateString()}</div>
+                      <div className="text-[10px] font-bold text-primary mt-0.5">{ev.time || "--:--"}</div>
                     </td>
                     <td className="px-6 py-4 text-xs text-foreground/40 max-w-[200px] truncate">
                       {ev.description || "—"}
+                    </td>
+                    <td className="px-6 py-4 text-xs text-foreground/50">
+                      <div className="flex items-center gap-1.5">
+                        <MapPin className="w-3.5 h-3.5 text-primary/40" />
+                        <span className="truncate max-w-[150px]">{ev.location || "—"}</span>
+                      </div>
                     </td>
                     <td className="px-6 py-4 text-right flex items-center justify-end gap-2">
                       <button
@@ -317,6 +367,6 @@ export default function AdminEventsPage() {
           </div>
         )}
       </div>
-    </div>
+    </div >
   );
 }

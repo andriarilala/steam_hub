@@ -70,17 +70,17 @@ const TICKET_PRICES: Record<string, number> = {
 };
 
 const STATUS_STYLES: Record<string, string> = {
-  pending: "bg-amber-500/20 text-amber-400",
-  completed: "bg-emerald-500/20 text-emerald-400",
-  failed: "bg-red-500/20 text-red-400",
-  cancelled: "bg-foreground/10 text-foreground/40",
+  pending: "bg-amber-50 text-amber-600 border border-amber-200",
+  completed: "bg-emerald-50 text-emerald-600 border border-emerald-200",
+  failed: "bg-red-50 text-red-600 border border-red-200",
+  cancelled: "bg-slate-100 text-slate-500 border border-slate-200",
 };
 
 const TYPE_STYLES: Record<string, string> = {
-  standard: "bg-blue-500/20 text-blue-400",
-  vip: "bg-purple-500/20 text-purple-400",
-  student: "bg-primary/20 text-primary",
-  virtual: "bg-cyan-500/20 text-cyan-400",
+  standard: "bg-blue-50 text-blue-600 border border-blue-200",
+  vip: "bg-purple-50 text-purple-600 border border-purple-200",
+  student: "bg-orange-50 text-orange-600 border border-orange-200",
+  virtual: "bg-cyan-50 text-cyan-600 border border-cyan-200",
 };
 
 function buildQRUrl(ticket: TicketOrder): string {
@@ -400,7 +400,7 @@ export default function AdminTicketsPage() {
     fetch("/api/admin/events")
       .then((r) => r.json())
       .then((d) => setEvents(Array.isArray(d) ? d : []))
-      .catch(() => {});
+      .catch(() => { });
 
     // Fetch ALL users across all pages so the dropdown is complete
     const fetchAllUsers = async () => {
@@ -741,22 +741,20 @@ export default function AdminTicketsPage() {
                     <button
                       type="button"
                       onClick={() => setUserMode("select")}
-                      className={`px-3 py-1.5 transition-colors ${
-                        userMode === "select"
+                      className={`px-3 py-1.5 transition-colors ${userMode === "select"
                           ? "bg-primary text-primary-foreground"
                           : "text-foreground/40 hover:text-foreground"
-                      }`}
+                        }`}
                     >
                       Existant
                     </button>
                     <button
                       type="button"
                       onClick={() => setUserMode("create")}
-                      className={`px-3 py-1.5 transition-colors ${
-                        userMode === "create"
+                      className={`px-3 py-1.5 transition-colors ${userMode === "create"
                           ? "bg-primary text-primary-foreground"
                           : "text-foreground/40 hover:text-foreground"
-                      }`}
+                        }`}
                     >
                       Créer
                     </button>
@@ -1072,60 +1070,60 @@ export default function AdminTicketsPage() {
           </div>
         ) : (
           <div className="overflow-x-auto">
-            <table className="w-full text-sm">
+            <table className="w-full border-separate border-spacing-y-2.5">
               <thead>
-                <tr className="border-b border-border text-foreground/20">
-                  <th className="px-5 py-4 text-left font-bold uppercase text-[10px]">
+                <tr className="text-foreground/30">
+                  <th className="px-6 py-2 text-left font-bold uppercase text-[10px] tracking-wider">
                     User
                   </th>
-                  <th className="px-5 py-4 text-left font-bold uppercase text-[10px]">
+                  <th className="px-6 py-2 text-left font-bold uppercase text-[10px] tracking-wider">
                     Event
                   </th>
-                  <th className="px-5 py-4 text-left font-bold uppercase text-[10px]">
+                  <th className="px-6 py-2 text-left font-bold uppercase text-[10px] tracking-wider">
                     Type
                   </th>
-                  <th className="px-5 py-4 text-left font-bold uppercase text-[10px]">
+                  <th className="px-6 py-2 text-center font-bold uppercase text-[10px] tracking-wider">
                     Qty
                   </th>
-                  <th className="px-5 py-4 text-left font-bold uppercase text-[10px]">
+                  <th className="px-6 py-2 text-left font-bold uppercase text-[10px] tracking-wider">
                     Total
                   </th>
-                  <th className="px-5 py-4 text-left font-bold uppercase text-[10px]">
+                  <th className="px-6 py-2 text-center font-bold uppercase text-[10px] tracking-wider">
                     Status
                   </th>
-                  <th className="px-5 py-4 text-left font-bold uppercase text-[10px]">
+                  <th className="px-6 py-2 text-left font-bold uppercase text-[10px] tracking-wider">
                     Date
                   </th>
-                  <th className="px-5 py-4 text-right font-bold uppercase text-[10px]">
+                  <th className="px-6 py-2 text-right font-bold uppercase text-[10px] tracking-wider">
                     Actions
                   </th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-border">
+              <tbody>
                 {tickets.map((ticket) => (
                   <tr
                     key={ticket.id}
-                    className="hover:bg-foreground/[0.02] transition-colors"
+                    className="bg-white hover:bg-slate-50 transition-all shadow-sm border border-slate-100 rounded-xl"
                   >
-                    <td className="px-5 py-4">
-                      <p className="font-medium text-xs">
+                    <td className="px-6 py-5 rounded-l-xl border-y border-l border-slate-100">
+                      <p className="font-bold text-sm text-primary leading-tight">
                         {ticket.user.name || (
                           <span className="italic text-foreground/30">
                             unnamed
                           </span>
                         )}
                       </p>
-                      <p className="text-[11px] text-foreground/40">
+                      <p className="text-[11px] text-foreground/40 mt-0.5">
                         {ticket.user.email}
                       </p>
                     </td>
-                    <td className="px-5 py-4 max-w-[150px]">
+                    <td className="px-6 py-5 border-y border-slate-100 max-w-[200px]">
                       {ticket.event ? (
                         <>
-                          <p className="text-xs font-medium truncate">
+                          <p className="text-sm font-bold text-slate-700 truncate">
                             {ticket.event.title}
                           </p>
-                          <p className="text-[11px] text-foreground/40">
+                          <p className="text-[11px] text-foreground/40 mt-0.5">
                             {new Date(ticket.event.date).toLocaleDateString()}
                           </p>
                         </>
@@ -1135,36 +1133,38 @@ export default function AdminTicketsPage() {
                         </span>
                       )}
                     </td>
-                    <td className="px-5 py-4">
+                    <td className="px-6 py-5 border-y border-slate-100">
                       <span
-                        className={`px-2 py-0.5 rounded text-[11px] font-bold capitalize ${TYPE_STYLES[ticket.ticketType]}`}
+                        className={`px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-tight ${TYPE_STYLES[ticket.ticketType]}`}
                       >
                         {ticket.ticketType}
                       </span>
                     </td>
-                    <td className="px-5 py-4 text-foreground/60">
+                    <td className="px-6 py-5 border-y border-slate-100 text-center text-slate-600 font-medium">
                       {ticket.quantity}
                     </td>
-                    <td className="px-5 py-4 font-bold">
-                      Ar {ticket.total.toFixed(2)}
+                    <td className="px-6 py-5 border-y border-slate-100">
+                      <span className="text-lg font-black text-slate-900 tracking-tight">
+                        Ar {ticket.total.toLocaleString("fr-FR", { minimumFractionDigits: 2 })}
+                      </span>
                     </td>
-                    <td className="px-5 py-4">
+                    <td className="px-6 py-5 border-y border-slate-100 text-center">
                       <span
-                        className={`px-2.5 py-1 rounded-lg text-[10px] font-bold capitalize ${STATUS_STYLES[ticket.status]}`}
+                        className={`px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-tight ${STATUS_STYLES[ticket.status]}`}
                       >
                         {ticket.status}
                       </span>
                     </td>
-                    <td className="px-5 py-4 text-xs text-foreground/40">
+                    <td className="px-6 py-5 border-y border-slate-100 text-xs text-foreground/40">
                       {new Date(ticket.createdAt).toLocaleDateString()}
                     </td>
-                    <td className="px-5 py-4">
-                      <div className="flex items-center justify-end gap-1.5">
+                    <td className="px-6 py-5 rounded-r-xl border-y border-r border-slate-100">
+                      <div className="flex items-center justify-end gap-2">
                         {/* QR Code button */}
                         <button
                           onClick={() => openQR(ticket)}
                           title="View QR Code"
-                          className="p-1.5 rounded-lg text-foreground/30 hover:text-primary hover:bg-primary/10 transition-colors"
+                          className="p-2 rounded-xl text-foreground/30 hover:text-primary hover:bg-primary/5 transition-all"
                         >
                           <QrCode className="w-4 h-4" />
                         </button>
@@ -1172,7 +1172,7 @@ export default function AdminTicketsPage() {
                         <button
                           onClick={() => openEdit(ticket)}
                           title="Edit"
-                          className="p-1.5 rounded-lg text-foreground/30 hover:text-blue-400 hover:bg-blue-500/10 transition-colors"
+                          className="p-2 rounded-xl text-foreground/30 hover:text-blue-500 hover:bg-blue-50 transition-all"
                         >
                           <Pencil className="w-4 h-4" />
                         </button>
@@ -1181,7 +1181,7 @@ export default function AdminTicketsPage() {
                           onClick={() => deleteTicket(ticket.id)}
                           disabled={deleting === ticket.id}
                           title="Delete"
-                          className="p-1.5 rounded-lg text-foreground/30 hover:text-red-400 hover:bg-red-500/10 transition-colors disabled:opacity-50"
+                          className="p-2 rounded-xl text-foreground/30 hover:text-red-500 hover:bg-red-50 transition-all disabled:opacity-50"
                         >
                           <Trash2 className="w-4 h-4" />
                         </button>

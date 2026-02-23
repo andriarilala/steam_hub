@@ -76,6 +76,8 @@ model Event {
   title        String
   description  String?
   date         DateTime
+  time         String?       // Time field for the event (e.g. "14:00")
+  location     String?       // Location/Venue of the event
   type         String?
   createdAt    DateTime      @default(now())
   ticketOrders TicketOrder[]

@@ -11,6 +11,10 @@ export const translations = {
     "nav.signIn": "Sign In",
     "nav.register": "Register",
     "nav.contact": "Contact",
+    "event.location": "Location",
+    "event.venue": "Venue",
+    "admin.location": "Location / Venue",
+    "admin.locationPlaceholder": "e.g. Accra, Ghana or Online",
 
     // Footer
     "footer.tagline": "The meeting point between today's talents and tomorrow's opportunities.",
@@ -374,7 +378,6 @@ export const translations = {
     "auth.resetPasswordSubtitle": "Choose a new password for your account.",
     "auth.resetPassword": "Reset Password",
     "auth.newPassword": "New Password",
-    "auth.confirmPassword": "Confirm Password",
     "auth.resetSuccess": "Password updated successfully. You can now sign in.",
     "auth.signIn": "Sign In",
     "auth.signUp": "Sign Up",
@@ -485,8 +488,11 @@ export const translations = {
     "nav.community": "Communaute",
     "nav.media": "Medias",
     "nav.signIn": "Se connecter",
-    "nav.register": "S'inscrire",
     "nav.contact": "Contact",
+    "event.location": "Lieu",
+    "event.venue": "Lieu de l'evenement",
+    "admin.location": "Lieu / Salle",
+    "admin.locationPlaceholder": "ex: Accra, Ghana ou En ligne",
 
     // Footer
     "footer.tagline": "Le carrefour entre les talents d'aujourd'hui et les opportunites de demain.",
@@ -884,7 +890,6 @@ export const translations = {
     "auth.resetPasswordSubtitle": "Choisissez un nouveau mot de passe pour votre compte.",
     "auth.resetPassword": "Réinitialiser le mot de passe",
     "auth.newPassword": "Nouveau mot de passe",
-    "auth.confirmPassword": "Confirmer le mot de passe",
     "auth.resetSuccess": "Mot de passe mis à jour. Vous pouvez maintenant vous connecter.",
 
     // Dashboard
@@ -952,10 +957,6 @@ export const translations = {
     "sponsor.overview": "Apercu",
     "sponsor.analytics": "Analytiques",
     "sponsor.sessions": "Sessions",
-    "sponsor.leads": "Leads",
-    "sponsor.messages": "Messages",
-    "sponsor.visits": "Visites",
-    "sponsor.clicks": "Clics",
     "sponsor.leads": "Leads Generes",
     "sponsor.conversions": "Conversions",
     "sponsor.performance": "Performance",

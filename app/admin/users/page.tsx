@@ -30,12 +30,12 @@ const ALL_ROLES = [
 ];
 
 const ROLE_COLORS: Record<string, string> = {
-  admin: "bg-red-500/20 text-red-400",
-  youth: "bg-primary/20 text-primary",
-  company: "bg-blue-500/20 text-blue-400",
-  institution: "bg-purple-500/20 text-purple-400",
-  mentor: "bg-amber-500/20 text-amber-400",
-  sponsor: "bg-emerald-500/20 text-emerald-400",
+  admin: "bg-red-50 text-red-600 border border-red-200", // Red from 'A'
+  youth: "bg-emerald-50 text-emerald-600 border border-emerald-200", // Teal from 'S'
+  company: "bg-blue-50 text-blue-600 border border-blue-200", // Blue from 'E'
+  institution: "bg-purple-50 text-purple-600 border border-purple-200", // Purple from 'M'
+  mentor: "bg-orange-50 text-orange-600 border border-orange-200", // Orange from 'T'
+  sponsor: "bg-primary/5 text-primary border border-primary/20", // Navy from 'HUB'
 };
 
 export default function AdminUsersPage() {
