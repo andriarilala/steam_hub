@@ -50,7 +50,7 @@ export async function POST(req: NextRequest) {
         title: data.title,
         description: data.description,
         date: new Date(data.date),
-        time: (data as any).time,
+        time: data.time,
         location: data.location,
         type: data.type,
       },
@@ -81,7 +81,7 @@ export async function PATCH(req: NextRequest) {
     const event = await prisma.event.update({
       where: { id },
       data: {
-        ...(data as any),
+        ...data,
         date: data.date ? new Date(data.date) : undefined,
       },
     });

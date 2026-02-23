@@ -19,7 +19,11 @@ export interface TicketOrder {
 }
 
 interface StripeContextType {
-  processPayment: (paymentInfo: PaymentInfo, ticketType: string, quantity: number) => Promise<TicketOrder>
+  processPayment: (
+    paymentInfo: PaymentInfo,
+    ticketType: "standard" | "vip" | "student" | "virtual",
+    quantity: number
+  ) => Promise<TicketOrder>
   isProcessing: boolean
   lastOrder: TicketOrder | null
 }
