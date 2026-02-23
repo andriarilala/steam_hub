@@ -1,29 +1,39 @@
-import NextAuth from "next-auth"
-import GoogleProvider from "next-auth/providers/google"
-import FacebookProvider from "next-auth/providers/facebook"
-import CredentialsProvider from "next-auth/providers/credentials"
-import { PrismaAdapter } from "@next-auth/prisma-adapter"
-import { prisma } from "@/lib/prisma"
-import bcrypt from "bcryptjs"
-import crypto from "crypto"
+import NextAuth from "next-auth";
+import GoogleProvider from "next-auth/providers/google";
+import FacebookProvider from "next-auth/providers/facebook";
+import CredentialsProvider from "next-auth/providers/credentials";
+import { PrismaAdapter } from "@next-auth/prisma-adapter";
+import { prisma } from "@/lib/prisma";
+import bcrypt from "bcryptjs";
+import crypto from "crypto";
 
 // automatically seed demo users (no intervention required)
 async function seedDemoData() {
-  // users
+  // users (includes a default admin account)
   const users = [
     {
       email: "andriarilala04@gmail.com",
       name: "Andriarilala User",
       password: "PassAvenir2025!",
+      role: "youth",
     },
     {
       email: "ainafandresena9@gmail.com",
       name: "Aina User",
       password: "PassAvenir2025!",
+      role: "youth",
+    },
+    {
+      email: "admin@passavenir.com",
+      name: "Admin PASS AVENIR",
+      password: "AdminPass2025!",
+      role: "admin",
     },
   ];
   for (const u of users) {
-    const existing = await prisma.user.findUnique({ where: { email: u.email } });
+    const existing = await prisma.user.findUnique({
+      where: { email: u.email },
+    });
     if (!existing) {
       const hash = await bcrypt.hash(u.password, 10);
       await prisma.user.create({
@@ -31,10 +41,10 @@ async function seedDemoData() {
           email: u.email,
           name: u.name,
           hashedPassword: hash,
-          role: "youth",
+          role: u.role,
         },
       });
-      console.log(`seeded demo user ${u.email}`);
+      console.log(`seeded demo user ${u.email} (role: ${u.role})`);
     }
   }
 
@@ -45,13 +55,15 @@ async function seedDemoData() {
       data: [
         {
           title: "Opening Keynote: Africa's Digital Future",
-          description: "An inspiring look at the future of technology across the continent.",
+          description:
+            "An inspiring look at the future of technology across the continent.",
           date: new Date("2025-03-15T09:00:00Z"),
           type: "Keynote",
         },
         {
           title: "Workshop: Building Your Personal Brand",
-          description: "Hands-on workshop on how to create and market your personal brand.",
+          description:
+            "Hands-on workshop on how to create and market your personal brand.",
           date: new Date("2025-03-15T14:00:00Z"),
           type: "Workshop",
         },
@@ -67,12 +79,18 @@ async function seedDemoData() {
   }
 
   // sample connection between the two demo users
-  const userA = await prisma.user.findUnique({ where: { email: "test@example.com" } });
-  const userB = await prisma.user.findUnique({ where: { email: "second@example.com" } });
+  const userA = await prisma.user.findUnique({
+    where: { email: "test@example.com" },
+  });
+  const userB = await prisma.user.findUnique({
+    where: { email: "second@example.com" },
+  });
   if (userA && userB) {
-    const existingConn = await prisma.userConnection.findUnique({
-      where: { userId_targetId: { userId: userA.id, targetId: userB.id } },
-    }).catch(() => null);
+    const existingConn = await prisma.userConnection
+      .findUnique({
+        where: { userId_targetId: { userId: userA.id, targetId: userB.id } },
+      })
+      .catch(() => null);
     if (!existingConn) {
       await prisma.userConnection.create({
         data: { userId: userA.id, targetId: userB.id, status: "connected" },
@@ -94,15 +112,21 @@ seedDemoData().catch((e) => {
 let nextAuthSecret = process.env.NEXTAUTH_SECRET;
 if (!nextAuthSecret) {
   if (process.env.NODE_ENV === "production") {
-    throw new Error("❌ NEXTAUTH_SECRET is required in production. Please set it in your environment variables.");
+    throw new Error(
+      "❌ NEXTAUTH_SECRET is required in production. Please set it in your environment variables.",
+    );
   }
   nextAuthSecret = crypto.randomBytes(32).toString("hex");
   // set it on the environment so NextAuth internal checks pass
   process.env.NEXTAUTH_SECRET = nextAuthSecret;
-  console.warn("⚠️ NEXTAUTH_SECRET not set – generated temporary secret for this session. Set NEXTAUTH_SECRET in your .env for stable sessions.");
+  console.warn(
+    "⚠️ NEXTAUTH_SECRET not set – generated temporary secret for this session. Set NEXTAUTH_SECRET in your .env for stable sessions.",
+  );
 }
 if (!process.env.NEXTAUTH_URL) {
-  console.warn("⚠️ NEXTAUTH_URL not defined – social callbacks and redirects may fail. Add NEXTAUTH_URL to your .env.");
+  console.warn(
+    "⚠️ NEXTAUTH_URL not defined – social callbacks and redirects may fail. Add NEXTAUTH_URL to your .env.",
+  );
 }
 
 export const authOptions = {
@@ -136,7 +160,10 @@ export const authOptions = {
           const user = await prisma.user.findUnique({ where: { email } });
           console.log("Found user in authorize", { user });
           if (user && user.hashedPassword) {
-            const valid = await bcrypt.compare(password as string, user.hashedPassword);
+            const valid = await bcrypt.compare(
+              password as string,
+              user.hashedPassword,
+            );
             console.log("Password valid?", valid);
             if (valid) {
               return {
@@ -205,10 +232,10 @@ export const authOptions = {
   events: {
     async createUser({ user }) {
       if (!user.role || !user.emailVerified) {
-        const data: any = {}
-        if (!user.role) data.role = "youth"
-        if (!user.emailVerified) data.emailVerified = new Date()
-        await prisma.user.update({ where: { id: user.id }, data })
+        const data: any = {};
+        if (!user.role) data.role = "youth";
+        if (!user.emailVerified) data.emailVerified = new Date();
+        await prisma.user.update({ where: { id: user.id }, data });
       }
     },
   },
@@ -216,8 +243,8 @@ export const authOptions = {
     signIn: "/signin",
     error: "/signin",
   },
-}
+};
 
 // NextAuth handler for App Router
-const handler = NextAuth(authOptions)
-export { handler as GET, handler as POST }
+const handler = NextAuth(authOptions);
+export { handler as GET, handler as POST };

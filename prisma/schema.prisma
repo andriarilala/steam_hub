@@ -8,24 +8,27 @@ datasource db {
 }
 
 model User {
-  id                    String   @id @default(uuid())
-  email                 String   @unique
-  name                  String?
-  role                  String
-  hashedPassword        String?
-  emailVerified         DateTime?
-  resetToken            String?
-  resetTokenExpires     DateTime?
-  image                 String?
+  id                String           @id @default(uuid())
+  email             String           @unique
+  name              String?
+  role              String
+  hashedPassword    String?
+  emailVerified     DateTime?
+  resetToken        String?
+  resetTokenExpires DateTime?
+  image             String?
   // relations required by NextAuth
-  accounts              Account[]
-  sessions              Session[]
+  accounts          Account[]
+  sessions          Session[]
   // connections relations
-  connections           UserConnection[] @relation("connections")
-  connectedTo           UserConnection[] @relation("connectedTo")
-  organization          String?
-  createdAt             DateTime @default(now())
-  updatedAt             DateTime @updatedAt
+  connections       UserConnection[] @relation("connections")
+  connectedTo       UserConnection[] @relation("connectedTo")
+  // other relations
+  notifications     Notification[]
+  ticketOrders      TicketOrder[]
+  organization      String?
+  createdAt         DateTime         @default(now())
+  updatedAt         DateTime         @updatedAt
 }
 
 // models added for NextAuth functionality
@@ -79,13 +82,52 @@ model Event {
 
 // user-to-user connections (many-to-many through this join table)
 model UserConnection {
-  id        String @id @default(uuid())
-  userId    String
-  targetId  String
-  status    String @default("connected")
+  id       String @id @default(uuid())
+  userId   String
+  targetId String
+  status   String @default("connected")
 
   user   User @relation("connections", fields: [userId], references: [id], onDelete: Cascade)
   target User @relation("connectedTo", fields: [targetId], references: [id], onDelete: Cascade)
 
   @@unique([userId, targetId])
+}
+
+// contact form submissions — persisted for admin review
+// User.role can be: "youth" | "company" | "institution" | "mentor" | "sponsor" | "admin"
+model ContactMessage {
+  id        String   @id @default(uuid())
+  name      String
+  email     String
+  subject   String?
+  message   String
+  status    String   @default("unread") // "unread" | "read" | "replied"
+  createdAt DateTime @default(now())
+}
+
+// in-app notifications (admin broadcasts + system alerts)
+model Notification {
+  id        String   @id @default(uuid())
+  userId    String? // null = broadcast to all
+  title     String
+  message   String
+  type      String   @default("info") // "info" | "warning" | "success" | "error"
+  read      Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  user User? @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+// ticket orders (persisted purchases)
+model TicketOrder {
+  id         String   @id @default(uuid())
+  userId     String
+  ticketType String // "standard" | "vip" | "student" | "virtual"
+  quantity   Int      @default(1)
+  price      Float
+  total      Float
+  status     String   @default("pending") // "pending" | "completed" | "failed"
+  createdAt  DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
