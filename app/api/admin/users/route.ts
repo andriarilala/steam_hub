@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "../../auth/[...nextauth]/route";
 import { prisma } from "@/lib/prisma";
+import bcrypt from "bcryptjs";
 
 async function requireAdmin(req: NextRequest) {
   const session = (await getServerSession(authOptions as any)) as any;
@@ -60,6 +61,48 @@ export async function GET(req: NextRequest) {
     pageSize,
     totalPages: Math.ceil(total / pageSize),
   });
+}
+
+// POST /api/admin/users — admin creates a new user account
+export async function POST(req: NextRequest) {
+  const admin = await requireAdmin(req);
+  if (!admin) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+
+  const { name, email, password } = await req.json();
+
+  if (!email || typeof email !== "string" || !email.includes("@"))
+    return NextResponse.json(
+      { error: "Valid email is required" },
+      { status: 400 },
+    );
+  if (!password || typeof password !== "string" || password.length < 6)
+    return NextResponse.json(
+      { error: "Password must be at least 6 characters" },
+      { status: 400 },
+    );
+
+  const existing = await prisma.user.findUnique({
+    where: { email: email.trim().toLowerCase() },
+  });
+  if (existing)
+    return NextResponse.json(
+      { error: "A user with this email already exists" },
+      { status: 409 },
+    );
+
+  const hashedPassword = await bcrypt.hash(password, 10);
+
+  const user = await prisma.user.create({
+    data: {
+      email: email.trim().toLowerCase(),
+      name: name?.trim() || null,
+      hashedPassword,
+      role: "youth", // default role; admin can change it later
+    },
+    select: { id: true, name: true, email: true, role: true, createdAt: true },
+  });
+
+  return NextResponse.json(user, { status: 201 });
 }
 
 // PATCH /api/admin/users — update role or name

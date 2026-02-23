@@ -131,9 +131,20 @@ export async function PATCH(req: NextRequest) {
 
   const data = TicketSchema.partial().parse(rest);
 
+  // If a new userId is provided, verify the user exists
+  if (data.userId) {
+    const userExists = await prisma.user.findUnique({
+      where: { id: data.userId },
+      select: { id: true },
+    });
+    if (!userExists)
+      return NextResponse.json({ error: "User not found" }, { status: 404 });
+  }
+
   const ticket = await prisma.ticketOrder.update({
     where: { id },
     data: {
+      ...(data.userId ? { userId: data.userId } : {}),
       ...(data.eventId !== undefined ? { eventId: data.eventId || null } : {}),
       ...(data.ticketType ? { ticketType: data.ticketType } : {}),
       ...(data.quantity !== undefined ? { quantity: data.quantity } : {}),

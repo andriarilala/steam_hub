@@ -100,6 +100,256 @@ function buildQRUrl(ticket: TicketOrder): string {
   return `https://api.qrserver.com/v1/create-qr-code/?size=220x220&margin=10&data=${encodeURIComponent(data)}`;
 }
 
+// ─── Canvas ticket‑image download helpers ───────────────────────────────────
+
+function loadImage(src: string): Promise<HTMLImageElement> {
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    img.crossOrigin = "anonymous";
+    img.onload = () => resolve(img);
+    img.onerror = reject;
+    img.src = src;
+  });
+}
+
+function roundRect(
+  ctx: CanvasRenderingContext2D,
+  x: number,
+  y: number,
+  w: number,
+  h: number,
+  r: number,
+) {
+  ctx.beginPath();
+  ctx.moveTo(x + r, y);
+  ctx.lineTo(x + w - r, y);
+  ctx.quadraticCurveTo(x + w, y, x + w, y + r);
+  ctx.lineTo(x + w, y + h - r);
+  ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+  ctx.lineTo(x + r, y + h);
+  ctx.quadraticCurveTo(x, y + h, x, y + h - r);
+  ctx.lineTo(x, y + r);
+  ctx.quadraticCurveTo(x, y, x + r, y);
+  ctx.closePath();
+}
+
+function wrapText(
+  ctx: CanvasRenderingContext2D,
+  text: string,
+  x: number,
+  y: number,
+  maxWidth: number,
+  lineHeight: number,
+): number {
+  const words = text.split(" ");
+  let line = "";
+  let yPos = y;
+  for (const word of words) {
+    const test = line + word + " ";
+    if (ctx.measureText(test).width > maxWidth && line !== "") {
+      ctx.fillText(line.trim(), x, yPos);
+      line = word + " ";
+      yPos += lineHeight;
+    } else {
+      line = test;
+    }
+  }
+  ctx.fillText(line.trim(), x, yPos);
+  return yPos;
+}
+
+async function downloadTicketImage(ticket: TicketOrder): Promise<void> {
+  // ── Landscape dimensions ──────────────────────────────────────────────────
+  const W = 920;
+  const H = 460;
+  const DIVIDER_X = 590; // vertical split: info left | QR right
+  const PAD = 36;
+
+  const canvas = document.createElement("canvas");
+  canvas.width = W;
+  canvas.height = H;
+  const ctx = canvas.getContext("2d")!;
+
+  // ── Background ──────────────────────────────────────────────────────────
+  ctx.fillStyle = "#094945";
+  ctx.fillRect(0, 0, W, H);
+
+  // ── Header band (full width) ─────────────────────────────────────────────
+  const HEADER_H = 74;
+  ctx.fillStyle = "#0b5a54";
+  ctx.fillRect(0, 0, W, HEADER_H);
+
+  // Brand name — left
+  ctx.fillStyle = "#ffffff";
+  ctx.textAlign = "left";
+  ctx.font = "bold 26px sans-serif";
+  ctx.fillText("PASS AVENIR", PAD, 46);
+
+  // Ticket-type badge — right of header
+  const typeColors: Record<string, string> = {
+    standard: "#3b82f6",
+    vip: "#a855f7",
+    student: "#22d3ee",
+    virtual: "#06b6d4",
+  };
+  const badgeColor = typeColors[ticket.ticketType] ?? "#6b7280";
+  const typeLabel = ticket.ticketType.toUpperCase();
+  ctx.font = "bold 11px sans-serif";
+  const badgeW = ctx.measureText(typeLabel).width + 26;
+  const badgeX = W - PAD - badgeW;
+  ctx.fillStyle = badgeColor;
+  roundRect(ctx, badgeX, 26, badgeW, 24, 7);
+  ctx.fill();
+  ctx.fillStyle = "#ffffff";
+  ctx.textAlign = "right";
+  ctx.fillText(typeLabel, W - PAD - 13, 42);
+
+  // Ticket id — next to badge
+  ctx.fillStyle = "rgba(255,255,255,0.35)";
+  ctx.font = "10px monospace";
+  ctx.textAlign = "right";
+  ctx.fillText(`#${ticket.id.slice(0, 8).toUpperCase()}`, badgeX - 12, 42);
+
+  // ── Horizontal dashed separator under header ─────────────────────────────
+  const hDash = (y: number, x0 = PAD, x1 = W - PAD) => {
+    ctx.save();
+    ctx.strokeStyle = "rgba(255,255,255,0.15)";
+    ctx.setLineDash([4, 6]);
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(x0, y);
+    ctx.lineTo(x1, y);
+    ctx.stroke();
+    ctx.restore();
+  };
+  hDash(HEADER_H + 1);
+
+  // ── Vertical dashed divider ───────────────────────────────────────────────
+  ctx.save();
+  ctx.strokeStyle = "rgba(255,255,255,0.15)";
+  ctx.setLineDash([4, 6]);
+  ctx.lineWidth = 1;
+  ctx.beginPath();
+  ctx.moveTo(DIVIDER_X, HEADER_H + 14);
+  ctx.lineTo(DIVIDER_X, H - 60);
+  ctx.stroke();
+  ctx.restore();
+
+  // ── LEFT PANEL — Event info ───────────────────────────────────────────────
+  const LEFT_W = DIVIDER_X - PAD * 2; // usable text width on left side
+  let y = HEADER_H + 26;
+
+  const label = (text: string, xPos = PAD) => {
+    ctx.fillStyle = "rgba(255,255,255,0.42)";
+    ctx.font = "9px sans-serif";
+    ctx.textAlign = "left";
+    ctx.fillText(text, xPos, y);
+    y += 16;
+  };
+
+  const value = (
+    text: string,
+    fontSize = 16,
+    alpha = 1,
+    xPos = PAD,
+    bold = true,
+  ) => {
+    ctx.fillStyle = alpha < 1 ? `rgba(255,255,255,${alpha})` : "#ffffff";
+    ctx.font = `${bold ? "bold " : ""}${fontSize}px sans-serif`;
+    ctx.textAlign = "left";
+    return wrapText(ctx, text, xPos, y, LEFT_W, fontSize + 5);
+  };
+
+  // Event
+  label("ÉVÉNEMENT");
+  const eventTitle = ticket.event?.title ?? "—";
+  const lastTitleY = value(eventTitle, 19);
+  y = lastTitleY + 22;
+
+  // Date & Time
+  if (ticket.event) {
+    const d = new Date(ticket.event.date);
+    const dateStr = d.toLocaleDateString("fr-FR", {
+      weekday: "long",
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+    });
+    const timeStr = d.toLocaleTimeString("fr-FR", {
+      hour: "2-digit",
+      minute: "2-digit",
+    });
+    label("DATE & HEURE");
+    value(dateStr, 13);
+    y += 16;
+    value(timeStr, 12, 0.7, PAD, false);
+    y += 22;
+  } else {
+    y += 8;
+  }
+
+  hDash(y, PAD, DIVIDER_X - 20);
+  y += 14;
+
+  // Titulaire
+  label("TITULAIRE");
+  value(ticket.user.name || ticket.user.email, 15);
+  y += 22;
+
+  // ── Footer Y reference (used by right panel) ───────────────────────────
+  const FOOTER_Y = H - 52;
+
+  // ── RIGHT PANEL — QR code ─────────────────────────────────────────────────
+  const rightCenterX = DIVIDER_X + (W - DIVIDER_X) / 2;
+  const qrSize = 190;
+  const qrX = rightCenterX - qrSize / 2;
+  // Center QR vertically in the right zone between header and footer strip
+  const rightZoneTop = HEADER_H + 14;
+  const rightZoneBot = H - 60;
+  const qrTop = rightZoneTop + (rightZoneBot - rightZoneTop - qrSize) / 2;
+
+  try {
+    const qrImg = await loadImage(buildQRUrl(ticket));
+    ctx.fillStyle = "#ffffff";
+    roundRect(ctx, qrX - 10, qrTop - 10, qrSize + 20, qrSize + 20, 12);
+    ctx.fill();
+    ctx.drawImage(qrImg, qrX, qrTop, qrSize, qrSize);
+  } catch {
+    ctx.fillStyle = "rgba(255,255,255,0.08)";
+    roundRect(ctx, qrX - 10, qrTop - 10, qrSize + 20, qrSize + 20, 12);
+    ctx.fill();
+    ctx.fillStyle = "rgba(255,255,255,0.3)";
+    ctx.font = "11px sans-serif";
+    ctx.textAlign = "center";
+    ctx.fillText("QR Code unavailable", rightCenterX, qrTop + qrSize / 2);
+  }
+
+  // QR code ref below QR
+  ctx.fillStyle = "rgba(255,255,255,0.22)";
+  ctx.font = "8px monospace";
+  ctx.textAlign = "center";
+  ctx.fillText(ticket.qrCode, rightCenterX, H - 38);
+
+  // ── Footer strip (right) ──────────────────────────────────────────────────
+  hDash(FOOTER_Y, DIVIDER_X + 20, W - PAD);
+
+  ctx.fillStyle = "rgba(255,255,255,0.42)";
+  ctx.font = "8px sans-serif";
+  ctx.textAlign = "center";
+  ctx.fillText("SCAN QR CODE", rightCenterX, FOOTER_Y + 14);
+  ctx.fillStyle = "rgba(255,255,255,0.6)";
+  ctx.font = "10px sans-serif";
+  ctx.fillText("pour valider l'accès", rightCenterX, FOOTER_Y + 28);
+
+  // ── Trigger download ──────────────────────────────────────────────────────
+  const link = document.createElement("a");
+  link.download = `ticket-${ticket.id.slice(0, 8)}.png`;
+  link.href = canvas.toDataURL("image/png");
+  link.click();
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+
 const emptyForm = () => ({
   userId: "",
   eventId: "",
@@ -129,7 +379,16 @@ export default function AdminTicketsPage() {
   );
   const [saving, setSaving] = useState(false);
   const [deleting, setDeleting] = useState<string | null>(null);
+  const [downloading, setDownloading] = useState(false);
   const [toast, setToast] = useState("");
+
+  // ── User section mode: select existing OR create new ──────────────────────
+  const [userMode, setUserMode] = useState<"select" | "create">("select");
+  const [newUserForm, setNewUserForm] = useState({
+    name: "",
+    email: "",
+    password: "",
+  });
 
   const showToast = (msg: string) => {
     setToast(msg);
@@ -143,10 +402,26 @@ export default function AdminTicketsPage() {
       .then((d) => setEvents(Array.isArray(d) ? d : []))
       .catch(() => {});
 
-    fetch("/api/admin/users?page=1")
-      .then((r) => r.json())
-      .then((d) => setUsers(Array.isArray(d.users) ? d.users : []))
-      .catch(() => {});
+    // Fetch ALL users across all pages so the dropdown is complete
+    const fetchAllUsers = async () => {
+      let currentPage = 1;
+      let accumulated: UserOption[] = [];
+      try {
+        while (true) {
+          const res = await fetch(`/api/admin/users?page=${currentPage}`);
+          if (!res.ok) break;
+          const d = await res.json();
+          const batch: UserOption[] = Array.isArray(d.users) ? d.users : [];
+          accumulated = [...accumulated, ...batch];
+          if (currentPage >= (d.totalPages ?? 1)) break;
+          currentPage++;
+        }
+      } catch {
+        // keep whatever we got
+      }
+      setUsers(accumulated);
+    };
+    fetchAllUsers();
   }, []);
 
   const load = useCallback(() => {
@@ -211,17 +486,76 @@ export default function AdminTicketsPage() {
     setModal(null);
     setSelectedTicket(null);
     setForm(emptyForm());
+    setUserMode("select");
+    setNewUserForm({ name: "", email: "", password: "" });
   };
 
   const save = async () => {
-    if (modal === "create" && !form.userId)
-      return showToast("User is required");
     setSaving(true);
 
     const isEdit = modal === "edit";
-    const payload = isEdit
-      ? { id: selectedTicket!.id, ...form, eventId: form.eventId || undefined }
-      : { ...form, eventId: form.eventId || undefined };
+    let resolvedUserId = form.userId;
+
+    // ── If admin chose to create a new user, do that first ─────────────────
+    if (userMode === "create") {
+      if (!newUserForm.email.trim()) {
+        setSaving(false);
+        return showToast("Email is required for new user");
+      }
+      if (!newUserForm.password || newUserForm.password.length < 6) {
+        setSaving(false);
+        return showToast("Password must be at least 6 characters");
+      }
+
+      const userRes = await fetch("/api/admin/users", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: newUserForm.name.trim() || undefined,
+          email: newUserForm.email.trim().toLowerCase(),
+          password: newUserForm.password,
+        }),
+      });
+      if (!userRes.ok) {
+        const d = await userRes.json();
+        setSaving(false);
+        return showToast(d.error || "Failed to create user");
+      }
+      const created = await userRes.json();
+      resolvedUserId = created.id;
+      // Add the newly created user to the local list so it appears in dropdown next time
+      setUsers((prev) => [
+        { id: created.id, name: created.name, email: created.email },
+        ...prev,
+      ]);
+    } else if (!isEdit && !resolvedUserId) {
+      setSaving(false);
+      return showToast("Please select or create a user");
+    }
+
+    let payload: Record<string, unknown>;
+
+    if (isEdit) {
+      payload = {
+        id: selectedTicket!.id,
+        ticketType: form.ticketType,
+        quantity: form.quantity,
+        price: form.price,
+        total: form.total,
+        status: form.status,
+        eventId: form.eventId || undefined,
+      };
+      // Include userId only when it changed
+      if (resolvedUserId && resolvedUserId !== selectedTicket!.userId) {
+        payload.userId = resolvedUserId;
+      }
+    } else {
+      payload = {
+        ...form,
+        userId: resolvedUserId,
+        eventId: form.eventId || undefined,
+      };
+    }
 
     const res = await fetch("/api/admin/tickets", {
       method: isEdit ? "PATCH" : "POST",
@@ -360,16 +694,21 @@ export default function AdminTicketsPage() {
                 </div>
               </div>
 
-              {/* Download link */}
-              <a
-                href={buildQRUrl(selectedTicket)}
-                download={`ticket-qr-${selectedTicket.id.slice(0, 8)}.png`}
-                target="_blank"
-                rel="noreferrer"
-                className="w-full text-center py-2.5 bg-primary text-primary-foreground text-sm font-bold rounded-xl hover:opacity-90 transition-opacity"
+              {/* Download styled ticket image */}
+              <button
+                onClick={async () => {
+                  setDownloading(true);
+                  try {
+                    await downloadTicketImage(selectedTicket);
+                  } finally {
+                    setDownloading(false);
+                  }
+                }}
+                disabled={downloading}
+                className="w-full text-center py-2.5 bg-primary text-primary-foreground text-sm font-bold rounded-xl hover:opacity-90 transition-opacity disabled:opacity-60"
               >
-                Download QR Code
-              </a>
+                {downloading ? "Génération…" : "Télécharger le ticket (PNG)"}
+              </button>
             </div>
           </div>
         </div>
@@ -391,12 +730,41 @@ export default function AdminTicketsPage() {
               </button>
             </div>
             <div className="p-6 space-y-4">
-              {/* User */}
-              {modal === "create" && (
-                <div>
-                  <label className="block text-xs font-bold text-foreground/50 mb-1.5 uppercase tracking-wider">
-                    User *
+              {/* User section — toggle between select existing / create new */}
+              <div>
+                <div className="flex items-center justify-between mb-2">
+                  <label className="text-xs font-bold text-foreground/50 uppercase tracking-wider">
+                    {modal === "create" ? "User *" : "User"}
                   </label>
+                  {/* Toggle tabs */}
+                  <div className="flex bg-background border border-border rounded-lg overflow-hidden text-[11px] font-bold">
+                    <button
+                      type="button"
+                      onClick={() => setUserMode("select")}
+                      className={`px-3 py-1.5 transition-colors ${
+                        userMode === "select"
+                          ? "bg-primary text-primary-foreground"
+                          : "text-foreground/40 hover:text-foreground"
+                      }`}
+                    >
+                      Existant
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setUserMode("create")}
+                      className={`px-3 py-1.5 transition-colors ${
+                        userMode === "create"
+                          ? "bg-primary text-primary-foreground"
+                          : "text-foreground/40 hover:text-foreground"
+                      }`}
+                    >
+                      Créer
+                    </button>
+                  </div>
+                </div>
+
+                {userMode === "select" ? (
+                  /* ── Select existing user ── */
                   <select
                     value={form.userId}
                     onChange={(e) =>
@@ -404,15 +772,77 @@ export default function AdminTicketsPage() {
                     }
                     className="w-full bg-background border border-border rounded-xl py-2.5 px-4 text-sm focus:outline-none focus:border-primary/50"
                   >
-                    <option value="">— Select a user —</option>
+                    {modal === "edit" ? (
+                      <option value="">— Garder l'utilisateur actuel —</option>
+                    ) : (
+                      <option value="">— Sélectionner un utilisateur —</option>
+                    )}
                     {users.map((u) => (
                       <option key={u.id} value={u.id}>
                         {u.name ? `${u.name} (${u.email})` : u.email}
                       </option>
                     ))}
                   </select>
-                </div>
-              )}
+                ) : (
+                  /* ── Create new user ── */
+                  <div className="space-y-3 p-4 bg-background border border-border rounded-xl">
+                    <p className="text-[11px] text-foreground/40 mb-1">
+                      Un nouvel utilisateur sera créé et associé à ce ticket.
+                    </p>
+                    <div>
+                      <label className="block text-[10px] font-bold text-foreground/40 mb-1 uppercase tracking-wider">
+                        Nom complet
+                      </label>
+                      <input
+                        type="text"
+                        placeholder="ex. Jean Dupont"
+                        value={newUserForm.name}
+                        onChange={(e) =>
+                          setNewUserForm((f) => ({
+                            ...f,
+                            name: e.target.value,
+                          }))
+                        }
+                        className="w-full bg-card border border-border rounded-lg py-2 px-3 text-sm focus:outline-none focus:border-primary/50"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-[10px] font-bold text-foreground/40 mb-1 uppercase tracking-wider">
+                        Email *
+                      </label>
+                      <input
+                        type="email"
+                        placeholder="ex. jean@example.com"
+                        value={newUserForm.email}
+                        onChange={(e) =>
+                          setNewUserForm((f) => ({
+                            ...f,
+                            email: e.target.value,
+                          }))
+                        }
+                        className="w-full bg-card border border-border rounded-lg py-2 px-3 text-sm focus:outline-none focus:border-primary/50"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-[10px] font-bold text-foreground/40 mb-1 uppercase tracking-wider">
+                        Mot de passe *
+                      </label>
+                      <input
+                        type="password"
+                        placeholder="Min. 6 caractères"
+                        value={newUserForm.password}
+                        onChange={(e) =>
+                          setNewUserForm((f) => ({
+                            ...f,
+                            password: e.target.value,
+                          }))
+                        }
+                        className="w-full bg-card border border-border rounded-lg py-2 px-3 text-sm focus:outline-none focus:border-primary/50"
+                      />
+                    </div>
+                  </div>
+                )}
+              </div>
 
               {/* Event */}
               <div>
