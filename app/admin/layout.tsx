@@ -12,6 +12,8 @@ import {
   ShieldCheck,
   ChevronRight,
   Ticket,
+  Handshake,
+  FileInput,
 } from "lucide-react";
 import { useAuth } from "@/lib/auth-context";
 
@@ -21,6 +23,8 @@ const sidebarIcons = [
   { href: "/admin/events", icon: Calendar, label: "Events" },
   { href: "/admin/contacts", icon: MessageSquare, label: "Messages" },
   { href: "/admin/tickets", icon: Ticket, label: "Tickets" },
+  { href: "/admin/partners", icon: Handshake, label: "Partners" },
+  { href: "/admin/applications", icon: FileInput, label: "Applications" },
 ];
 
 export default function AdminLayout({
@@ -61,15 +65,18 @@ export default function AdminLayout({
 
         <nav className="flex-1 space-y-6">
           {sidebarIcons.map((item) => {
-            const isActive = pathname === item.href || (item.href !== "/admin" && pathname.startsWith(item.href));
+            const isActive =
+              pathname === item.href ||
+              (item.href !== "/admin" && pathname.startsWith(item.href));
             return (
               <Link
                 key={item.href}
                 href={item.href}
-                className={`flex items-center justify-center w-12 h-12 rounded-2xl transition-all ${isActive
-                  ? "bg-[#2d2d2d] text-white shadow-xl shadow-[#2d2d2d]/20"
-                  : "text-[#d1c9c4] hover:text-[#ff5722] hover:bg-[#fbf9f8]"
-                  }`}
+                className={`flex items-center justify-center w-12 h-12 rounded-2xl transition-all ${
+                  isActive
+                    ? "bg-[#2d2d2d] text-white shadow-xl shadow-[#2d2d2d]/20"
+                    : "text-[#d1c9c4] hover:text-[#ff5722] hover:bg-[#fbf9f8]"
+                }`}
               >
                 <item.icon className="w-5 h-5" />
               </Link>
@@ -94,15 +101,18 @@ export default function AdminLayout({
           {/* Pill Navigation */}
           <div className="flex bg-white p-1 rounded-full border border-[#f0ece9]/50 shadow-sm overflow-hidden">
             {sidebarIcons.map((item) => {
-              const isActive = pathname === item.href || (item.href !== "/admin" && pathname.startsWith(item.href));
+              const isActive =
+                pathname === item.href ||
+                (item.href !== "/admin" && pathname.startsWith(item.href));
               return (
                 <Link
                   key={item.href}
                   href={item.href}
-                  className={`px-5 py-1.5 rounded-full text-xs font-bold transition-all ${isActive
-                    ? "bg-[#2d2d2d] text-white shadow-md shadow-[#2d2d2d]/10"
-                    : "text-[#8e8581] hover:text-[#ff5722]"
-                    }`}
+                  className={`px-5 py-1.5 rounded-full text-xs font-bold transition-all ${
+                    isActive
+                      ? "bg-[#2d2d2d] text-white shadow-md shadow-[#2d2d2d]/10"
+                      : "text-[#8e8581] hover:text-[#ff5722]"
+                  }`}
                 >
                   {item.label}
                 </Link>
@@ -113,14 +123,20 @@ export default function AdminLayout({
           {/* Right Header: Search & Profile */}
           <div className="flex items-center gap-6">
             <div className="flex items-center gap-3 text-[#d1c9c4]">
-              <button className="p-2 hover:text-[#ff5722] transition-colors"><MessageSquare className="w-5 h-5" /></button>
-              <button className="p-2 hover:text-[#ff5722] transition-colors"><ShieldCheck className="w-5 h-5" /></button>
+              <button className="p-2 hover:text-[#ff5722] transition-colors">
+                <MessageSquare className="w-5 h-5" />
+              </button>
+              <button className="p-2 hover:text-[#ff5722] transition-colors">
+                <ShieldCheck className="w-5 h-5" />
+              </button>
             </div>
 
             <div className="flex items-center gap-3 pl-6 border-l border-[#f0ece9]">
               <div className="text-right hidden sm:block">
                 <p className="text-xs font-black leading-none">{user.name}</p>
-                <p className="text-[10px] text-[#8e8581] mt-1 uppercase tracking-tight font-bold">{user.role}</p>
+                <p className="text-[10px] text-[#8e8581] mt-1 uppercase tracking-tight font-bold">
+                  {user.role}
+                </p>
               </div>
               <div className="w-10 h-10 rounded-2xl bg-[#fbf9f8] flex items-center justify-center overflow-hidden border border-[#f0ece9] shadow-sm">
                 <div className="w-full h-full bg-[#ff5722] flex items-center justify-center text-white font-black text-sm">

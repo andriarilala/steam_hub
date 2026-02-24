@@ -29,6 +29,8 @@ model User {
   organization      String?
   createdAt         DateTime         @default(now())
   updatedAt         DateTime         @updatedAt
+  // partner/sponsor relation
+  partner           Partner?
 }
 
 // models added for NextAuth functionality
@@ -76,8 +78,8 @@ model Event {
   title        String
   description  String?
   date         DateTime
-  time         String?       // Time field for the event (e.g. "14:00")
-  location     String?       // Location/Venue of the event
+  time         String? // Time field for the event (e.g. "14:00")
+  location     String? // Location/Venue of the event
   type         String?
   createdAt    DateTime      @default(now())
   ticketOrders TicketOrder[]
@@ -136,4 +138,124 @@ model TicketOrder {
 
   user  User   @relation(fields: [userId], references: [id], onDelete: Cascade)
   event Event? @relation(fields: [eventId], references: [id], onDelete: SetNull)
+}
+
+// ─── Partner / Sponsor Management ────────────────────────────────────────────
+
+model Partner {
+  id      String  @id @default(uuid())
+  name    String
+  slug    String  @unique
+  logo    String?
+  website String?
+  email   String?
+  phone   String?
+
+  category String // "tech" | "finance" | "education" | "ngo" | "government" | "other"
+  type     String @default("PARTNER") // "PARTNER" | "SPONSOR"
+  status   String @default("ACTIVE") // "ACTIVE" | "INACTIVE" | "PENDING"
+
+  tagline     String?
+  description String?
+  vision      String?
+  impact      String?
+  locations   String[] @default([])
+
+  // Optional link to a User account with role="sponsor"
+  userId String? @unique
+  user   User?   @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  opportunities  PartnerOpportunity[]
+  testimonials   PartnerTestimonial[]
+  sponsorPackage SponsorPackage?
+  applications   SponsorApplication[]
+}
+
+model PartnerOpportunity {
+  id          String   @id @default(uuid())
+  partnerId   String
+  title       String
+  description String?
+  level       String? // "Entry Level" | "Student" | "All Levels"
+  type        String? // "internship" | "job" | "scholarship" | "mentorship"
+  createdAt   DateTime @default(now())
+
+  partner Partner @relation(fields: [partnerId], references: [id], onDelete: Cascade)
+}
+
+model PartnerTestimonial {
+  id        String   @id @default(uuid())
+  partnerId String
+  quote     String
+  author    String
+  role      String?
+  createdAt DateTime @default(now())
+
+  partner Partner @relation(fields: [partnerId], references: [id], onDelete: Cascade)
+}
+
+model SponsorPackage {
+  id          String    @id @default(uuid())
+  partnerId   String    @unique
+  packageType String // "INSTITUTIONAL" | "IMPACT" | "INNOVATION" | "PREMIUM"
+  budget      Float?
+  startDate   DateTime?
+  endDate     DateTime?
+  benefits    String[]  @default([])
+  notes       String?
+
+  partner   Partner           @relation(fields: [partnerId], references: [id], onDelete: Cascade)
+  analytics SponsorAnalytics?
+}
+
+model SponsorApplication {
+  id                  String   @id @default(uuid())
+  companyName         String
+  contactName         String
+  email               String
+  phone               String?
+  jobTitle            String?
+  sponsorshipInterest String?
+  budget              String?
+  message             String?
+  status              String   @default("PENDING") // "PENDING" | "REVIEWED" | "ACCEPTED" | "REJECTED" | "COMPLETED"
+  partnerId           String?
+  createdAt           DateTime @default(now())
+
+  partner Partner? @relation(fields: [partnerId], references: [id], onDelete: SetNull)
+}
+
+model SponsorAnalytics {
+  id                String   @id @default(uuid())
+  packageId         String   @unique
+  boothVisits       Int      @default(0)
+  impressions       Int      @default(0)
+  clicks            Int      @default(0)
+  leads             Int      @default(0)
+  conversions       Int      @default(0)
+  socialMentions    Int      @default(0)
+  videoViews        Int      @default(0)
+  downloadsMaterial Int      @default(0)
+  ctr               Float    @default(0)
+  roi               Float    @default(0)
+  engagement        Float    @default(0)
+  updatedAt         DateTime @updatedAt
+
+  package      SponsorPackage @relation(fields: [packageId], references: [id], onDelete: Cascade)
+  sponsorLeads SponsorLead[]
+}
+
+model SponsorLead {
+  id           String   @id @default(uuid())
+  analyticsId  String
+  name         String
+  email        String
+  organization String?
+  interested   Boolean  @default(false)
+  createdAt    DateTime @default(now())
+
+  analytics SponsorAnalytics @relation(fields: [analyticsId], references: [id], onDelete: Cascade)
 }
