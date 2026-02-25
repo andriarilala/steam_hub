@@ -81,6 +81,8 @@ model Event {
   time         String? // Time field for the event (e.g. "14:00")
   location     String? // Location/Venue of the event
   type         String?
+  price        Float? // Ticket price for this event
+  phone_number String? // Contact phone number for the event
   createdAt    DateTime      @default(now())
   ticketOrders TicketOrder[]
 }
@@ -130,8 +132,9 @@ model TicketOrder {
   eventId    String? // linked event
   ticketType String // "standard" | "vip" | "student" | "virtual"
   quantity   Int      @default(1)
-  price      Float
-  total      Float
+  price      Float // price per ticket (= event.price * quantity)
+  total      Float // kept for backward compat (same as price)
+  reference  String? // optional payment reference (e.g. 1133223564476)
   status     String   @default("pending") // "pending" | "completed" | "failed" | "cancelled"
   qrCode     String   @unique @default(uuid()) // unique token encoded in QR
   createdAt  DateTime @default(now())

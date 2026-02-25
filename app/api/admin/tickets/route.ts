@@ -31,6 +31,7 @@ const TicketSchema = z.object({
   price: z.number().min(0),
   total: z.number().min(0),
   status: z.enum(TICKET_STATUSES).default("pending"),
+  reference: z.string().optional(),
 });
 
 // GET /api/admin/tickets?page=1&status=&eventId=&search=
@@ -109,6 +110,7 @@ export async function POST(req: NextRequest) {
       price: data.price,
       total: data.total,
       status: data.status,
+      reference: data.reference ?? null,
       qrCode: randomUUID(), // unique QR token
     },
     include: {
@@ -151,6 +153,9 @@ export async function PATCH(req: NextRequest) {
       ...(data.price !== undefined ? { price: data.price } : {}),
       ...(data.total !== undefined ? { total: data.total } : {}),
       ...(data.status ? { status: data.status } : {}),
+      ...(data.reference !== undefined
+        ? { reference: data.reference || null }
+        : {}),
     },
     include: {
       user: { select: { id: true, name: true, email: true } },

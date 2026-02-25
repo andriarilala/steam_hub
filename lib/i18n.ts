@@ -4,6 +4,7 @@ export const translations = {
     "nav.home": "Home",
     "nav.story": "The Story",
     "nav.event": "The Event",
+    "nav.events": "Events",
     "nav.agenda": "Agenda",
     "nav.partners": "Partners",
     "nav.community": "Community",
@@ -17,7 +18,8 @@ export const translations = {
     "admin.locationPlaceholder": "e.g. Accra, Ghana or Online",
 
     // Footer
-    "footer.tagline": "The meeting point between today's talents and tomorrow's opportunities.",
+    "footer.tagline":
+      "The meeting point between today's talents and tomorrow's opportunities.",
     "footer.platform": "Platform",
     "footer.resources": "Resources",
     "footer.connect": "Connect",
@@ -27,73 +29,99 @@ export const translations = {
 
     // Home Page
     "home.title": "PASS AVENIR",
-    "home.subtitle": "The meeting point between today's talents and tomorrow's opportunities",
+    "home.subtitle":
+      "The meeting point between today's talents and tomorrow's opportunities",
     "home.cta": "Participate",
     "home.ctaSecondary": "Become a Sponsor",
     "home.whyJoin": "Why Join PASS AVENIR?",
-    "home.whyJoinDesc": "An immersive platform designed for every participant in Africa's future ecosystem",
+    "home.whyJoinDesc":
+      "An immersive platform designed for every participant in Africa's future ecosystem",
     "home.connect": "Connect",
-    "home.connectDesc": "Meet thousands of talented youth, companies, and institutions",
+    "home.connectDesc":
+      "Meet thousands of talented youth, companies, and institutions",
     "home.discover": "Discover",
-    "home.discoverDesc": "Explore opportunities in tech, education, innovation, and more",
+    "home.discoverDesc":
+      "Explore opportunities in tech, education, innovation, and more",
     "home.grow": "Grow",
-    "home.growDesc": "Access mentorship, internships, jobs, and transformative programs",
+    "home.growDesc":
+      "Access mentorship, internships, jobs, and transformative programs",
     "home.lead": "Lead",
     "home.leadDesc": "Be part of a movement shaping tomorrow's Africa",
     "home.platform": "A Real International-Level Platform",
-    "home.platformDesc": "PASS AVENIR is not a simple event website. It's a strategic digital ecosystem bringing together youth, institutions, companies, and mentors to create lasting impact. Active all year round, built for scale.",
+    "home.platformDesc":
+      "PASS AVENIR is not a simple event website. It's a strategic digital ecosystem bringing together youth, institutions, companies, and mentors to create lasting impact. Active all year round, built for scale.",
     "home.feature1": "Interactive agenda with intelligent filtering",
     "home.feature2": "Digital expo hall with sponsor profiles",
     "home.feature3": "Community platform for ongoing connections",
     "home.feature4": "Registration, ticketing, and analytics",
     "home.learnMore": "Learn More",
     "home.ready": "Ready to Transform Your Future?",
-    "home.readyDesc": "Join thousands of talents, institutions, and companies shaping Africa's tomorrow",
+    "home.readyDesc":
+      "Join thousands of talents, institutions, and companies shaping Africa's tomorrow",
     "home.registerNow": "Register Now",
     "home.exploreOpp": "Explore Opportunities",
 
     // Story Page
     "story.title": "The Story of PASS AVENIR",
-    "story.subtitle": "Understanding the vision, mission, and movement that drives our platform",
+    "story.subtitle":
+      "Understanding the vision, mission, and movement that drives our platform",
     "story.origin": "The Origin",
-    "story.originP1": "PASS AVENIR was born from a simple yet powerful observation: Africa is home to the world's youngest population, with over 60% under 25 years old. Yet, despite extraordinary potential, young African talents often lack meaningful connections to institutions, companies, and global opportunities.",
-    "story.originP2": "At the same time, forward-thinking organizations, companies, and governments are desperately seeking ways to discover, engage, and invest in the next generation of leaders. The gap was not a lack of talent or opportunities—it was the absence of a strategic meeting point.",
-    "story.originP3": "PASS AVENIR exists to bridge that gap. It is a platform designed to connect ambition with opportunity, potential with reality, and individuals with institutions that shape tomorrow's world.",
+    "story.originP1":
+      "PASS AVENIR was born from a simple yet powerful observation: Africa is home to the world's youngest population, with over 60% under 25 years old. Yet, despite extraordinary potential, young African talents often lack meaningful connections to institutions, companies, and global opportunities.",
+    "story.originP2":
+      "At the same time, forward-thinking organizations, companies, and governments are desperately seeking ways to discover, engage, and invest in the next generation of leaders. The gap was not a lack of talent or opportunities—it was the absence of a strategic meeting point.",
+    "story.originP3":
+      "PASS AVENIR exists to bridge that gap. It is a platform designed to connect ambition with opportunity, potential with reality, and individuals with institutions that shape tomorrow's world.",
     "story.context": "The Context",
     "story.stat1Title": "African Youth",
     "story.stat1Desc": "Over 60% of Africa's population is under 25 years old",
     "story.stat2Title": "Untapped Potential",
-    "story.stat2Desc": "Young talents with limited access to global opportunities",
+    "story.stat2Desc":
+      "Young talents with limited access to global opportunities",
     "story.stat3Title": "Year of Action",
     "story.stat3Desc": "The time to invest in Africa's future is now",
     "story.vision": "Our Long-Term Vision",
-    "story.visionP1": "PASS AVENIR is not a one-time event. It is the foundation of a year-round ecosystem where connections made at our summits continue to flourish through mentorship programs, exclusive community access, and ongoing partnership opportunities.",
+    "story.visionP1":
+      "PASS AVENIR is not a one-time event. It is the foundation of a year-round ecosystem where connections made at our summits continue to flourish through mentorship programs, exclusive community access, and ongoing partnership opportunities.",
     "story.visionP2": "We envision a future where:",
-    "story.visionItem1": "Every talented young African has access to world-class institutions and companies",
-    "story.visionItem2": "Organizations across sectors actively discover and nurture the next generation",
-    "story.visionItem3": "Technology, innovation, and human potential converge to solve Africa's greatest challenges",
-    "story.visionItem4": "PASS AVENIR becomes the benchmark for global youth-institution-business ecosystems",
+    "story.visionItem1":
+      "Every talented young African has access to world-class institutions and companies",
+    "story.visionItem2":
+      "Organizations across sectors actively discover and nurture the next generation",
+    "story.visionItem3":
+      "Technology, innovation, and human potential converge to solve Africa's greatest challenges",
+    "story.visionItem4":
+      "PASS AVENIR becomes the benchmark for global youth-institution-business ecosystems",
     "story.quotes": "Words from Leaders",
-    "story.quote1": "PASS AVENIR is more than a platform—it's a movement to unleash Africa's potential and connect the continent's brightest minds with global opportunities.",
+    "story.quote1":
+      "PASS AVENIR is more than a platform—it's a movement to unleash Africa's potential and connect the continent's brightest minds with global opportunities.",
     "story.quote1Author": "Founder, PASS AVENIR",
-    "story.quote2": "In the 21st century, success belongs to those who can connect talent with opportunity. PASS AVENIR does exactly that at scale.",
+    "story.quote2":
+      "In the 21st century, success belongs to those who can connect talent with opportunity. PASS AVENIR does exactly that at scale.",
     "story.quote2Author": "Tech Visionary & Advisor",
 
     // Event Page
     "event.title": "The PASS AVENIR Event",
-    "event.subtitle": "A strategic gathering of Africa's brightest talents, leading institutions, and innovative companies",
+    "event.subtitle":
+      "A strategic gathering of Africa's brightest talents, leading institutions, and innovative companies",
     "event.what": "What is PASS AVENIR?",
-    "event.whatP1": "PASS AVENIR is an immersive, multi-day summit bringing together young talents, institutions, companies, NGOs, and thought leaders for strategic engagement, learning, and partnership-building. It's a catalyst for change, combining keynotes, workshops, exhibitions, networking sessions, and exclusive opportunities.",
-    "event.whatP2": "Unlike traditional conferences, PASS AVENIR is designed as a platform where every participant—whether a student seeking mentorship, a company hunting for talent, or an institution showcasing opportunities—leaves with concrete connections and next steps.",
+    "event.whatP1":
+      "PASS AVENIR is an immersive, multi-day summit bringing together young talents, institutions, companies, NGOs, and thought leaders for strategic engagement, learning, and partnership-building. It's a catalyst for change, combining keynotes, workshops, exhibitions, networking sessions, and exclusive opportunities.",
+    "event.whatP2":
+      "Unlike traditional conferences, PASS AVENIR is designed as a platform where every participant—whether a student seeking mentorship, a company hunting for talent, or an institution showcasing opportunities—leaves with concrete connections and next steps.",
     "event.goals": "Goals of This Edition",
     "event.goal1": "Connect 10,000+ Talents",
-    "event.goal1Desc": "Gather Africa's brightest young minds in one transformative experience",
+    "event.goal1Desc":
+      "Gather Africa's brightest young minds in one transformative experience",
     "event.goal2": "Showcase 50+ Opportunities",
-    "event.goal2Desc": "Present jobs, internships, scholarships, and mentorship programs from global leaders",
+    "event.goal2Desc":
+      "Present jobs, internships, scholarships, and mentorship programs from global leaders",
     "event.goal3": "Facilitate 1,000+ Meaningful Meetings",
-    "event.goal3Desc": "Create structured networking to build lasting professional relationships",
+    "event.goal3Desc":
+      "Create structured networking to build lasting professional relationships",
     "event.goal4": "Inspire Action",
-    "event.goal4Desc": "Empower participants to take the next step in their careers and ambitions",
+    "event.goal4Desc":
+      "Empower participants to take the next step in their careers and ambitions",
     "event.for": "Who It's For",
     "event.forYouth": "Students & Young Professionals",
     "event.forYouth1": "Discover global career opportunities",
@@ -130,24 +158,32 @@ export const translations = {
     "event.gainsOrg5": "Partner with Africa's most ambitious ecosystem",
     "event.highlights": "Event Highlights",
     "event.highlight1": "Keynote Sessions",
-    "event.highlight1Desc": "Inspiring talks from world-renowned leaders, innovators, and changemakers",
+    "event.highlight1Desc":
+      "Inspiring talks from world-renowned leaders, innovators, and changemakers",
     "event.highlight2": "Interactive Workshops",
-    "event.highlight2Desc": "Deep-dive learning on tech, entrepreneurship, career development, and more",
+    "event.highlight2Desc":
+      "Deep-dive learning on tech, entrepreneurship, career development, and more",
     "event.highlight3": "Digital Expo Hall",
-    "event.highlight3Desc": "Meet 50+ companies and institutions showcasing opportunities and programs",
+    "event.highlight3Desc":
+      "Meet 50+ companies and institutions showcasing opportunities and programs",
     "event.highlight4": "Mentorship Zones",
-    "event.highlight4Desc": "One-on-one and small-group sessions with industry experts and mentors",
+    "event.highlight4Desc":
+      "One-on-one and small-group sessions with industry experts and mentors",
     "event.highlight5": "Networking Sessions",
-    "event.highlight5Desc": "Structured and casual networking designed for meaningful connections",
+    "event.highlight5Desc":
+      "Structured and casual networking designed for meaningful connections",
     "event.highlight6": "Exclusive Announcements",
-    "event.highlight6Desc": "First access to new scholarship programs, internship offers, and partnerships",
+    "event.highlight6Desc":
+      "First access to new scholarship programs, internship offers, and partnerships",
     "event.cta": "Ready to Be Part of the Movement?",
-    "event.ctaDesc": "Register now to secure your spot at PASS AVENIR. Limited spaces available.",
+    "event.ctaDesc":
+      "Register now to secure your spot at PASS AVENIR. Limited spaces available.",
     "event.ctaBtn": "Register Now",
 
     // Agenda Page
     "agenda.title": "Event Agenda",
-    "agenda.subtitle": "Two days of immersive learning, networking, and opportunities",
+    "agenda.subtitle":
+      "Two days of immersive learning, networking, and opportunities",
     "agenda.filterTheme": "Filter by Theme",
     "agenda.filterAudience": "Filter by Audience",
     "agenda.allThemes": "All Themes",
@@ -155,7 +191,8 @@ export const translations = {
     "agenda.showing": "Showing",
     "agenda.of": "of",
     "agenda.sessions": "sessions",
-    "agenda.noSessions": "No sessions match your filters. Try adjusting your selection.",
+    "agenda.noSessions":
+      "No sessions match your filters. Try adjusting your selection.",
     "agenda.learnMore": "Learn More",
     "agenda.showLess": "Show Less",
     "agenda.speakers": "Speakers:",
@@ -167,7 +204,8 @@ export const translations = {
     "agenda.venue": "Venue",
     "agenda.venueValue": "International Convention Center\nAccra, Ghana",
     "agenda.bring": "What to Bring",
-    "agenda.bringValue": "Confirmation email, ID, Business cards (optional), Comfortable shoes",
+    "agenda.bringValue":
+      "Confirmation email, ID, Business cards (optional), Comfortable shoes",
     "agenda.technology": "Technology",
     "agenda.innovation": "Innovation",
     "agenda.career": "Career",
@@ -180,52 +218,70 @@ export const translations = {
 
     // Partners Page
     "partners.title": "Our Partners & Sponsors",
-    "partners.subtitle": "Meet the institutions and companies shaping Africa's future",
+    "partners.subtitle":
+      "Meet the institutions and companies shaping Africa's future",
     "partners.expo": "Digital Expo Hall",
-    "partners.expoDesc": "Our partners represent the best of Africa's ecosystem—institutions committed to talent development, innovation, and creating real opportunities. Explore their stories, understand what they offer, and discover your next opportunity.",
+    "partners.expoDesc":
+      "Our partners represent the best of Africa's ecosystem—institutions committed to talent development, innovation, and creating real opportunities. Explore their stories, understand what they offer, and discover your next opportunity.",
     "partners.featured": "Featured Partners",
     "partners.viewProfile": "View Profile",
     "partners.packages": "Sponsor Packages",
-    "partners.packagesDesc": "Partner with PASS AVENIR to gain visibility, reach top talent, and build lasting impact in Africa's youth ecosystem.",
+    "partners.packagesDesc":
+      "Partner with PASS AVENIR to gain visibility, reach top talent, and build lasting impact in Africa's youth ecosystem.",
     "partners.institutional": "Institutional",
     "partners.impact": "Impact",
     "partners.innovation": "Innovation",
     "partners.premium": "Premium",
     "partners.why": "Why Partner With PASS AVENIR?",
     "partners.why1": "Access Africa's Top Talent",
-    "partners.why1Desc": "Reach 10,000+ of the continent's brightest young minds—pre-screened, motivated, and ready for opportunities.",
+    "partners.why1Desc":
+      "Reach 10,000+ of the continent's brightest young minds—pre-screened, motivated, and ready for opportunities.",
     "partners.why2": "Build Your Employer Brand",
-    "partners.why2Desc": "Connect with youth at the beginning of their careers. Create lasting impressions and loyalty among top talent.",
+    "partners.why2Desc":
+      "Connect with youth at the beginning of their careers. Create lasting impressions and loyalty among top talent.",
     "partners.why3": "Digital + Physical Experience",
-    "partners.why3Desc": "Our platform provides both in-person and digital exposure. Reach participants before, during, and after the event.",
+    "partners.why3Desc":
+      "Our platform provides both in-person and digital exposure. Reach participants before, during, and after the event.",
     "partners.why4": "Data-Driven Insights",
-    "partners.why4Desc": "Get analytics on participant engagement, interests, and interactions with your booth or content.",
+    "partners.why4Desc":
+      "Get analytics on participant engagement, interests, and interactions with your booth or content.",
     "partners.why5": "Strategic Partnerships",
-    "partners.why5Desc": "Collaborate with other leading organizations to amplify impact and create mutually beneficial opportunities.",
+    "partners.why5Desc":
+      "Collaborate with other leading organizations to amplify impact and create mutually beneficial opportunities.",
     "partners.why6": "Year-Round Engagement",
-    "partners.why6Desc": "Your partnership doesn't end at the event. Access our community platform for continued engagement all year.",
+    "partners.why6Desc":
+      "Your partnership doesn't end at the event. Access our community platform for continued engagement all year.",
     "partners.downloadDeck": "Download Sponsor Deck",
     "partners.contactSales": "Contact Sales",
-    "partners.partnersReady": "Ready to partner with PASS AVENIR? Download our partnership prospectus or contact our team.",
+    "partners.partnersReady":
+      "Ready to partner with PASS AVENIR? Download our partnership prospectus or contact our team.",
 
     // Community Page
     "community.title": "PASS AVENIR Community",
-    "community.subtitle": "Year-round connections, learning, and growth beyond the summit",
+    "community.subtitle":
+      "Year-round connections, learning, and growth beyond the summit",
     "community.intro": "More Than an Event",
-    "community.introDesc": "PASS AVENIR is an active year-round community connecting talents, mentors, experts, and companies. Access exclusive content, build meaningful relationships, and continue your growth journey between summits.",
+    "community.introDesc":
+      "PASS AVENIR is an active year-round community connecting talents, mentors, experts, and companies. Access exclusive content, build meaningful relationships, and continue your growth journey between summits.",
     "community.benefits": "Community Benefits",
     "community.benefit1": "Connect & Network",
-    "community.benefit1Desc": "Meet talented youth, experienced mentors, and company leaders. Build your professional network.",
+    "community.benefit1Desc":
+      "Meet talented youth, experienced mentors, and company leaders. Build your professional network.",
     "community.benefit2": "Ask & Collaborate",
-    "community.benefit2Desc": "Access community forums, group chats, and direct messaging to get advice and collaborate on projects.",
+    "community.benefit2Desc":
+      "Access community forums, group chats, and direct messaging to get advice and collaborate on projects.",
     "community.benefit3": "Exclusive Opportunities",
-    "community.benefit3Desc": "First access to job postings, internships, speaking engagements, and partnership opportunities.",
+    "community.benefit3Desc":
+      "First access to job postings, internships, speaking engagements, and partnership opportunities.",
     "community.benefit4": "Ongoing Learning",
-    "community.benefit4Desc": "Exclusive webinars, guides, toolkits, and challenges to develop skills and stay ahead.",
+    "community.benefit4Desc":
+      "Exclusive webinars, guides, toolkits, and challenges to develop skills and stay ahead.",
     "community.benefit5": "Global Network",
-    "community.benefit5Desc": "Connect with African talents and opportunities on the continent and internationally.",
+    "community.benefit5Desc":
+      "Connect with African talents and opportunities on the continent and internationally.",
     "community.benefit6": "Members-Only Content",
-    "community.benefit6Desc": "Access curated insights, salary data, career resources, and expert advice.",
+    "community.benefit6Desc":
+      "Access curated insights, salary data, career resources, and expert advice.",
     "community.tabOverview": "Overview",
     "community.tabMembers": "Members",
     "community.tabContent": "Exclusive Content",
@@ -237,15 +293,20 @@ export const translations = {
     "community.stat4": "Connections Made",
     "community.howWorks": "How It Works",
     "community.step1": "Create Your Profile",
-    "community.step1Desc": "Tell us about yourself, your interests, goals, and expertise. Build your professional brand.",
+    "community.step1Desc":
+      "Tell us about yourself, your interests, goals, and expertise. Build your professional brand.",
     "community.step2": "Join Interest Groups",
-    "community.step2Desc": "Connect with like-minded members. Participate in discussions, ask questions, and share knowledge.",
+    "community.step2Desc":
+      "Connect with like-minded members. Participate in discussions, ask questions, and share knowledge.",
     "community.step3": "Attend Events & Webinars",
-    "community.step3Desc": "Join monthly webinars, workshops, and networking sessions. Learn from industry experts and peers.",
+    "community.step3Desc":
+      "Join monthly webinars, workshops, and networking sessions. Learn from industry experts and peers.",
     "community.step4": "Access Opportunities",
-    "community.step4Desc": "Discover jobs, internships, speaking engagements, and collaborations shared by community members.",
+    "community.step4Desc":
+      "Discover jobs, internships, speaking engagements, and collaborations shared by community members.",
     "community.step5": "Grow & Give Back",
-    "community.step5Desc": "Develop your skills, build relationships, and mentor others in the community. Create impact together.",
+    "community.step5Desc":
+      "Develop your skills, build relationships, and mentor others in the community. Create impact together.",
     "community.members": "Community Members",
     "community.allMembers": "All Members",
     "community.filterYouth": "Youth",
@@ -264,35 +325,47 @@ export const translations = {
     "community.type.toolkit": "Toolkit",
     "community.type.challenge": "Challenge",
     "community.content1Title": "Mastering Technical Interviews",
-    "community.content1Desc": "Step-by-step guide to ace your technical interviews at top tech companies. Includes real examples.",
+    "community.content1Desc":
+      "Step-by-step guide to ace your technical interviews at top tech companies. Includes real examples.",
     "community.content2Title": "From Idea to Funding: Startup Pitching 101",
-    "community.content2Desc": "Live session with successful founders and VCs on how to pitch your startup and secure funding.",
+    "community.content2Desc":
+      "Live session with successful founders and VCs on how to pitch your startup and secure funding.",
     "community.content3Title": "African Tech Salary Benchmark Report 2025",
-    "community.content3Desc": "Comprehensive data on tech salaries across African countries. Use this to negotiate better offers.",
+    "community.content3Desc":
+      "Comprehensive data on tech salaries across African countries. Use this to negotiate better offers.",
     "community.content4Title": "30-Day Coding Challenge",
-    "community.content4Desc": "Monthly coding challenge with prizes. Build portfolio projects, compete, and win recognition.",
+    "community.content4Desc":
+      "Monthly coding challenge with prizes. Build portfolio projects, compete, and win recognition.",
     "community.groups": "Interest Groups",
     "community.joinGroup": "Join Group",
     "community.membersCount": "members",
     "community.group1": "Tech & Innovation",
-    "community.group1Desc": "For software developers, data scientists, AI enthusiasts, and tech entrepreneurs.",
+    "community.group1Desc":
+      "For software developers, data scientists, AI enthusiasts, and tech entrepreneurs.",
     "community.group2": "Career Development",
-    "community.group2Desc": "Job search support, interview prep, career coaching, and professional growth.",
+    "community.group2Desc":
+      "Job search support, interview prep, career coaching, and professional growth.",
     "community.group3": "Entrepreneurship",
-    "community.group3Desc": "Startup founders, early-stage entrepreneurs, and business builders sharing experiences.",
+    "community.group3Desc":
+      "Startup founders, early-stage entrepreneurs, and business builders sharing experiences.",
     "community.group4": "Women in Tech",
-    "community.group4Desc": "Female technologists supporting each other's growth and leadership journeys.",
+    "community.group4Desc":
+      "Female technologists supporting each other's growth and leadership journeys.",
     "community.group5": "Education & Learning",
-    "community.group5Desc": "Continuous learners, bootcamp graduates, and lifelong education enthusiasts.",
+    "community.group5Desc":
+      "Continuous learners, bootcamp graduates, and lifelong education enthusiasts.",
     "community.group6": "Mentorship Circle",
-    "community.group6Desc": "Mentors and mentees connecting for professional guidance and knowledge sharing.",
+    "community.group6Desc":
+      "Mentors and mentees connecting for professional guidance and knowledge sharing.",
     "community.ctaTitle": "Ready to Join Our Community?",
-    "community.ctaDesc": "Connect with Africa's brightest talents and leading organizations. Your journey starts here.",
+    "community.ctaDesc":
+      "Connect with Africa's brightest talents and leading organizations. Your journey starts here.",
     "community.ctaBtn": "Join Community",
 
     // Media Page
     "media.title": "Media Center",
-    "media.subtitle": "Photos, videos, articles and press resources from PASS AVENIR events",
+    "media.subtitle":
+      "Photos, videos, articles and press resources from PASS AVENIR events",
     "media.filterType": "Filter by Type",
     "media.filterCategory": "Filter by Category",
     "media.allTypes": "All Types",
@@ -309,7 +382,8 @@ export const translations = {
     "media.watch": "Watch",
     "media.read": "Read",
     "media.pressKit": "Press Kit",
-    "media.pressKitDesc": "Download official PASS AVENIR assets for media coverage and partnerships.",
+    "media.pressKitDesc":
+      "Download official PASS AVENIR assets for media coverage and partnerships.",
     "media.brandGuidelines": "Brand Guidelines",
     "media.brandGuidelinesDesc": "Logo, colors, typography, and usage rules",
     "media.pressRelease": "Press Release",
@@ -323,7 +397,8 @@ export const translations = {
     "contact.title": "Contact Us",
     "contact.subtitle": "Get in touch with the PASS AVENIR team",
     "contact.getInTouch": "Get In Touch",
-    "contact.getInTouchDesc": "Have questions about PASS AVENIR? We're here to help. Reach out through any of the channels below.",
+    "contact.getInTouchDesc":
+      "Have questions about PASS AVENIR? We're here to help. Reach out through any of the channels below.",
     "contact.email": "Email",
     "contact.emailValue": "hello@passavenir.com",
     "contact.phone": "Phone",
@@ -348,20 +423,25 @@ export const translations = {
     "contact.send": "Send Message",
     "contact.faq": "Frequently Asked Questions",
     "contact.faq1Q": "When is the next PASS AVENIR event?",
-    "contact.faq1A": "Our next summit is scheduled for March 15-16, 2025 in Accra, Ghana. Registration opens soon.",
+    "contact.faq1A":
+      "Our next summit is scheduled for March 15-16, 2025 in Accra, Ghana. Registration opens soon.",
     "contact.faq2Q": "How can my company become a sponsor?",
-    "contact.faq2A": "Visit our Partners page to view sponsorship packages, or contact our sales team directly at sponsors@passavenir.com.",
+    "contact.faq2A":
+      "Visit our Partners page to view sponsorship packages, or contact our sales team directly at sponsors@passavenir.com.",
     "contact.faq3Q": "Is there a cost to attend as a student?",
-    "contact.faq3A": "We offer various ticket types including discounted student passes. Early registration gets the best rates.",
+    "contact.faq3A":
+      "We offer various ticket types including discounted student passes. Early registration gets the best rates.",
     "contact.faq4Q": "Can I volunteer at PASS AVENIR?",
-    "contact.faq4A": "Yes! We welcome volunteers. Send us a message expressing your interest and we'll get back to you.",
+    "contact.faq4A":
+      "Yes! We welcome volunteers. Send us a message expressing your interest and we'll get back to you.",
     "contact.followUs": "Follow Us",
 
     // Authentication
     "auth.signInTitle": "Welcome Back",
     "auth.signInSubtitle": "Sign in to access your PASS AVENIR account",
     "auth.signUpTitle": "Join PASS AVENIR",
-    "auth.signUpSubtitle": "Create your account and connect with thousands of talents",
+    "auth.signUpSubtitle":
+      "Create your account and connect with thousands of talents",
     "auth.email": "Email",
     "auth.password": "Password",
     "auth.confirmPassword": "Confirm Password",
@@ -369,9 +449,11 @@ export const translations = {
     "auth.organization": "Organization",
     "auth.rememberMe": "Remember me",
     "auth.forgotPassword": "Forgot password?",
-    "auth.forgotPasswordDesc": "Enter your email and we'll send a link to reset your password.",
+    "auth.forgotPasswordDesc":
+      "Enter your email and we'll send a link to reset your password.",
     "auth.sendResetEmail": "Send reset link",
-    "auth.resetEmailSent": "If that email is registered, a reset link has been sent.",
+    "auth.resetEmailSent":
+      "If that email is registered, a reset link has been sent.",
     "auth.backToSignIn": "Back to sign in",
     "auth.invalidToken": "Invalid or expired token",
     "auth.resetPasswordTitle": "Reset Password",
@@ -390,11 +472,13 @@ export const translations = {
     "auth.signInLink": "Sign in",
     "auth.selectRole": "Select your profile",
     "auth.roleYouth": "Student / Young Professional",
-    "auth.roleYouthDesc": "Looking for opportunities, internships, and mentorship",
+    "auth.roleYouthDesc":
+      "Looking for opportunities, internships, and mentorship",
     "auth.roleCompany": "Company / Recruiter",
     "auth.roleCompanyDesc": "Recruiting talents and showcasing opportunities",
     "auth.roleInstitution": "Institution / Government",
-    "auth.roleInstitutionDesc": "Representing an institution or public organization",
+    "auth.roleInstitutionDesc":
+      "Representing an institution or public organization",
     "auth.roleMentor": "Mentor / Expert",
     "auth.roleMentorDesc": "Sharing expertise and guiding the next generation",
     "auth.roleSponsor": "Sponsor / Partner",
@@ -433,7 +517,8 @@ export const translations = {
     "dashboard.exploreOpportunities": "Explore Opportunities",
     "dashboard.accessContent": "Access Content",
     "dashboard.missionTitle": "Our Mission",
-    "dashboard.missionDesc": "Pass Avenir is the meeting point between today’s talents and tomorrow’s opportunities. Explore the agenda, community and sponsors to join the platform.",
+    "dashboard.missionDesc":
+      "Pass Avenir is the meeting point between today’s talents and tomorrow’s opportunities. Explore the agenda, community and sponsors to join the platform.",
     "dashboard.sponsorHub": "Visit the Sponsor Experience Hub",
     "dashboard.upcomingSessions": "Upcoming Sessions",
     "dashboard.viewAll": "View All",
@@ -453,7 +538,8 @@ export const translations = {
 
     // Registration & Ticketing
     "register.title": "Register for PASS AVENIR",
-    "register.subtitle": "Secure your spot at Africa's most transformative summit",
+    "register.subtitle":
+      "Secure your spot at Africa's most transformative summit",
     "register.selectTicket": "Select Your Ticket",
     "register.standard": "Standard",
     "register.standardPrice": "3000 AR",
@@ -476,13 +562,15 @@ export const translations = {
     "register.pay": "Pay",
     "register.secure": "Secure Payment",
     "register.success": "Registration Successful!",
-    "register.successDesc": "You will receive a confirmation email with your ticket.",
+    "register.successDesc":
+      "You will receive a confirmation email with your ticket.",
   },
   fr: {
     // Navigation
     "nav.home": "Accueil",
     "nav.story": "L'Histoire",
     "nav.event": "L'Evenement",
+    "nav.events": "Événements",
     "nav.agenda": "Agenda",
     "nav.partners": "Partenaires",
     "nav.community": "Communaute",
@@ -495,7 +583,8 @@ export const translations = {
     "admin.locationPlaceholder": "ex: Accra, Ghana ou En ligne",
 
     // Footer
-    "footer.tagline": "Le carrefour entre les talents d'aujourd'hui et les opportunites de demain.",
+    "footer.tagline":
+      "Le carrefour entre les talents d'aujourd'hui et les opportunites de demain.",
     "footer.platform": "Plateforme",
     "footer.resources": "Ressources",
     "footer.connect": "Contact",
@@ -505,73 +594,102 @@ export const translations = {
 
     // Home Page
     "home.title": "PASS AVENIR",
-    "home.subtitle": "Le carrefour entre les talents d'aujourd'hui et les opportunites de demain",
+    "home.subtitle":
+      "Le carrefour entre les talents d'aujourd'hui et les opportunites de demain",
     "home.cta": "Participer",
     "home.ctaSecondary": "Devenir Partenaire",
     "home.whyJoin": "Pourquoi rejoindre PASS AVENIR ?",
-    "home.whyJoinDesc": "Une plateforme immersive concue pour chaque acteur de l'ecosysteme africain de demain",
+    "home.whyJoinDesc":
+      "Une plateforme immersive concue pour chaque acteur de l'ecosysteme africain de demain",
     "home.connect": "Connecter",
-    "home.connectDesc": "Rencontrez des milliers de talents, d'entreprises et d'institutions",
+    "home.connectDesc":
+      "Rencontrez des milliers de talents, d'entreprises et d'institutions",
     "home.discover": "Decouvrir",
-    "home.discoverDesc": "Explorez des opportunites en technologie, education, innovation, et plus",
+    "home.discoverDesc":
+      "Explorez des opportunites en technologie, education, innovation, et plus",
     "home.grow": "Grandir",
-    "home.growDesc": "Accedez au mentorat, stages, emplois et programmes transformateurs",
+    "home.growDesc":
+      "Accedez au mentorat, stages, emplois et programmes transformateurs",
     "home.lead": "Diriger",
-    "home.leadDesc": "Faites partie d'un mouvement faconnant l'Afrique de demain",
+    "home.leadDesc":
+      "Faites partie d'un mouvement faconnant l'Afrique de demain",
     "home.platform": "Une Veritable Plateforme de Niveau International",
-    "home.platformDesc": "PASS AVENIR n'est pas un simple site d'evenement. C'est un ecosysteme numerique strategique reunissant jeunes talents, institutions, entreprises et mentors pour creer un impact durable. Actif toute l'annee, concu pour l'expansion.",
+    "home.platformDesc":
+      "PASS AVENIR n'est pas un simple site d'evenement. C'est un ecosysteme numerique strategique reunissant jeunes talents, institutions, entreprises et mentors pour creer un impact durable. Actif toute l'annee, concu pour l'expansion.",
     "home.feature1": "Agenda interactif avec filtrage intelligent",
     "home.feature2": "Exposition numerique avec profils des partenaires",
     "home.feature3": "Plateforme communautaire pour les connexions continues",
     "home.feature4": "Inscription, billetterie et analytics",
     "home.learnMore": "En Savoir Plus",
     "home.ready": "Pret a Transformer Votre Avenir ?",
-    "home.readyDesc": "Rejoignez des milliers de talents, d'institutions et d'entreprises faconnant l'Afrique de demain",
+    "home.readyDesc":
+      "Rejoignez des milliers de talents, d'institutions et d'entreprises faconnant l'Afrique de demain",
     "home.registerNow": "S'inscrire Maintenant",
     "home.exploreOpp": "Explorer les Opportunites",
 
     // Story Page
     "story.title": "L'Histoire de PASS AVENIR",
-    "story.subtitle": "Comprendre la vision, la mission et le mouvement qui anime notre plateforme",
+    "story.subtitle":
+      "Comprendre la vision, la mission et le mouvement qui anime notre plateforme",
     "story.origin": "L'Origine",
-    "story.originP1": "PASS AVENIR est ne d'une observation simple mais puissante : l'Afrique est le foyer de la population la plus jeune du monde, avec plus de 60% de moins de 25 ans. Pourtant, malgre un potentiel extraordinaire, les jeunes talents africains manquent souvent de connexions significatives avec les institutions, les entreprises et les opportunites mondiales.",
-    "story.originP2": "En meme temps, les organisations, les entreprises et les gouvernements prosperes cherchent desesperement des moyens de decouvrir, d'engager et d'investir dans la prochaine generation de leaders. Le probleme n'etait pas un manque de talent ou d'opportunites—c'etait l'absence d'un point de rencontre strategique.",
-    "story.originP3": "PASS AVENIR existe pour combler ce fosse. C'est une plateforme concue pour connecter l'ambition avec l'opportunite, le potentiel avec la realite, et les individus avec les institutions qui faconnent le monde de demain.",
+    "story.originP1":
+      "PASS AVENIR est ne d'une observation simple mais puissante : l'Afrique est le foyer de la population la plus jeune du monde, avec plus de 60% de moins de 25 ans. Pourtant, malgre un potentiel extraordinaire, les jeunes talents africains manquent souvent de connexions significatives avec les institutions, les entreprises et les opportunites mondiales.",
+    "story.originP2":
+      "En meme temps, les organisations, les entreprises et les gouvernements prosperes cherchent desesperement des moyens de decouvrir, d'engager et d'investir dans la prochaine generation de leaders. Le probleme n'etait pas un manque de talent ou d'opportunites—c'etait l'absence d'un point de rencontre strategique.",
+    "story.originP3":
+      "PASS AVENIR existe pour combler ce fosse. C'est une plateforme concue pour connecter l'ambition avec l'opportunite, le potentiel avec la realite, et les individus avec les institutions qui faconnent le monde de demain.",
     "story.context": "Le Contexte",
     "story.stat1Title": "Jeunesse Africaine",
-    "story.stat1Desc": "Plus de 60% de la population africaine a moins de 25 ans",
+    "story.stat1Desc":
+      "Plus de 60% de la population africaine a moins de 25 ans",
     "story.stat2Title": "Potentiel Inexploite",
-    "story.stat2Desc": "Jeunes talents avec un acces limite aux opportunites mondiales",
+    "story.stat2Desc":
+      "Jeunes talents avec un acces limite aux opportunites mondiales",
     "story.stat3Title": "Annee d'Action",
-    "story.stat3Desc": "Le moment d'investir dans l'avenir de l'Afrique est maintenant",
+    "story.stat3Desc":
+      "Le moment d'investir dans l'avenir de l'Afrique est maintenant",
     "story.vision": "Notre Vision a Long Terme",
-    "story.visionP1": "PASS AVENIR n'est pas un evenement unique. C'est la fondation d'un ecosysteme actif toute l'annee ou les connexions creees lors de nos sommets continuent de prosperer a travers des programmes de mentorat, un acces exclusif a la communaute et des opportunites de partenariat continues.",
+    "story.visionP1":
+      "PASS AVENIR n'est pas un evenement unique. C'est la fondation d'un ecosysteme actif toute l'annee ou les connexions creees lors de nos sommets continuent de prosperer a travers des programmes de mentorat, un acces exclusif a la communaute et des opportunites de partenariat continues.",
     "story.visionP2": "Nous envisageons un avenir ou :",
-    "story.visionItem1": "Chaque jeune talent africain a acces aux institutions et entreprises de classe mondiale",
-    "story.visionItem2": "Les organisations de tous les secteurs decouvrent et cultivent activement la prochaine generation",
-    "story.visionItem3": "La technologie, l'innovation et le potentiel humain convergent pour resoudre les plus grands defis de l'Afrique",
-    "story.visionItem4": "PASS AVENIR devient la reference pour les ecosystemes jeunesse-institution-entreprise mondiaux",
+    "story.visionItem1":
+      "Chaque jeune talent africain a acces aux institutions et entreprises de classe mondiale",
+    "story.visionItem2":
+      "Les organisations de tous les secteurs decouvrent et cultivent activement la prochaine generation",
+    "story.visionItem3":
+      "La technologie, l'innovation et le potentiel humain convergent pour resoudre les plus grands defis de l'Afrique",
+    "story.visionItem4":
+      "PASS AVENIR devient la reference pour les ecosystemes jeunesse-institution-entreprise mondiaux",
     "story.quotes": "Paroles de Leaders",
-    "story.quote1": "PASS AVENIR est plus qu'une plateforme—c'est un mouvement pour liberer le potentiel de l'Afrique et connecter les esprits les plus brillants du continent avec des opportunites mondiales.",
+    "story.quote1":
+      "PASS AVENIR est plus qu'une plateforme—c'est un mouvement pour liberer le potentiel de l'Afrique et connecter les esprits les plus brillants du continent avec des opportunites mondiales.",
     "story.quote1Author": "Fondateur, PASS AVENIR",
-    "story.quote2": "Au 21eme siecle, le succes appartient a ceux qui peuvent connecter le talent avec l'opportunite. PASS AVENIR fait exactement cela a grande echelle.",
+    "story.quote2":
+      "Au 21eme siecle, le succes appartient a ceux qui peuvent connecter le talent avec l'opportunite. PASS AVENIR fait exactement cela a grande echelle.",
     "story.quote2Author": "Visionnaire Tech & Conseiller",
 
     // Event Page
     "event.title": "L'Evenement PASS AVENIR",
-    "event.subtitle": "Un rassemblement strategique des talents les plus brillants d'Afrique, des institutions leaders et des entreprises innovantes",
+    "event.subtitle":
+      "Un rassemblement strategique des talents les plus brillants d'Afrique, des institutions leaders et des entreprises innovantes",
     "event.what": "Qu'est-ce que PASS AVENIR ?",
-    "event.whatP1": "PASS AVENIR est un sommet immersif de plusieurs jours reunissant jeunes talents, institutions, entreprises, ONG et leaders d'opinion pour un engagement strategique, l'apprentissage et la creation de partenariats. C'est un catalyseur de changement, combinant conferences, ateliers, expositions, sessions de networking et opportunites exclusives.",
-    "event.whatP2": "Contrairement aux conferences traditionnelles, PASS AVENIR est concu comme une plateforme ou chaque participant—qu'il soit etudiant cherchant du mentorat, entreprise chassant des talents, ou institution presentant des opportunites—repart avec des connexions concretes et des prochaines etapes.",
+    "event.whatP1":
+      "PASS AVENIR est un sommet immersif de plusieurs jours reunissant jeunes talents, institutions, entreprises, ONG et leaders d'opinion pour un engagement strategique, l'apprentissage et la creation de partenariats. C'est un catalyseur de changement, combinant conferences, ateliers, expositions, sessions de networking et opportunites exclusives.",
+    "event.whatP2":
+      "Contrairement aux conferences traditionnelles, PASS AVENIR est concu comme une plateforme ou chaque participant—qu'il soit etudiant cherchant du mentorat, entreprise chassant des talents, ou institution presentant des opportunites—repart avec des connexions concretes et des prochaines etapes.",
     "event.goals": "Objectifs de Cette Edition",
     "event.goal1": "Connecter 10 000+ Talents",
-    "event.goal1Desc": "Rassembler les esprits les plus brillants d'Afrique dans une experience transformatrice",
+    "event.goal1Desc":
+      "Rassembler les esprits les plus brillants d'Afrique dans une experience transformatrice",
     "event.goal2": "Presenter 50+ Opportunites",
-    "event.goal2Desc": "Presenter des emplois, stages, bourses et programmes de mentorat de leaders mondiaux",
+    "event.goal2Desc":
+      "Presenter des emplois, stages, bourses et programmes de mentorat de leaders mondiaux",
     "event.goal3": "Faciliter 1 000+ Rencontres Significatives",
-    "event.goal3Desc": "Creer un networking structure pour batir des relations professionnelles durables",
+    "event.goal3Desc":
+      "Creer un networking structure pour batir des relations professionnelles durables",
     "event.goal4": "Inspirer l'Action",
-    "event.goal4Desc": "Donner aux participants les moyens de passer a l'etape suivante dans leurs carrieres et ambitions",
+    "event.goal4Desc":
+      "Donner aux participants les moyens de passer a l'etape suivante dans leurs carrieres et ambitions",
     "event.for": "Pour Qui ?",
     "event.forYouth": "Etudiants & Jeunes Professionnels",
     "event.forYouth1": "Decouvrir des opportunites de carriere mondiales",
@@ -604,28 +722,38 @@ export const translations = {
     "event.gainsOrg1": "Visibilite premium et opportunites de branding",
     "event.gainsOrg2": "Stand dedie ou presence sur scene",
     "event.gainsOrg3": "Acces au pipeline de talents selectionnes",
-    "event.gainsOrg4": "Insights bases sur les donnees sur l'engagement des participants",
-    "event.gainsOrg5": "Partenariat avec l'ecosysteme le plus ambitieux d'Afrique",
+    "event.gainsOrg4":
+      "Insights bases sur les donnees sur l'engagement des participants",
+    "event.gainsOrg5":
+      "Partenariat avec l'ecosysteme le plus ambitieux d'Afrique",
     "event.highlights": "Points Forts de l'Evenement",
     "event.highlight1": "Sessions Plenieres",
-    "event.highlight1Desc": "Discours inspirants de leaders de renommee mondiale, innovateurs et acteurs du changement",
+    "event.highlight1Desc":
+      "Discours inspirants de leaders de renommee mondiale, innovateurs et acteurs du changement",
     "event.highlight2": "Ateliers Interactifs",
-    "event.highlight2Desc": "Apprentissage approfondi sur la tech, l'entrepreneuriat, le developpement de carriere, et plus",
+    "event.highlight2Desc":
+      "Apprentissage approfondi sur la tech, l'entrepreneuriat, le developpement de carriere, et plus",
     "event.highlight3": "Hall d'Exposition Numerique",
-    "event.highlight3Desc": "Rencontrez 50+ entreprises et institutions presentant des opportunites et programmes",
+    "event.highlight3Desc":
+      "Rencontrez 50+ entreprises et institutions presentant des opportunites et programmes",
     "event.highlight4": "Zones de Mentorat",
-    "event.highlight4Desc": "Sessions individuelles et en petits groupes avec des experts et mentors de l'industrie",
+    "event.highlight4Desc":
+      "Sessions individuelles et en petits groupes avec des experts et mentors de l'industrie",
     "event.highlight5": "Sessions de Networking",
-    "event.highlight5Desc": "Networking structure et decontracte concu pour des connexions significatives",
+    "event.highlight5Desc":
+      "Networking structure et decontracte concu pour des connexions significatives",
     "event.highlight6": "Annonces Exclusives",
-    "event.highlight6Desc": "Acces en avant-premiere aux nouveaux programmes de bourses, offres de stages et partenariats",
+    "event.highlight6Desc":
+      "Acces en avant-premiere aux nouveaux programmes de bourses, offres de stages et partenariats",
     "event.cta": "Pret a Faire Partie du Mouvement ?",
-    "event.ctaDesc": "Inscrivez-vous maintenant pour reserver votre place a PASS AVENIR. Places limitees.",
+    "event.ctaDesc":
+      "Inscrivez-vous maintenant pour reserver votre place a PASS AVENIR. Places limitees.",
     "event.ctaBtn": "S'inscrire Maintenant",
 
     // Agenda Page
     "agenda.title": "Agenda de l'Evenement",
-    "agenda.subtitle": "Deux jours d'apprentissage immersif, de networking et d'opportunites",
+    "agenda.subtitle":
+      "Deux jours d'apprentissage immersif, de networking et d'opportunites",
     "agenda.filterTheme": "Filtrer par Theme",
     "agenda.filterAudience": "Filtrer par Public",
     "agenda.allThemes": "Tous les Themes",
@@ -633,7 +761,8 @@ export const translations = {
     "agenda.showing": "Affichage de",
     "agenda.of": "sur",
     "agenda.sessions": "sessions",
-    "agenda.noSessions": "Aucune session ne correspond a vos filtres. Essayez d'ajuster votre selection.",
+    "agenda.noSessions":
+      "Aucune session ne correspond a vos filtres. Essayez d'ajuster votre selection.",
     "agenda.learnMore": "En Savoir Plus",
     "agenda.showLess": "Voir Moins",
     "agenda.speakers": "Intervenants :",
@@ -645,7 +774,8 @@ export const translations = {
     "agenda.venue": "Lieu",
     "agenda.venueValue": "Centre de Conventions International\nAccra, Ghana",
     "agenda.bring": "A Apporter",
-    "agenda.bringValue": "Email de confirmation, Piece d'identite, Cartes de visite (optionnel), Chaussures confortables",
+    "agenda.bringValue":
+      "Email de confirmation, Piece d'identite, Cartes de visite (optionnel), Chaussures confortables",
     "agenda.technology": "Technologie",
     "agenda.innovation": "Innovation",
     "agenda.career": "Carriere",
@@ -658,52 +788,70 @@ export const translations = {
 
     // Partners Page
     "partners.title": "Nos Partenaires & Sponsors",
-    "partners.subtitle": "Rencontrez les institutions et entreprises qui faconnent l'avenir de l'Afrique",
+    "partners.subtitle":
+      "Rencontrez les institutions et entreprises qui faconnent l'avenir de l'Afrique",
     "partners.expo": "Hall d'Exposition Numerique",
-    "partners.expoDesc": "Nos partenaires representent le meilleur de l'ecosysteme africain—des institutions engagees dans le developpement des talents, l'innovation et la creation d'opportunites reelles. Explorez leurs histoires, comprenez ce qu'ils offrent et decouvrez votre prochaine opportunite.",
+    "partners.expoDesc":
+      "Nos partenaires representent le meilleur de l'ecosysteme africain—des institutions engagees dans le developpement des talents, l'innovation et la creation d'opportunites reelles. Explorez leurs histoires, comprenez ce qu'ils offrent et decouvrez votre prochaine opportunite.",
     "partners.featured": "Partenaires en Vedette",
     "partners.viewProfile": "Voir le Profil",
     "partners.packages": "Forfaits de Parrainage",
-    "partners.packagesDesc": "Associez-vous a PASS AVENIR pour gagner en visibilite, atteindre les meilleurs talents et creer un impact durable dans l'ecosysteme jeunesse africain.",
+    "partners.packagesDesc":
+      "Associez-vous a PASS AVENIR pour gagner en visibilite, atteindre les meilleurs talents et creer un impact durable dans l'ecosysteme jeunesse africain.",
     "partners.institutional": "Institutionnel",
     "partners.impact": "Impact",
     "partners.innovation": "Innovation",
     "partners.premium": "Premium",
     "partners.why": "Pourquoi S'associer a PASS AVENIR ?",
     "partners.why1": "Accedez aux Meilleurs Talents d'Afrique",
-    "partners.why1Desc": "Atteignez plus de 10 000 des esprits les plus brillants du continent—preselectionnes, motives et prets pour les opportunites.",
+    "partners.why1Desc":
+      "Atteignez plus de 10 000 des esprits les plus brillants du continent—preselectionnes, motives et prets pour les opportunites.",
     "partners.why2": "Construisez Votre Marque Employeur",
-    "partners.why2Desc": "Connectez-vous avec les jeunes au debut de leur carriere. Creez des impressions durables et de la fidelite parmi les meilleurs talents.",
+    "partners.why2Desc":
+      "Connectez-vous avec les jeunes au debut de leur carriere. Creez des impressions durables et de la fidelite parmi les meilleurs talents.",
     "partners.why3": "Experience Numerique + Physique",
-    "partners.why3Desc": "Notre plateforme offre une exposition en personne et numerique. Atteignez les participants avant, pendant et apres l'evenement.",
+    "partners.why3Desc":
+      "Notre plateforme offre une exposition en personne et numerique. Atteignez les participants avant, pendant et apres l'evenement.",
     "partners.why4": "Insights Bases sur les Donnees",
-    "partners.why4Desc": "Obtenez des analytics sur l'engagement, les interets et les interactions des participants avec votre stand ou contenu.",
+    "partners.why4Desc":
+      "Obtenez des analytics sur l'engagement, les interets et les interactions des participants avec votre stand ou contenu.",
     "partners.why5": "Partenariats Strategiques",
-    "partners.why5Desc": "Collaborez avec d'autres organisations leaders pour amplifier l'impact et creer des opportunites mutuellement benefiques.",
+    "partners.why5Desc":
+      "Collaborez avec d'autres organisations leaders pour amplifier l'impact et creer des opportunites mutuellement benefiques.",
     "partners.why6": "Engagement Toute l'Annee",
-    "partners.why6Desc": "Votre partenariat ne se termine pas a l'evenement. Accedez a notre plateforme communautaire pour un engagement continu toute l'annee.",
+    "partners.why6Desc":
+      "Votre partenariat ne se termine pas a l'evenement. Accedez a notre plateforme communautaire pour un engagement continu toute l'annee.",
     "partners.downloadDeck": "Telecharger le Dossier Sponsor",
     "partners.contactSales": "Contacter les Ventes",
-    "partners.partnersReady": "Pret a vous associer a PASS AVENIR ? Telechargez notre prospectus de partenariat ou contactez notre equipe.",
+    "partners.partnersReady":
+      "Pret a vous associer a PASS AVENIR ? Telechargez notre prospectus de partenariat ou contactez notre equipe.",
 
     // Community Page
     "community.title": "Communaute PASS AVENIR",
-    "community.subtitle": "Connexions, apprentissage et croissance toute l'annee au-dela du sommet",
+    "community.subtitle":
+      "Connexions, apprentissage et croissance toute l'annee au-dela du sommet",
     "community.intro": "Plus Qu'un Evenement",
-    "community.introDesc": "PASS AVENIR est une communaute active toute l'annee connectant talents, mentors, experts et entreprises. Accedez a du contenu exclusif, construisez des relations significatives et continuez votre parcours de croissance entre les sommets.",
+    "community.introDesc":
+      "PASS AVENIR est une communaute active toute l'annee connectant talents, mentors, experts et entreprises. Accedez a du contenu exclusif, construisez des relations significatives et continuez votre parcours de croissance entre les sommets.",
     "community.benefits": "Avantages de la Communaute",
     "community.benefit1": "Connecter & Reseauter",
-    "community.benefit1Desc": "Rencontrez des jeunes talentueux, des mentors experimentes et des leaders d'entreprise. Construisez votre reseau professionnel.",
+    "community.benefit1Desc":
+      "Rencontrez des jeunes talentueux, des mentors experimentes et des leaders d'entreprise. Construisez votre reseau professionnel.",
     "community.benefit2": "Demander & Collaborer",
-    "community.benefit2Desc": "Accedez aux forums communautaires, chats de groupe et messagerie directe pour obtenir des conseils et collaborer sur des projets.",
+    "community.benefit2Desc":
+      "Accedez aux forums communautaires, chats de groupe et messagerie directe pour obtenir des conseils et collaborer sur des projets.",
     "community.benefit3": "Opportunites Exclusives",
-    "community.benefit3Desc": "Acces prioritaire aux offres d'emploi, stages, conferences et opportunites de partenariat.",
+    "community.benefit3Desc":
+      "Acces prioritaire aux offres d'emploi, stages, conferences et opportunites de partenariat.",
     "community.benefit4": "Apprentissage Continu",
-    "community.benefit4Desc": "Webinaires, guides, kits d'outils et defis exclusifs pour developper vos competences et rester en avance.",
+    "community.benefit4Desc":
+      "Webinaires, guides, kits d'outils et defis exclusifs pour developper vos competences et rester en avance.",
     "community.benefit5": "Reseau Mondial",
-    "community.benefit5Desc": "Connectez-vous avec des talents africains et des opportunites sur le continent et a l'international.",
+    "community.benefit5Desc":
+      "Connectez-vous avec des talents africains et des opportunites sur le continent et a l'international.",
     "community.benefit6": "Contenu Reserve aux Membres",
-    "community.benefit6Desc": "Accedez a des insights selectionnes, donnees salariales, ressources de carriere et conseils d'experts.",
+    "community.benefit6Desc":
+      "Accedez a des insights selectionnes, donnees salariales, ressources de carriere et conseils d'experts.",
     "community.tabOverview": "Apercu",
     "community.tabMembers": "Membres",
     "community.tabContent": "Contenu Exclusif",
@@ -715,15 +863,20 @@ export const translations = {
     "community.stat4": "Connexions Creees",
     "community.howWorks": "Comment Ca Marche",
     "community.step1": "Creez Votre Profil",
-    "community.step1Desc": "Parlez-nous de vous, vos interets, objectifs et expertise. Construisez votre marque professionnelle.",
+    "community.step1Desc":
+      "Parlez-nous de vous, vos interets, objectifs et expertise. Construisez votre marque professionnelle.",
     "community.step2": "Rejoignez des Groupes d'Interet",
-    "community.step2Desc": "Connectez-vous avec des membres partageant les memes idees. Participez aux discussions, posez des questions et partagez vos connaissances.",
+    "community.step2Desc":
+      "Connectez-vous avec des membres partageant les memes idees. Participez aux discussions, posez des questions et partagez vos connaissances.",
     "community.step3": "Participez aux Evenements & Webinaires",
-    "community.step3Desc": "Rejoignez les webinaires mensuels, ateliers et sessions de networking. Apprenez des experts de l'industrie et de vos pairs.",
+    "community.step3Desc":
+      "Rejoignez les webinaires mensuels, ateliers et sessions de networking. Apprenez des experts de l'industrie et de vos pairs.",
     "community.step4": "Accedez aux Opportunites",
-    "community.step4Desc": "Decouvrez des emplois, stages, conferences et collaborations partages par les membres de la communaute.",
+    "community.step4Desc":
+      "Decouvrez des emplois, stages, conferences et collaborations partages par les membres de la communaute.",
     "community.step5": "Grandissez & Redonnez",
-    "community.step5Desc": "Developpez vos competences, construisez des relations et mentorez d'autres membres de la communaute. Creez un impact ensemble.",
+    "community.step5Desc":
+      "Developpez vos competences, construisez des relations et mentorez d'autres membres de la communaute. Creez un impact ensemble.",
     "community.members": "Membres de la Communaute",
     "community.allMembers": "Tous les Membres",
     "community.filterYouth": "Jeunesse",
@@ -742,35 +895,49 @@ export const translations = {
     "community.type.toolkit": "Kit d'Outils",
     "community.type.challenge": "Defi",
     "community.content1Title": "Maitriser les Entretiens Techniques",
-    "community.content1Desc": "Guide etape par etape pour reussir vos entretiens techniques dans les meilleures entreprises tech. Inclut des exemples reels.",
-    "community.content2Title": "De l'Idee au Financement : Pitcher sa Startup 101",
-    "community.content2Desc": "Session live avec des fondateurs a succes et des VCs sur comment pitcher votre startup et obtenir un financement.",
-    "community.content3Title": "Rapport Benchmark des Salaires Tech Africains 2025",
-    "community.content3Desc": "Donnees completes sur les salaires tech dans les pays africains. Utilisez ceci pour negocier de meilleures offres.",
+    "community.content1Desc":
+      "Guide etape par etape pour reussir vos entretiens techniques dans les meilleures entreprises tech. Inclut des exemples reels.",
+    "community.content2Title":
+      "De l'Idee au Financement : Pitcher sa Startup 101",
+    "community.content2Desc":
+      "Session live avec des fondateurs a succes et des VCs sur comment pitcher votre startup et obtenir un financement.",
+    "community.content3Title":
+      "Rapport Benchmark des Salaires Tech Africains 2025",
+    "community.content3Desc":
+      "Donnees completes sur les salaires tech dans les pays africains. Utilisez ceci pour negocier de meilleures offres.",
     "community.content4Title": "Defi Coding 30 Jours",
-    "community.content4Desc": "Defi de programmation mensuel avec des prix. Construisez des projets portfolio, competitionnez et gagnez en reconnaissance.",
+    "community.content4Desc":
+      "Defi de programmation mensuel avec des prix. Construisez des projets portfolio, competitionnez et gagnez en reconnaissance.",
     "community.groups": "Groupes d'Interet",
     "community.joinGroup": "Rejoindre le Groupe",
     "community.membersCount": "membres",
     "community.group1": "Tech & Innovation",
-    "community.group1Desc": "Pour les developpeurs logiciels, data scientists, passionnes d'IA et entrepreneurs tech.",
+    "community.group1Desc":
+      "Pour les developpeurs logiciels, data scientists, passionnes d'IA et entrepreneurs tech.",
     "community.group2": "Developpement de Carriere",
-    "community.group2Desc": "Soutien a la recherche d'emploi, preparation aux entretiens, coaching de carriere et croissance professionnelle.",
+    "community.group2Desc":
+      "Soutien a la recherche d'emploi, preparation aux entretiens, coaching de carriere et croissance professionnelle.",
     "community.group3": "Entrepreneuriat",
-    "community.group3Desc": "Fondateurs de startups, entrepreneurs en debut de parcours et batisseurs d'entreprises partageant leurs experiences.",
+    "community.group3Desc":
+      "Fondateurs de startups, entrepreneurs en debut de parcours et batisseurs d'entreprises partageant leurs experiences.",
     "community.group4": "Femmes dans la Tech",
-    "community.group4Desc": "Femmes technologues se soutenant mutuellement dans leur croissance et leurs parcours de leadership.",
+    "community.group4Desc":
+      "Femmes technologues se soutenant mutuellement dans leur croissance et leurs parcours de leadership.",
     "community.group5": "Education & Apprentissage",
-    "community.group5Desc": "Apprenants continus, diplomes de bootcamps et passionnes d'education permanente.",
+    "community.group5Desc":
+      "Apprenants continus, diplomes de bootcamps et passionnes d'education permanente.",
     "community.group6": "Cercle de Mentorat",
-    "community.group6Desc": "Mentors et mentes se connectant pour un accompagnement professionnel et un partage de connaissances.",
+    "community.group6Desc":
+      "Mentors et mentes se connectant pour un accompagnement professionnel et un partage de connaissances.",
     "community.ctaTitle": "Pret a Rejoindre Notre Communaute ?",
-    "community.ctaDesc": "Connectez-vous avec les talents les plus brillants d'Afrique et les organisations leaders. Votre parcours commence ici.",
+    "community.ctaDesc":
+      "Connectez-vous avec les talents les plus brillants d'Afrique et les organisations leaders. Votre parcours commence ici.",
     "community.ctaBtn": "Rejoindre la Communaute",
 
     // Media Page
     "media.title": "Centre Media",
-    "media.subtitle": "Photos, videos, articles et ressources presse des evenements PASS AVENIR",
+    "media.subtitle":
+      "Photos, videos, articles et ressources presse des evenements PASS AVENIR",
     "media.filterType": "Filtrer par Type",
     "media.filterCategory": "Filtrer par Categorie",
     "media.allTypes": "Tous les Types",
@@ -787,11 +954,14 @@ export const translations = {
     "media.watch": "Regarder",
     "media.read": "Lire",
     "media.pressKit": "Kit Presse",
-    "media.pressKitDesc": "Telechargez les ressources officielles PASS AVENIR pour la couverture media et les partenariats.",
+    "media.pressKitDesc":
+      "Telechargez les ressources officielles PASS AVENIR pour la couverture media et les partenariats.",
     "media.brandGuidelines": "Charte Graphique",
-    "media.brandGuidelinesDesc": "Logo, couleurs, typographie et regles d'utilisation",
+    "media.brandGuidelinesDesc":
+      "Logo, couleurs, typographie et regles d'utilisation",
     "media.pressRelease": "Communique de Presse",
-    "media.pressReleaseDesc": "Dernieres annonces et informations sur l'evenement",
+    "media.pressReleaseDesc":
+      "Dernieres annonces et informations sur l'evenement",
     "media.mediaContact": "Contact Medias",
     "media.mediaContactDesc": "Pour les demandes presse et les interviews",
     "media.download": "Telecharger",
@@ -801,7 +971,8 @@ export const translations = {
     "contact.title": "Contactez-Nous",
     "contact.subtitle": "Entrez en contact avec l'equipe PASS AVENIR",
     "contact.getInTouch": "Prenez Contact",
-    "contact.getInTouchDesc": "Des questions sur PASS AVENIR ? Nous sommes la pour vous aider. Contactez-nous via l'un des canaux ci-dessous.",
+    "contact.getInTouchDesc":
+      "Des questions sur PASS AVENIR ? Nous sommes la pour vous aider. Contactez-nous via l'un des canaux ci-dessous.",
     "contact.email": "Email",
     "contact.emailValue": "hello@passavenir.com",
     "contact.phone": "Telephone",
@@ -826,20 +997,26 @@ export const translations = {
     "contact.send": "Envoyer le Message",
     "contact.faq": "Questions Frequentes",
     "contact.faq1Q": "Quand est le prochain evenement PASS AVENIR ?",
-    "contact.faq1A": "Notre prochain sommet est prevu pour les 15-16 mars 2025 a Accra, Ghana. Les inscriptions ouvrent bientot.",
+    "contact.faq1A":
+      "Notre prochain sommet est prevu pour les 15-16 mars 2025 a Accra, Ghana. Les inscriptions ouvrent bientot.",
     "contact.faq2Q": "Comment mon entreprise peut-elle devenir sponsor ?",
-    "contact.faq2A": "Visitez notre page Partenaires pour voir les forfaits de sponsoring, ou contactez notre equipe commerciale directement a sponsors@passavenir.com.",
+    "contact.faq2A":
+      "Visitez notre page Partenaires pour voir les forfaits de sponsoring, ou contactez notre equipe commerciale directement a sponsors@passavenir.com.",
     "contact.faq3Q": "Y a-t-il un cout pour assister en tant qu'etudiant ?",
-    "contact.faq3A": "Nous proposons differents types de billets incluant des pass etudiants a prix reduit. L'inscription anticipee obtient les meilleurs tarifs.",
+    "contact.faq3A":
+      "Nous proposons differents types de billets incluant des pass etudiants a prix reduit. L'inscription anticipee obtient les meilleurs tarifs.",
     "contact.faq4Q": "Puis-je faire du benevolat a PASS AVENIR ?",
-    "contact.faq4A": "Oui ! Nous accueillons les benevoles. Envoyez-nous un message exprimant votre interet et nous vous repondrons.",
+    "contact.faq4A":
+      "Oui ! Nous accueillons les benevoles. Envoyez-nous un message exprimant votre interet et nous vous repondrons.",
     "contact.followUs": "Suivez-Nous",
 
     // Authentication
     "auth.signInTitle": "Bienvenue",
-    "auth.signInSubtitle": "Connectez-vous pour acceder a votre compte PASS AVENIR",
+    "auth.signInSubtitle":
+      "Connectez-vous pour acceder a votre compte PASS AVENIR",
     "auth.signUpTitle": "Rejoignez PASS AVENIR",
-    "auth.signUpSubtitle": "Creez votre compte et connectez-vous avec des milliers de talents",
+    "auth.signUpSubtitle":
+      "Creez votre compte et connectez-vous avec des milliers de talents",
     "auth.email": "Email",
     "auth.password": "Mot de passe",
     "auth.confirmPassword": "Confirmer le mot de passe",
@@ -862,9 +1039,11 @@ export const translations = {
     "auth.roleCompany": "Entreprise / Recruteur",
     "auth.roleCompanyDesc": "Recrute des talents et presente des opportunites",
     "auth.roleInstitution": "Institution / Gouvernement",
-    "auth.roleInstitutionDesc": "Represente une institution ou un organisme public",
+    "auth.roleInstitutionDesc":
+      "Represente une institution ou un organisme public",
     "auth.roleMentor": "Mentor / Expert",
-    "auth.roleMentorDesc": "Partage son expertise et guide la prochaine generation",
+    "auth.roleMentorDesc":
+      "Partage son expertise et guide la prochaine generation",
     "auth.roleSponsor": "Sponsor / Partenaire",
     "auth.roleSponsorDesc": "Soutient l'evenement et gagne en visibilite",
     "auth.continue": "Continuer",
@@ -881,16 +1060,19 @@ export const translations = {
     "auth.errorInvalid": "Email ou mot de passe incorrect",
     "auth.errorSignIn": "Impossible de se connecter. Veuillez réessayer.",
     "auth.errorPasswordMatch": "Les mots de passe ne correspondent pas",
-    "auth.errorPasswordLength": "Le mot de passe doit contenir au moins 8 caracteres",
+    "auth.errorPasswordLength":
+      "Le mot de passe doit contenir au moins 8 caracteres",
     "auth.errorTerms": "Vous devez accepter les conditions d'utilisation",
     "auth.errorSignUp": "Erreur lors de l'inscription. Veuillez reessayer.",
     "auth.errorSelectRole": "Veuillez selectionner un profil",
     "auth.invalidToken": "Jeton invalide ou expiré",
     "auth.resetPasswordTitle": "Réinitialiser le mot de passe",
-    "auth.resetPasswordSubtitle": "Choisissez un nouveau mot de passe pour votre compte.",
+    "auth.resetPasswordSubtitle":
+      "Choisissez un nouveau mot de passe pour votre compte.",
     "auth.resetPassword": "Réinitialiser le mot de passe",
     "auth.newPassword": "Nouveau mot de passe",
-    "auth.resetSuccess": "Mot de passe mis à jour. Vous pouvez maintenant vous connecter.",
+    "auth.resetSuccess":
+      "Mot de passe mis à jour. Vous pouvez maintenant vous connecter.",
 
     // Dashboard
     "dashboard.welcome": "Bienvenue",
@@ -898,12 +1080,14 @@ export const translations = {
     "dashboard.signOut": "Deconnexion",
     "dashboard.editProfile": "Modifier le profil",
     "dashboard.missionTitle": "Notre mission",
-    "dashboard.missionDesc": "Pass Avenir est le point de rencontre entre les talents d’aujourd’hui et les opportunités de demain. Explorez l’agenda, la communauté et les sponsors pour rejoindre la plateforme.",
+    "dashboard.missionDesc":
+      "Pass Avenir est le point de rencontre entre les talents d’aujourd’hui et les opportunités de demain. Explorez l’agenda, la communauté et les sponsors pour rejoindre la plateforme.",
     "dashboard.sponsorHub": "Visitez le Sponsor Experience Hub",
     "dashboard.connections": "connexions",
     "dashboard.memberSince": "Membre depuis",
     "dashboard.profileCompletion": "Completion du profil",
-    "dashboard.completeProfile": "Completez votre profil pour obtenir plus de visibilite",
+    "dashboard.completeProfile":
+      "Completez votre profil pour obtenir plus de visibilite",
     "dashboard.quickActions": "Actions rapides",
     "dashboard.viewAgenda": "Voir l'agenda",
     "dashboard.findConnections": "Trouver des connexions",
@@ -927,7 +1111,8 @@ export const translations = {
 
     // Registration & Ticketing
     "register.title": "Inscription a PASS AVENIR",
-    "register.subtitle": "Reservez votre place pour le sommet le plus transformateur d'Afrique",
+    "register.subtitle":
+      "Reservez votre place pour le sommet le plus transformateur d'Afrique",
     "register.selectTicket": "Choisissez votre billet",
     "register.standard": "Standard",
     "register.standardPrice": "3000 AR",
@@ -950,7 +1135,8 @@ export const translations = {
     "register.pay": "Payer",
     "register.secure": "Paiement securise",
     "register.success": "Inscription reussie !",
-    "register.successDesc": "Vous recevrez un email de confirmation avec votre billet.",
+    "register.successDesc":
+      "Vous recevrez un email de confirmation avec votre billet.",
 
     // Sponsor Dashboard
     "sponsor.dashboardTitle": "Tableau de Bord Sponsor",
@@ -1019,7 +1205,8 @@ export const translations = {
 
     // Analytics Page
     "analytics.title": "Tableau de Bord Analytique",
-    "analytics.subtitle": "Suivi en Temps Reel des Evenements et Metriques de Performance",
+    "analytics.subtitle":
+      "Suivi en Temps Reel des Evenements et Metriques de Performance",
     "analytics.overview": "Apercu",
     "analytics.trafficAnalysis": "Analyse du Trafic",
     "analytics.conversionFunnel": "Entonnoir de Conversion",
@@ -1039,7 +1226,8 @@ export const translations = {
 
     // Forums Page
     "forums.title": "Forums et Discussions",
-    "forums.subtitle": "Participez a des conversations et connectez-vous avec la communaute",
+    "forums.subtitle":
+      "Participez a des conversations et connectez-vous avec la communaute",
     "forums.searchForums": "Rechercher les forums...",
     "forums.createThread": "Creer un Thread",
     "forums.categories": "Categories",
@@ -1067,12 +1255,14 @@ export const translations = {
     "forums.reportPost": "Signaler le Post",
     "forums.addReply": "Ajouter une Reponse",
   },
-} as const
+} as const;
 
-export type Language = "en" | "fr"
-export type TranslationKey = keyof (typeof translations)["en"]
+export type Language = "en" | "fr";
+export type TranslationKey = keyof (typeof translations)["en"];
 
 export function getTranslation(lang: Language, key: string): string {
-  const langTranslations = translations[lang] as Record<string, string>
-  return langTranslations[key] || translations["en"][key as TranslationKey] || key
+  const langTranslations = translations[lang] as Record<string, string>;
+  return (
+    langTranslations[key] || translations["en"][key as TranslationKey] || key
+  );
 }

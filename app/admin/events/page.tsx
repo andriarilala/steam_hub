@@ -1,7 +1,17 @@
 "use client";
 
 import { useEffect, useState, useCallback } from "react";
-import { Plus, Pencil, Trash2, RefreshCw, X, Calendar, MapPin } from "lucide-react";
+import {
+  Plus,
+  Pencil,
+  Trash2,
+  RefreshCw,
+  X,
+  Calendar,
+  MapPin,
+  Phone,
+  DollarSign,
+} from "lucide-react";
 
 interface Event {
   id: string;
@@ -11,6 +21,8 @@ interface Event {
   time: string | null;
   location: string | null;
   type: string | null;
+  price: number | null;
+  phone_number: string | null;
   createdAt: string;
 }
 
@@ -31,6 +43,8 @@ const empty = (): Partial<Event> => ({
   time: "",
   location: "",
   type: "Workshop",
+  price: undefined,
+  phone_number: "",
 });
 
 export default function AdminEventsPage() {
@@ -178,7 +192,11 @@ export default function AdminEventsPage() {
                   </label>
                   <input
                     type="date"
-                    value={form.date ? new Date(form.date).toISOString().split('T')[0] : ""}
+                    value={
+                      form.date
+                        ? new Date(form.date).toISOString().split("T")[0]
+                        : ""
+                    }
                     onChange={(e) =>
                       setForm((f) => ({ ...f, date: e.target.value }))
                     }
@@ -233,6 +251,49 @@ export default function AdminEventsPage() {
                     </option>
                   ))}
                 </select>
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-xs font-bold text-foreground/50 mb-1.5 uppercase tracking-wider">
+                    Ticket Price (Ar)
+                  </label>
+                  <div className="relative">
+                    <DollarSign className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-foreground/30" />
+                    <input
+                      type="number"
+                      min="0"
+                      step="0.01"
+                      value={form.price ?? ""}
+                      onChange={(e) =>
+                        setForm((f) => ({
+                          ...f,
+                          price: e.target.value
+                            ? parseFloat(e.target.value)
+                            : undefined,
+                        }))
+                      }
+                      placeholder="e.g. 5000"
+                      className="w-full bg-background border border-border rounded-xl py-2.5 pl-11 pr-4 text-sm focus:outline-none focus:border-primary/50 transition-colors"
+                    />
+                  </div>
+                </div>
+                <div>
+                  <label className="block text-xs font-bold text-foreground/50 mb-1.5 uppercase tracking-wider">
+                    Phone Number
+                  </label>
+                  <div className="relative">
+                    <Phone className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-foreground/30" />
+                    <input
+                      type="text"
+                      value={form.phone_number || ""}
+                      onChange={(e) =>
+                        setForm((f) => ({ ...f, phone_number: e.target.value }))
+                      }
+                      placeholder="e.g. +226 70 00 00 00"
+                      className="w-full bg-background border border-border rounded-xl py-2.5 pl-11 pr-4 text-sm focus:outline-none focus:border-primary/50 transition-colors"
+                    />
+                  </div>
+                </div>
               </div>
             </div>
             <div className="px-6 pb-6 flex gap-3 justify-end">
@@ -308,7 +369,10 @@ export default function AdminEventsPage() {
                     Date
                   </th>
                   <th className="px-6 py-4 text-left font-bold uppercase text-[10px]">
-                    Description
+                    Price
+                  </th>
+                  <th className="px-6 py-4 text-left font-bold uppercase text-[10px]">
+                    Phone
                   </th>
                   <th className="px-6 py-4 text-left font-bold uppercase text-[10px]">
                     Location
@@ -334,15 +398,24 @@ export default function AdminEventsPage() {
                     </td>
                     <td className="px-6 py-4 text-xs text-foreground/50">
                       <div>{new Date(ev.date).toLocaleDateString()}</div>
-                      <div className="text-[10px] font-bold text-primary mt-0.5">{ev.time || "--:--"}</div>
+                      <div className="text-[10px] font-bold text-primary mt-0.5">
+                        {ev.time || "--:--"}
+                      </div>
                     </td>
-                    <td className="px-6 py-4 text-xs text-foreground/40 max-w-[200px] truncate">
-                      {ev.description || "—"}
+                    <td className="px-6 py-4 text-xs font-semibold text-primary">
+                      {ev.price != null
+                        ? `${ev.price.toLocaleString()} Ar`
+                        : "—"}
+                    </td>
+                    <td className="px-6 py-4 text-xs text-foreground/50">
+                      {ev.phone_number || "—"}
                     </td>
                     <td className="px-6 py-4 text-xs text-foreground/50">
                       <div className="flex items-center gap-1.5">
                         <MapPin className="w-3.5 h-3.5 text-primary/40" />
-                        <span className="truncate max-w-[150px]">{ev.location || "—"}</span>
+                        <span className="truncate max-w-[150px]">
+                          {ev.location || "—"}
+                        </span>
                       </div>
                     </td>
                     <td className="px-6 py-4 text-right flex items-center justify-end gap-2">
@@ -367,6 +440,6 @@ export default function AdminEventsPage() {
           </div>
         )}
       </div>
-    </div >
+    </div>
   );
 }

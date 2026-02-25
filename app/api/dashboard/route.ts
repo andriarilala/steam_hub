@@ -9,7 +9,9 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const user = await prisma.user.findUnique({ where: { email: session.user.email } });
+  const user = await prisma.user.findUnique({
+    where: { email: session.user.email },
+  });
   if (!user) {
     return NextResponse.json({ error: "User not found" }, { status: 404 });
   }
@@ -39,7 +41,9 @@ export async function GET(request: NextRequest) {
     image: r.image || "/placeholder.svg",
   }));
 
-  const connectionsCount = await prisma.userConnection.count({ where: { userId: user.id } });
+  const connectionsCount = await prisma.userConnection.count({
+    where: { userId: user.id },
+  });
 
   const stats = {
     sessionsAttended: 0,

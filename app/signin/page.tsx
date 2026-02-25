@@ -12,6 +12,20 @@ import { useAuth } from "@/lib/auth-context";
 import { useLanguage } from "@/lib/language-context";
 import { getSession } from "next-auth/react";
 
+/** Maps a user role to its home route. Keep in sync with middleware.ts. */
+function getRedirectPath(role?: string): string {
+  switch (role) {
+    case "admin":
+      return "/admin";
+    case "youth":
+      return "/youth";
+    case "sponsor":
+      return "/sponsor-dashboard";
+    default:
+      return "/dashboard";
+  }
+}
+
 export default function SignInPage() {
   const router = useRouter();
   const { signIn, signInWithProvider, isLoading, isAuthenticated, user } =
@@ -29,8 +43,7 @@ export default function SignInPage() {
   // redirect if already signed in
   useEffect(() => {
     if (isAuthenticated) {
-      const role = (user as any)?.role;
-      router.push(role === "admin" ? "/admin" : "/dashboard");
+      router.push(getRedirectPath(user?.role));
     }
   }, [isAuthenticated, user, router]);
 
@@ -48,7 +61,7 @@ export default function SignInPage() {
     if (success) {
       const session = await getSession();
       const role = (session?.user as any)?.role;
-      router.push(role === "admin" ? "/admin" : "/dashboard");
+      router.push(getRedirectPath(role));
     } else {
       setError(t("auth.errorInvalid"));
     }

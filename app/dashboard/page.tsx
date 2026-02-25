@@ -62,6 +62,10 @@ export default function DashboardPage() {
     if (!isLoading && isAuthenticated && (user?.role as string) === "admin") {
       router.replace("/admin");
     }
+    // redirect youth users to their dedicated portal
+    if (!isLoading && isAuthenticated && (user?.role as string) === "youth") {
+      router.replace("/youth");
+    }
   }, [isLoading, isAuthenticated, user, router]);
 
   useEffect(() => {

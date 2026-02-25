@@ -21,6 +21,8 @@ const EventSchema = z.object({
   time: z.string().optional(),
   location: z.string().optional(),
   type: z.string().optional(),
+  price: z.number().min(0).optional(),
+  phone_number: z.string().optional(),
 });
 
 // GET /api/admin/events
@@ -36,12 +38,16 @@ export async function GET(req: NextRequest) {
 export async function POST(req: NextRequest) {
   try {
     const admin = await requireAdmin(req);
-    if (!admin) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    if (!admin)
+      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
 
     const body = await req.json();
     const result = EventSchema.safeParse(body);
     if (!result.success) {
-      return NextResponse.json({ error: result.error.errors[0].message }, { status: 400 });
+      return NextResponse.json(
+        { error: result.error.errors[0].message },
+        { status: 400 },
+      );
     }
     const data = result.data;
 
@@ -53,12 +59,17 @@ export async function POST(req: NextRequest) {
         time: data.time,
         location: data.location,
         type: data.type,
+        price: data.price,
+        phone_number: data.phone_number,
       },
     });
     return NextResponse.json(event, { status: 201 });
   } catch (error: any) {
     console.error("POST /api/admin/events error:", error);
-    return NextResponse.json({ error: error.message || "Server error" }, { status: 500 });
+    return NextResponse.json(
+      { error: error.message || "Server error" },
+      { status: 500 },
+    );
   }
 }
 
@@ -66,15 +77,20 @@ export async function POST(req: NextRequest) {
 export async function PATCH(req: NextRequest) {
   try {
     const admin = await requireAdmin(req);
-    if (!admin) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    if (!admin)
+      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
 
     const body = await req.json();
     const { id, ...rest } = body;
-    if (!id) return NextResponse.json({ error: "id required" }, { status: 400 });
+    if (!id)
+      return NextResponse.json({ error: "id required" }, { status: 400 });
 
     const result = EventSchema.partial().safeParse(rest);
     if (!result.success) {
-      return NextResponse.json({ error: result.error.errors[0].message }, { status: 400 });
+      return NextResponse.json(
+        { error: result.error.errors[0].message },
+        { status: 400 },
+      );
     }
     const data = result.data;
 
@@ -88,7 +104,10 @@ export async function PATCH(req: NextRequest) {
     return NextResponse.json(event);
   } catch (error: any) {
     console.error("PATCH /api/admin/events error:", error);
-    return NextResponse.json({ error: error.message || "Server error" }, { status: 500 });
+    return NextResponse.json(
+      { error: error.message || "Server error" },
+      { status: 500 },
+    );
   }
 }
 
@@ -96,16 +115,21 @@ export async function PATCH(req: NextRequest) {
 export async function DELETE(req: NextRequest) {
   try {
     const admin = await requireAdmin(req);
-    if (!admin) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    if (!admin)
+      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
 
     const { searchParams } = new URL(req.url);
     const id = searchParams.get("id");
-    if (!id) return NextResponse.json({ error: "id required" }, { status: 400 });
+    if (!id)
+      return NextResponse.json({ error: "id required" }, { status: 400 });
 
     await prisma.event.delete({ where: { id } });
     return NextResponse.json({ success: true });
   } catch (error: any) {
     console.error("DELETE /api/admin/events error:", error);
-    return NextResponse.json({ error: error.message || "Server error" }, { status: 500 });
+    return NextResponse.json(
+      { error: error.message || "Server error" },
+      { status: 500 },
+    );
   }
 }

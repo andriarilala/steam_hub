@@ -35,6 +35,7 @@ interface TicketOrder {
   quantity: number;
   price: number;
   total: number;
+  reference: string | null;
   status: "pending" | "completed" | "failed" | "cancelled";
   qrCode: string;
   createdAt: string;
@@ -358,6 +359,7 @@ const emptyForm = () => ({
   price: 50,
   total: 50,
   status: "pending" as "pending" | "completed" | "failed" | "cancelled",
+  reference: "",
 });
 
 export default function AdminTicketsPage() {
@@ -400,7 +402,7 @@ export default function AdminTicketsPage() {
     fetch("/api/admin/events")
       .then((r) => r.json())
       .then((d) => setEvents(Array.isArray(d) ? d : []))
-      .catch(() => { });
+      .catch(() => {});
 
     // Fetch ALL users across all pages so the dropdown is complete
     const fetchAllUsers = async () => {
@@ -472,6 +474,7 @@ export default function AdminTicketsPage() {
       price: t.price,
       total: t.total,
       status: t.status,
+      reference: t.reference || "",
     });
     setSelectedTicket(t);
     setModal("edit");
@@ -544,6 +547,7 @@ export default function AdminTicketsPage() {
         total: form.total,
         status: form.status,
         eventId: form.eventId || undefined,
+        reference: (form as any).reference || undefined,
       };
       // Include userId only when it changed
       if (resolvedUserId && resolvedUserId !== selectedTicket!.userId) {
@@ -741,20 +745,22 @@ export default function AdminTicketsPage() {
                     <button
                       type="button"
                       onClick={() => setUserMode("select")}
-                      className={`px-3 py-1.5 transition-colors ${userMode === "select"
+                      className={`px-3 py-1.5 transition-colors ${
+                        userMode === "select"
                           ? "bg-primary text-primary-foreground"
                           : "text-foreground/40 hover:text-foreground"
-                        }`}
+                      }`}
                     >
                       Existant
                     </button>
                     <button
                       type="button"
                       onClick={() => setUserMode("create")}
-                      className={`px-3 py-1.5 transition-colors ${userMode === "create"
+                      className={`px-3 py-1.5 transition-colors ${
+                        userMode === "create"
                           ? "bg-primary text-primary-foreground"
                           : "text-foreground/40 hover:text-foreground"
-                        }`}
+                      }`}
                     >
                       Créer
                     </button>
@@ -965,6 +971,23 @@ export default function AdminTicketsPage() {
                   ))}
                 </select>
               </div>
+              <div>
+                <label className="block text-xs font-bold text-foreground/50 mb-1.5 uppercase tracking-wider">
+                  Référence de paiement{" "}
+                  <span className="font-normal text-foreground/30">
+                    (optionnel)
+                  </span>
+                </label>
+                <input
+                  type="text"
+                  value={(form as any).reference || ""}
+                  onChange={(e) =>
+                    setForm((f) => ({ ...f, reference: e.target.value }))
+                  }
+                  placeholder="Ex: 1133223564476..."
+                  className="w-full bg-background border border-border rounded-xl py-2.5 px-4 text-sm focus:outline-none focus:border-primary/50 transition-colors"
+                />
+              </div>
             </div>
             <div className="px-6 pb-6 flex gap-3 justify-end sticky bottom-0 bg-card pt-4 border-t border-border">
               <button
@@ -1092,6 +1115,9 @@ export default function AdminTicketsPage() {
                     Status
                   </th>
                   <th className="px-6 py-2 text-left font-bold uppercase text-[10px] tracking-wider">
+                    Référence
+                  </th>
+                  <th className="px-6 py-2 text-left font-bold uppercase text-[10px] tracking-wider">
                     Date
                   </th>
                   <th className="px-6 py-2 text-right font-bold uppercase text-[10px] tracking-wider">
@@ -1145,7 +1171,10 @@ export default function AdminTicketsPage() {
                     </td>
                     <td className="px-6 py-5 border-y border-slate-100">
                       <span className="text-lg font-black text-slate-900 tracking-tight">
-                        Ar {ticket.total.toLocaleString("fr-FR", { minimumFractionDigits: 2 })}
+                        Ar{" "}
+                        {ticket.total.toLocaleString("fr-FR", {
+                          minimumFractionDigits: 2,
+                        })}
                       </span>
                     </td>
                     <td className="px-6 py-5 border-y border-slate-100 text-center">
@@ -1155,11 +1184,50 @@ export default function AdminTicketsPage() {
                         {ticket.status}
                       </span>
                     </td>
+                    <td className="px-6 py-5 border-y border-slate-100 text-xs text-foreground/50 font-mono max-w-[130px] truncate">
+                      {ticket.reference || "—"}
+                    </td>
                     <td className="px-6 py-5 border-y border-slate-100 text-xs text-foreground/40">
                       {new Date(ticket.createdAt).toLocaleDateString()}
                     </td>
                     <td className="px-6 py-5 rounded-r-xl border-y border-r border-slate-100">
                       <div className="flex items-center justify-end gap-2">
+                        {/* Quick validate button — only for pending tickets */}
+                        {ticket.status === "pending" && (
+                          <button
+                            onClick={async () => {
+                              const res = await fetch("/api/admin/tickets", {
+                                method: "PATCH",
+                                headers: { "Content-Type": "application/json" },
+                                body: JSON.stringify({
+                                  id: ticket.id,
+                                  status: "completed",
+                                }),
+                              });
+                              if (res.ok) {
+                                showToast("Ticket validé !");
+                                load();
+                              } else {
+                                showToast("Erreur lors de la validation");
+                              }
+                            }}
+                            title="Valider le billet"
+                            className="p-2 rounded-xl text-emerald-400 hover:text-emerald-600 hover:bg-emerald-50 transition-all"
+                          >
+                            <svg
+                              xmlns="http://www.w3.org/2000/svg"
+                              className="w-4 h-4"
+                              viewBox="0 0 24 24"
+                              fill="none"
+                              stroke="currentColor"
+                              strokeWidth="2.5"
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                            >
+                              <path d="M20 6 9 17l-5-5" />
+                            </svg>
+                          </button>
+                        )}
                         {/* QR Code button */}
                         <button
                           onClick={() => openQR(ticket)}
