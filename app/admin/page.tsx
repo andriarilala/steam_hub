@@ -5,11 +5,11 @@ import Link from "next/link";
 import {
   Users,
   Calendar,
-  GitBranch,
+  Ticket,
   MessageSquare,
-  MailOpen,
-  ChevronRight,
+  ArrowRight,
   RefreshCw,
+  TrendingUp,
 } from "lucide-react";
 import { useAuth } from "@/lib/auth-context";
 
@@ -31,13 +31,13 @@ interface Stats {
   roleBreakdown: { role: string; count: number }[];
 }
 
-const ROLE_COLORS: Record<string, string> = {
-  admin: "bg-red-50 text-red-600 border border-red-200", // Red from 'A'
-  youth: "bg-emerald-50 text-emerald-600 border border-emerald-200", // Teal from 'S'
-  company: "bg-blue-50 text-blue-600 border border-blue-200", // Blue from 'E'
-  institution: "bg-purple-50 text-purple-600 border border-purple-200", // Purple from 'M'
-  mentor: "bg-orange-50 text-orange-600 border border-orange-200", // Orange from 'T'
-  sponsor: "bg-primary/5 text-primary border border-primary/20", // Navy from 'HUB'
+const ROLE_LABELS: Record<string, string> = {
+  admin: "Admin",
+  youth: "Youth",
+  company: "Company",
+  institution: "Institution",
+  mentor: "Mentor",
+  sponsor: "Sponsor",
 };
 
 export default function AdminDashboard() {
@@ -48,6 +48,7 @@ export default function AdminDashboard() {
 
   const load = () => {
     setLoading(true);
+    setError("");
     fetch("/api/admin/stats")
       .then((r) => r.json())
       .then((d) => {
@@ -64,175 +65,201 @@ export default function AdminDashboard() {
     load();
   }, []);
 
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center h-64">
-        <div className="w-8 h-8 border-4 border-primary/30 border-t-primary rounded-full animate-spin" />
-      </div>
-    );
-  }
+  const statCards = stats
+    ? [
+      {
+        title: "Total Users",
+        value: stats.totalUsers,
+        icon: Users,
+        href: "/admin/users",
+        sub: "Registered accounts",
+      },
+      {
+        title: "Events",
+        value: stats.totalEvents,
+        icon: Calendar,
+        href: "/admin/events",
+        sub: "Scheduled",
+      },
+      {
+        title: "Ticket Orders",
+        value: stats.totalTicketOrders,
+        icon: Ticket,
+        href: "/admin/tickets",
+        sub: "All time",
+      },
+      {
+        title: "Unread Messages",
+        value: stats.unreadContacts,
+        icon: MessageSquare,
+        href: "/admin/contacts",
+        sub: `${stats?.totalContacts ?? 0} total`,
+      },
+    ]
+    : [];
 
-  if (error || !stats) {
-    return (
-      <div className="p-8 text-center text-destructive">
-        <p>{error || "No data"}</p>
-        <button
-          onClick={load}
-          className="mt-4 text-xs underline text-foreground/60"
-        >
-          Retry
-        </button>
-      </div>
-    );
-  }
-
-  const cards = [
-    {
-      title: "Total Balance",
-      value: `Ar ${stats.totalUsers * 12500}`, // Mock balance based on users
-      icon: Users,
-      trend: "+ 5% than last month",
-      color: "bg-white text-[#ff5722] border-[#f0ece9] shadow-sm",
-      action: "Transfer",
-    },
-    {
-      title: "Total Earnings",
-      value: `Ar ${stats.totalTicketOrders * 150}`,
-      icon: Calendar,
-      trend: "+ 7% this month",
-      color: "bg-[#ff5722] text-white shadow-xl shadow-[#ff5722]/20",
-    },
-    {
-      title: "Total Spending",
-      value: `Ar ${stats.totalEvents * 120}`,
-      icon: GitBranch,
-      trend: "- 4% this month",
-      color: "bg-white text-[#ff5722] border-[#f0ece9] shadow-sm",
-    },
-    {
-      title: "Message Inbox",
-      value: stats.totalContacts,
-      icon: MessageSquare,
-      trend: "12% new messages",
-      color: "bg-white text-[#ff5722] border-[#f0ece9] shadow-sm",
-    },
+  const quickLinks = [
+    { label: "Manage Users", href: "/admin/users", icon: Users },
+    { label: "Create Event", href: "/admin/events", icon: Calendar },
+    { label: "View Tickets", href: "/admin/tickets", icon: Ticket },
+    { label: "Read Messages", href: "/admin/contacts", icon: MessageSquare },
+    { label: "Partners", href: "/admin/partners", icon: TrendingUp },
+    { label: "Applications", href: "/admin/applications", icon: ArrowRight },
   ];
 
   return (
-    <div className="space-y-10 animate-in fade-in duration-700">
-      {/* Welcome Header */}
-      <div>
-        <h1 className="text-4xl font-black tracking-tight text-secondary">
-          Good morning, {user?.name?.split(" ")[0]}
-        </h1>
-        <p className="text-foreground/40 mt-2 font-medium">
-          Stay on top of your tasks, monitor progress, and track status.
-        </p>
+    <div className="space-y-6">
+      {/* Page header */}
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-xl font-bold text-slate-900 tracking-tight">
+            Good morning, {user?.name?.split(" ")[0]}
+          </h1>
+          <p className="text-sm text-slate-400 mt-0.5">
+            Platform overview
+          </p>
+        </div>
+        <button
+          onClick={load}
+          disabled={loading}
+          className="flex items-center gap-2 text-sm text-slate-500 hover:text-slate-700 border border-slate-200 bg-white px-3 py-1.5 rounded-lg transition-colors disabled:opacity-50"
+        >
+          <RefreshCw className={`w-3.5 h-3.5 ${loading ? "animate-spin" : ""}`} />
+          Refresh
+        </button>
       </div>
 
-      {/* Hero Stats Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-4 md:grid-cols-2 gap-8">
-        {cards.map((card, idx) => (
-          <div
-            key={card.title}
-            className={`p-8 rounded-[32px] flex flex-col justify-between h-56 transition-all hover:scale-[1.02] ${card.color}`}
-          >
-            <div className="flex justify-between items-start">
-              <span className={`text-[10px] font-black uppercase tracking-widest ${idx === 1 ? "text-white/60" : "text-foreground/30"}`}>
-                {card.title}
-              </span>
-              <div className={`p-2 rounded-xl ${idx === 1 ? "bg-white/10" : "bg-slate-50"}`}>
-                <card.icon className="w-5 h-5" />
-              </div>
-            </div>
-
-            <div className="mt-4">
-              <p className="text-3xl font-black tracking-tighter leading-none mb-2">
-                {card.value}
-              </p>
-              <div className="flex items-center gap-2">
-                <span className={`text-[10px] font-bold ${idx === 1 ? "text-white/60" : card.trend.startsWith("+") ? "text-emerald-500" : "text-red-500"}`}>
-                  {card.trend}
-                </span>
-              </div>
-            </div>
-
-            {idx === 0 && (
-              <div className="mt-6 flex gap-2">
-                <button className="flex-1 bg-[#2d2d2d] text-white text-[10px] font-black uppercase tracking-wider py-3 rounded-2xl shadow-lg shadow-[#2d2d2d]/20">Transfer</button>
-                <button className="flex-1 border border-[#f0ece9] text-foreground text-[10px] font-black uppercase tracking-wider py-3 rounded-2xl hover:bg-slate-50">Request</button>
-              </div>
-            )}
-          </div>
-        ))}
-      </div>
-
-      {/* Main Grid: Income / Recent Activities */}
-      <div className="grid grid-cols-1 xl:grid-cols-3 gap-8">
-        <div className="xl:col-span-2 space-y-8">
-          <div className="bg-white p-8 rounded-[40px] border border-border/50 shadow-sm">
-            <div className="flex items-center justify-between mb-8">
-              <h2 className="font-black text-xl tracking-tight">Recent Activities</h2>
-              <div className="flex bg-slate-50 p-1 rounded-full border border-border/50">
-                <button className="px-4 py-1.5 text-[10px] font-black uppercase tracking-wider text-primary">View All</button>
-              </div>
-            </div>
-
-            <div className="space-y-2">
-              {stats.recentUsers.map((u, i) => (
-                <div key={u.id} className="flex items-center justify-between p-4 bg-slate-50/50 rounded-2xl hover:bg-slate-50 transition-colors">
-                  <div className="flex items-center gap-4">
-                    <div className="w-10 h-10 rounded-xl bg-white border border-border flex items-center justify-center font-black text-xs text-primary shadow-sm">
-                      {u.name?.charAt(0) || "U"}
-                    </div>
-                    <div>
-                      <p className="text-sm font-bold leading-none">{u.name || "Unnamed User"}</p>
-                      <p className="text-[10px] text-foreground/40 mt-1 uppercase tracking-tighter font-bold">{u.role}</p>
-                    </div>
-                  </div>
-                  <div className="text-right">
-                    <p className="text-xs font-black">Ar 0.00</p>
-                    <p className="text-[10px] text-foreground/40 mt-1 uppercase font-bold">Pending</p>
-                  </div>
+      {/* Stat Cards */}
+      {loading ? (
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+          {[...Array(4)].map((_, i) => (
+            <div key={i} className="bg-white border border-slate-200 rounded-2xl p-5 h-[100px] animate-pulse" />
+          ))}
+        </div>
+      ) : error ? (
+        <div className="bg-white border border-slate-200 rounded-2xl p-6 text-center">
+          <p className="text-slate-500 text-sm">{error}</p>
+          <button onClick={load} className="mt-3 text-sm text-slate-700 underline">Try again</button>
+        </div>
+      ) : (
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+          {statCards.map((card) => (
+            <Link
+              key={card.title}
+              href={card.href}
+              className="group bg-white border border-slate-200 rounded-2xl p-5 hover:border-slate-300 hover:shadow-sm transition-all"
+            >
+              <div className="flex items-center justify-between mb-3">
+                <div className="w-8 h-8 bg-slate-100 rounded-lg flex items-center justify-center group-hover:bg-slate-200 transition-colors">
+                  <card.icon className="w-4 h-4 text-slate-600" />
                 </div>
-              ))}
-            </div>
-          </div>
+                <ArrowRight className="w-3.5 h-3.5 text-slate-300 group-hover:text-slate-500 transition-colors" />
+              </div>
+              <p className="text-2xl font-bold text-slate-900 tabular-nums">{card.value}</p>
+              <p className="text-xs font-semibold text-slate-600 mt-0.5">{card.title}</p>
+              <p className="text-[11px] text-slate-400">{card.sub}</p>
+            </Link>
+          ))}
         </div>
+      )}
 
-        <div className="bg-white p-8 rounded-[40px] border border-border/50 shadow-sm overflow-hidden flex flex-col">
-          <div className="mb-8">
-            <h2 className="font-black text-xl tracking-tight">Total Income</h2>
-            <p className="text-xs text-foreground/30 font-medium mt-1">View your income in a certain period</p>
+      {/* Two-column body */}
+      {!loading && !error && stats && (
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          {/* Recent Registrations — 2/3 */}
+          <div className="lg:col-span-2 bg-white border border-slate-200 rounded-2xl overflow-hidden">
+            <div className="flex items-center justify-between px-5 py-4 border-b border-slate-100">
+              <h2 className="text-sm font-semibold text-slate-800">Recent Registrations</h2>
+              <Link
+                href="/admin/users"
+                className="flex items-center gap-1 text-xs text-slate-400 hover:text-slate-600 font-medium transition-colors"
+              >
+                View all <ArrowRight className="w-3 h-3" />
+              </Link>
+            </div>
+            <div className="divide-y divide-slate-50">
+              {stats.recentUsers.length === 0 ? (
+                <div className="py-10 text-center text-sm text-slate-400">No users yet.</div>
+              ) : (
+                stats.recentUsers.map((u) => (
+                  <div key={u.id} className="flex items-center gap-3 px-5 py-3 hover:bg-slate-50 transition-colors">
+                    <div className="w-8 h-8 rounded-lg bg-slate-100 flex items-center justify-center shrink-0">
+                      <span className="text-xs font-bold text-slate-500">
+                        {u.name?.charAt(0)?.toUpperCase() ?? "U"}
+                      </span>
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-semibold text-slate-800 truncate">{u.name ?? "Unnamed"}</p>
+                      <p className="text-[11px] text-slate-400 truncate">{u.email}</p>
+                    </div>
+                    <span className="text-[11px] font-medium text-slate-500 bg-slate-100 px-2 py-0.5 rounded-full shrink-0">
+                      {ROLE_LABELS[u.role] ?? u.role}
+                    </span>
+                    <span className="text-[11px] text-slate-400 shrink-0 hidden sm:block">
+                      {new Date(u.createdAt).toLocaleDateString("fr-FR")}
+                    </span>
+                  </div>
+                ))
+              )}
+            </div>
           </div>
-          <div className="flex-1 flex items-end gap-2 h-40">
-            {[40, 70, 45, 90, 65, 80, 55].map((h, i) => (
-              <div key={i} className="flex-1 flex flex-col gap-1 items-center">
-                <div
-                  className={`w-full rounded-t-lg transition-all ${i === 3 ? "bg-[#ff5722] shadow-lg shadow-[#ff5722]/20" : "bg-[#2d2d2d]"}`}
-                  style={{ height: `${h}%` }}
-                />
-                <span className="text-[9px] font-bold text-foreground/30 uppercase mt-2">
-                  {['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul'][i]}
-                </span>
-              </div>
-            ))}
-          </div>
-          <div className="mt-8 pt-8 border-t border-border flex justify-between items-center font-black uppercase text-[10px] tracking-widest text-foreground/40">
-            <span>Profit and Loss</span>
-            <div className="flex gap-4">
-              <div className="flex items-center gap-2">
-                <div className="w-2 h-2 rounded-full bg-[#ff5722]" />
-                <span>Profit</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <div className="w-2 h-2 rounded-full bg-[#2d2d2d]" />
-                <span>Loss</span>
+
+          {/* Right column */}
+          <div className="flex flex-col gap-6">
+            {/* Role Breakdown */}
+            <div className="bg-white border border-slate-200 rounded-2xl p-5">
+              <h2 className="text-sm font-semibold text-slate-800 mb-4">Users by Role</h2>
+              {stats.roleBreakdown.length === 0 ? (
+                <p className="text-sm text-slate-400">No data yet.</p>
+              ) : (
+                <div className="space-y-3">
+                  {stats.roleBreakdown.map((r) => {
+                    const pct = stats.totalUsers > 0
+                      ? Math.round((r.count / stats.totalUsers) * 100)
+                      : 0;
+                    return (
+                      <div key={r.role}>
+                        <div className="flex items-center justify-between mb-1">
+                          <span className="text-xs text-slate-500">{ROLE_LABELS[r.role] ?? r.role}</span>
+                          <span className="text-xs font-semibold text-slate-700">{r.count}</span>
+                        </div>
+                        <div className="h-1.5 bg-slate-100 rounded-full overflow-hidden">
+                          <div
+                            className="h-full bg-slate-800 rounded-full transition-all"
+                            style={{ width: `${pct}%` }}
+                          />
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+
+            {/* Quick Links */}
+            <div className="bg-white border border-slate-200 rounded-2xl p-5">
+              <h2 className="text-sm font-semibold text-slate-800 mb-4">Quick Access</h2>
+              <div className="space-y-1">
+                {quickLinks.map((ql) => (
+                  <Link
+                    key={ql.href}
+                    href={ql.href}
+                    className="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-slate-50 transition-colors group"
+                  >
+                    <div className="w-7 h-7 bg-slate-100 rounded-lg flex items-center justify-center group-hover:bg-slate-200 transition-colors shrink-0">
+                      <ql.icon className="w-3.5 h-3.5 text-slate-500" />
+                    </div>
+                    <span className="text-sm text-slate-600 font-medium group-hover:text-slate-900 transition-colors">
+                      {ql.label}
+                    </span>
+                    <ArrowRight className="w-3 h-3 text-slate-300 group-hover:text-slate-500 transition-colors ml-auto" />
+                  </Link>
+                ))}
               </div>
             </div>
           </div>
         </div>
-      </div>
+      )}
     </div>
   );
 }

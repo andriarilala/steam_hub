@@ -402,7 +402,7 @@ export default function AdminTicketsPage() {
     fetch("/api/admin/events")
       .then((r) => r.json())
       .then((d) => setEvents(Array.isArray(d) ? d : []))
-      .catch(() => {});
+      .catch(() => { });
 
     // Fetch ALL users across all pages so the dropdown is complete
     const fetchAllUsers = async () => {
@@ -591,10 +591,9 @@ export default function AdminTicketsPage() {
   };
 
   return (
-    <div className="p-8">
-      {/* Toast */}
+    <div>
       {toast && (
-        <div className="fixed bottom-6 right-6 bg-card border border-border px-4 py-2 rounded-xl text-sm font-medium shadow-xl z-50">
+        <div className="fixed bottom-6 right-6 bg-white border border-slate-200 px-4 py-2.5 rounded-xl text-sm font-medium shadow-lg z-50 text-slate-800">
           {toast}
         </div>
       )}
@@ -745,22 +744,20 @@ export default function AdminTicketsPage() {
                     <button
                       type="button"
                       onClick={() => setUserMode("select")}
-                      className={`px-3 py-1.5 transition-colors ${
-                        userMode === "select"
+                      className={`px-3 py-1.5 transition-colors ${userMode === "select"
                           ? "bg-primary text-primary-foreground"
                           : "text-foreground/40 hover:text-foreground"
-                      }`}
+                        }`}
                     >
                       Existant
                     </button>
                     <button
                       type="button"
                       onClick={() => setUserMode("create")}
-                      className={`px-3 py-1.5 transition-colors ${
-                        userMode === "create"
+                      className={`px-3 py-1.5 transition-colors ${userMode === "create"
                           ? "bg-primary text-primary-foreground"
                           : "text-foreground/40 hover:text-foreground"
-                      }`}
+                        }`}
                     >
                       Créer
                     </button>

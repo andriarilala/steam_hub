@@ -118,16 +118,16 @@ export default function YouthEventsPage() {
       {/* Page header */}
       <div className="flex items-center justify-between flex-wrap gap-4">
         <div>
-          <h1 className="text-2xl font-black text-[#1a2e25]">
-            Événements disponibles
+          <h1 className="text-xl font-bold text-slate-900 tracking-tight">
+            Evenements
           </h1>
-          <p className="text-sm text-[#7aaa94] mt-0.5">
-            Parcourez les événements et achetez vos billets en ligne.
+          <p className="text-sm text-slate-400 mt-0.5">
+            Parcourez les evenements et achetez vos billets.
           </p>
         </div>
         <Link
           href="/youth/tickets"
-          className="flex items-center gap-2 text-sm bg-[#1a2e25] text-white font-bold px-4 py-2.5 rounded-xl hover:bg-[#2a4035] transition-colors shadow-sm"
+          className="flex items-center gap-2 text-sm bg-slate-900 text-white font-semibold px-4 py-2.5 rounded-xl hover:bg-slate-700 transition-colors"
         >
           <Ticket className="w-4 h-4" />
           Mes billets
@@ -137,13 +137,13 @@ export default function YouthEventsPage() {
       {/* Events grid */}
       {loading ? (
         <div className="flex items-center justify-center h-48">
-          <Loader2 className="w-8 h-8 animate-spin text-emerald-400" />
+          <div className="w-7 h-7 border-[3px] border-slate-200 border-t-slate-600 rounded-full animate-spin" />
         </div>
       ) : events.length === 0 ? (
-        <div className="text-center py-24 bg-white rounded-2xl border border-[#e2f0eb]">
-          <Calendar className="w-12 h-12 mx-auto mb-4 text-[#c5e0d5]" />
-          <p className="text-[#9dbfb0] text-base">
-            Aucun événement disponible pour le moment.
+        <div className="text-center py-24 bg-white rounded-2xl border border-slate-200">
+          <Calendar className="w-10 h-10 mx-auto mb-3 text-slate-300" />
+          <p className="text-slate-400 text-sm">
+            Aucun evenement disponible pour le moment.
           </p>
         </div>
       ) : (
@@ -153,13 +153,8 @@ export default function YouthEventsPage() {
             return (
               <div
                 key={ev.id}
-                className="bg-white border border-[#e2f0eb] rounded-2xl overflow-hidden flex flex-col hover:shadow-md transition-shadow"
+                className="bg-white border border-slate-200 rounded-2xl overflow-hidden flex flex-col hover:shadow-sm transition-shadow"
               >
-                {/* top color band */}
-                <div
-                  className={`h-1.5 w-full ${isPast ? "bg-slate-300" : "bg-emerald-500"}`}
-                />
-
                 <div className="p-5 flex flex-col flex-1 gap-3">
                   {/* badges */}
                   <div className="flex items-center gap-1.5 flex-wrap">
@@ -177,20 +172,20 @@ export default function YouthEventsPage() {
                     )}
                   </div>
 
-                  <h2 className="text-base font-bold text-[#1a2e25] leading-snug">
+                  <h2 className="text-sm font-bold text-slate-900 leading-snug">
                     {ev.title}
                   </h2>
 
                   {ev.description && (
-                    <p className="text-xs text-[#7aaa94] line-clamp-2">
+                    <p className="text-xs text-slate-500 line-clamp-2">
                       {ev.description}
                     </p>
                   )}
 
                   {/* meta */}
                   <div className="space-y-1.5 mt-auto">
-                    <div className="flex items-center gap-2 text-xs text-[#9dbfb0]">
-                      <Calendar className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
+                    <div className="flex items-center gap-2 text-xs text-slate-400">
+                      <Calendar className="w-3.5 h-3.5 text-slate-400 shrink-0" />
                       {new Date(ev.date).toLocaleDateString("fr-FR", {
                         weekday: "long",
                         year: "numeric",
@@ -199,37 +194,37 @@ export default function YouthEventsPage() {
                       })}
                       {ev.time && (
                         <>
-                          <Clock className="w-3.5 h-3.5 text-emerald-400 ml-1" />
+                          <Clock className="w-3.5 h-3.5 text-slate-400 ml-1" />
                           {ev.time}
                         </>
                       )}
                     </div>
                     {ev.location && (
-                      <div className="flex items-center gap-2 text-xs text-[#9dbfb0]">
-                        <MapPin className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
+                      <div className="flex items-center gap-2 text-xs text-slate-400">
+                        <MapPin className="w-3.5 h-3.5 text-slate-400 shrink-0" />
                         {ev.location}
                       </div>
                     )}
                     {ev.phone_number && (
-                      <div className="flex items-center gap-2 text-xs text-[#9dbfb0]">
-                        <Phone className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
+                      <div className="flex items-center gap-2 text-xs text-slate-400">
+                        <Phone className="w-3.5 h-3.5 text-slate-400 shrink-0" />
                         {ev.phone_number}
                       </div>
                     )}
                   </div>
 
                   {/* footer: price + buy */}
-                  <div className="flex items-center justify-between pt-3 border-t border-[#f0f8f4] mt-1">
-                    <div className="flex items-center gap-1 text-emerald-600 font-black text-sm">
+                  <div className="flex items-center justify-between pt-3 border-t border-slate-100 mt-1">
+                    <div className="flex items-center gap-1 text-slate-700 font-bold text-sm">
                       <Tag className="w-3.5 h-3.5" />
                       {ev.price != null
                         ? `${ev.price.toLocaleString("fr-FR")} Ar`
-                        : "Gratuit"}
+                        : "3 000 Ar"}
                     </div>
                     {!isPast && (
                       <button
                         onClick={() => openBuy(ev)}
-                        className="flex items-center gap-1.5 text-xs bg-emerald-500 text-white font-bold px-3.5 py-2 rounded-xl hover:bg-emerald-600 transition-colors shadow-sm"
+                        className="flex items-center gap-1.5 text-xs bg-slate-900 text-white font-semibold px-3.5 py-2 rounded-xl hover:bg-slate-700 transition-colors"
                       >
                         <ShoppingCart className="w-3.5 h-3.5" />
                         Acheter
@@ -246,50 +241,50 @@ export default function YouthEventsPage() {
       {/* ── Purchase Modal ────────────────────────────────────────────── */}
       {buyModal && (
         <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4">
-          <div className="bg-white border border-[#e2f0eb] rounded-2xl w-full max-w-md shadow-2xl">
+          <div className="bg-white border border-slate-200 rounded-2xl w-full max-w-md shadow-2xl">
             {success ? (
               <div className="p-8 flex flex-col items-center gap-4 text-center">
-                <div className="w-16 h-16 bg-emerald-50 rounded-full flex items-center justify-center">
-                  <CheckCircle className="w-9 h-9 text-emerald-500" />
+                <div className="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center">
+                  <CheckCircle className="w-9 h-9 text-slate-500" />
                 </div>
-                <h2 className="text-xl font-black text-[#1a2e25]">
-                  Commande envoyée !
+                <h2 className="text-xl font-bold text-slate-900">
+                  Commande envoyee
                 </h2>
-                <p className="text-[#9dbfb0] text-sm leading-relaxed">
-                  Votre demande de billet est en attente de validation par
-                  l'administrateur. Vous pouvez suivre son statut dans l'onglet{" "}
-                  <strong>"Mes billets"</strong>.
+                <p className="text-slate-400 text-sm leading-relaxed">
+                  Votre demande de billet est en attente de validation. Vous
+                  pouvez suivre son statut dans
+                  <strong className="text-slate-700"> Mes billets</strong>.
                 </p>
                 <div className="flex gap-3 mt-2">
                   <button
                     onClick={closeBuy}
-                    className="px-5 py-2.5 text-sm border border-[#e2f0eb] rounded-xl hover:bg-[#f4fbf8] transition-colors font-semibold"
+                    className="px-5 py-2.5 text-sm border border-slate-200 rounded-xl hover:bg-slate-50 transition-colors font-semibold"
                   >
                     Fermer
                   </button>
                   <Link
                     href="/youth/tickets"
-                    className="px-5 py-2.5 text-sm bg-[#1a2e25] text-white font-bold rounded-xl hover:bg-[#2a4035] transition-colors"
+                    className="px-5 py-2.5 text-sm bg-slate-900 text-white font-semibold rounded-xl hover:bg-slate-700 transition-colors"
                   >
-                    Mes billets →
+                    Mes billets
                   </Link>
                 </div>
               </div>
             ) : (
               <>
                 {/* Modal header */}
-                <div className="flex items-center justify-between p-6 border-b border-[#f0f8f4]">
+                <div className="flex items-center justify-between p-6 border-b border-slate-100">
                   <div>
-                    <h2 className="font-black text-[#1a2e25]">
+                    <h2 className="font-bold text-slate-900">
                       Acheter un billet
                     </h2>
-                    <p className="text-xs text-[#9dbfb0] mt-0.5 truncate max-w-65">
+                    <p className="text-xs text-slate-400 mt-0.5 truncate max-w-xs">
                       {buyModal.title}
                     </p>
                   </div>
                   <button
                     onClick={closeBuy}
-                    className="text-[#9dbfb0] hover:text-[#1a2e25] transition-colors"
+                    className="text-slate-400 hover:text-slate-700 transition-colors"
                   >
                     <X className="w-5 h-5" />
                   </button>
@@ -297,26 +292,26 @@ export default function YouthEventsPage() {
 
                 <div className="p-6 space-y-4">
                   {/* Event summary card */}
-                  <div className="bg-[#f4fbf8] border border-[#e2f0eb] rounded-xl p-4 space-y-1.5">
-                    <div className="flex items-center gap-2 text-xs text-[#7aaa94]">
-                      <Calendar className="w-3.5 h-3.5 text-emerald-400" />
+                  <div className="bg-slate-50 border border-slate-200 rounded-xl p-4 space-y-1.5">
+                    <div className="flex items-center gap-2 text-xs text-slate-500">
+                      <Calendar className="w-3.5 h-3.5 text-slate-400" />
                       {new Date(buyModal.date).toLocaleDateString("fr-FR", {
                         weekday: "long",
                         year: "numeric",
                         month: "long",
                         day: "numeric",
                       })}
-                      {buyModal.time && ` • ${buyModal.time}`}
+                      {buyModal.time && ` · ${buyModal.time}`}
                     </div>
                     {buyModal.location && (
-                      <div className="flex items-center gap-2 text-xs text-[#7aaa94]">
-                        <MapPin className="w-3.5 h-3.5 text-emerald-400" />
+                      <div className="flex items-center gap-2 text-xs text-slate-500">
+                        <MapPin className="w-3.5 h-3.5 text-slate-400" />
                         {buyModal.location}
                       </div>
                     )}
                     {buyModal.phone_number && (
-                      <div className="flex items-center gap-2 text-xs text-[#7aaa94]">
-                        <Phone className="w-3.5 h-3.5 text-emerald-400" />
+                      <div className="flex items-center gap-2 text-xs text-slate-500">
+                        <Phone className="w-3.5 h-3.5 text-slate-400" />
                         {buyModal.phone_number}
                       </div>
                     )}
@@ -332,11 +327,10 @@ export default function YouthEventsPage() {
                         <button
                           key={t.value}
                           onClick={() => setTicketType(t.value)}
-                          className={`py-2.5 px-3 rounded-xl border text-sm font-bold transition-all text-left ${
-                            ticketType === t.value
-                              ? "border-emerald-500 bg-emerald-50 text-emerald-700"
-                              : "border-[#e2f0eb] text-[#7aaa94] hover:border-emerald-300 hover:bg-[#f4fbf8]"
-                          }`}
+                          className={`py-2.5 px-3 rounded-xl border text-sm font-semibold transition-all text-left ${ticketType === t.value
+                            ? "border-slate-900 bg-slate-900 text-white"
+                            : "border-slate-200 text-slate-500 hover:border-slate-400 hover:bg-slate-50"
+                            }`}
                         >
                           {t.label}
                         </button>
@@ -352,16 +346,16 @@ export default function YouthEventsPage() {
                     <div className="flex items-center gap-3">
                       <button
                         onClick={() => setQuantity((q) => Math.max(1, q - 1))}
-                        className="w-10 h-10 rounded-xl border border-[#e2f0eb] hover:bg-[#f4fbf8] font-black text-[#1a2e25] text-lg transition-colors"
+                        className="w-10 h-10 rounded-xl border border-slate-200 hover:bg-slate-50 font-bold text-slate-700 text-lg transition-colors"
                       >
                         −
                       </button>
-                      <span className="text-xl font-black text-[#1a2e25] w-8 text-center">
+                      <span className="text-xl font-bold text-slate-900 w-8 text-center">
                         {quantity}
                       </span>
                       <button
                         onClick={() => setQuantity((q) => Math.min(10, q + 1))}
-                        className="w-10 h-10 rounded-xl border border-[#e2f0eb] hover:bg-[#f4fbf8] font-black text-[#1a2e25] text-lg transition-colors"
+                        className="w-10 h-10 rounded-xl border border-slate-200 hover:bg-slate-50 font-bold text-slate-700 text-lg transition-colors"
                       >
                         +
                       </button>
@@ -381,26 +375,26 @@ export default function YouthEventsPage() {
                       value={reference}
                       onChange={(e) => setReference(e.target.value)}
                       placeholder="Ex: 1133223564476..."
-                      className="w-full bg-[#f4fbf8] border border-[#e2f0eb] rounded-xl py-2.5 px-4 text-sm focus:outline-none focus:border-emerald-400 transition-colors text-[#1a2e25] placeholder:text-[#c5e0d5]"
+                      className="w-full bg-slate-50 border border-slate-200 rounded-xl py-2.5 px-4 text-sm focus:outline-none focus:border-slate-400 transition-colors text-slate-800 placeholder:text-slate-300"
                     />
                   </div>
 
                   {/* Price summary */}
-                  <div className="bg-emerald-50 border border-emerald-200 rounded-xl p-4">
+                  <div className="bg-slate-50 border border-slate-200 rounded-xl p-4">
                     <div className="flex items-center justify-between">
-                      <span className="text-sm text-[#7aaa94]">
+                      <span className="text-sm text-slate-500">
                         {buyModal.price != null
-                          ? `${buyModal.price.toLocaleString("fr-FR")} Ar × ${quantity}`
-                          : "Gratuit"}
+                          ? `${buyModal.price.toLocaleString("fr-FR")} Ar x ${quantity}`
+                          : "3 000 Ar"}
                       </span>
-                      <span className="font-black text-emerald-700 text-lg">
+                      <span className="font-bold text-slate-900 text-lg">
                         {computedTotal != null
                           ? `${computedTotal.toLocaleString("fr-FR")} Ar`
-                          : "Gratuit"}
+                          : "3 000 Ar"}
                       </span>
                     </div>
-                    <p className="text-[11px] text-[#9dbfb0] mt-1.5">
-                      ⏳ En attente de validation par l'administrateur
+                    <p className="text-[11px] text-slate-400 mt-1.5">
+                      En attente de validation par l'administrateur
                     </p>
                   </div>
 
@@ -421,14 +415,14 @@ export default function YouthEventsPage() {
                   <button
                     onClick={handlePurchase}
                     disabled={purchasing}
-                    className="flex items-center gap-2 px-5 py-2.5 text-sm bg-emerald-500 hover:bg-emerald-600 text-white font-bold rounded-xl transition-colors disabled:opacity-50 shadow-md shadow-emerald-500/20"
+                    className="flex items-center gap-2 px-5 py-2.5 text-sm bg-slate-900 hover:bg-slate-700 text-white font-semibold rounded-xl transition-colors disabled:opacity-50"
                   >
                     {purchasing ? (
-                      <Loader2 className="w-4 h-4 animate-spin" />
+                      <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
                     ) : (
                       <ShoppingCart className="w-4 h-4" />
                     )}
-                    {purchasing ? "Traitement…" : "Confirmer l'achat"}
+                    {purchasing ? "Traitement..." : "Confirmer l'achat"}
                   </button>
                 </div>
               </>

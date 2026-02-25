@@ -107,10 +107,9 @@ export default function AdminContactsPage() {
   };
 
   return (
-    <div className="p-8">
-      {/* Toast */}
+    <div>
       {toast && (
-        <div className="fixed bottom-6 right-6 bg-card border border-border px-4 py-2 rounded-xl text-sm font-medium shadow-xl z-50">
+        <div className="fixed bottom-6 right-6 bg-white border border-slate-200 px-4 py-2.5 rounded-xl text-sm font-medium shadow-lg z-50 text-slate-800">
           {toast}
         </div>
       )}
@@ -182,17 +181,17 @@ export default function AdminContactsPage() {
 
       <div className="flex items-center justify-between mb-8">
         <div>
-          <h1 className="text-2xl font-bold">Contact Messages</h1>
-          <p className="text-sm text-foreground/40 mt-1">
+          <h1 className="text-2xl font-bold text-slate-900 tracking-tight">Messages</h1>
+          <p className="text-sm text-slate-500 mt-1">
             {total} total messages
           </p>
         </div>
         <div className="flex gap-3">
           <button
             onClick={load}
-            className="flex items-center gap-2 text-xs bg-card border border-border px-4 py-2 rounded-lg hover:bg-foreground/5 transition-colors"
+            className="flex items-center gap-2 text-sm text-slate-500 hover:text-slate-700 border border-slate-200 bg-white px-3.5 py-2 rounded-lg transition-colors"
           >
-            <RefreshCw className="w-3.5 h-3.5" /> Refresh
+            <RefreshCw className="w-4 h-4" /> Refresh
           </button>
           <select
             value={statusFilter}
@@ -210,7 +209,7 @@ export default function AdminContactsPage() {
       <div className="bg-card border border-border rounded-2xl overflow-hidden">
         {loading ? (
           <div className="flex items-center justify-center h-40">
-            <div className="w-6 h-6 border-4 border-primary/30 border-t-primary rounded-full animate-spin" />
+            <div className="w-6 h-6 border-[3px] border-slate-200 border-t-slate-600 rounded-full animate-spin" />
           </div>
         ) : messages.length === 0 ? (
           <div className="text-center py-16">

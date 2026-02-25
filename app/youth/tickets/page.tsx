@@ -116,157 +116,189 @@ function wrapText(
   return yPos;
 }
 
-async function downloadTicketImage(ticket: TicketOrder): Promise<void> {
-  const W = 920,
-    H = 460,
-    DIVIDER_X = 590,
-    PAD = 36;
+async function downloadTicketImage(ticket: TicketOrder, user: any): Promise<void> {
+  const W = 1000,
+    H = 500,
+    PAD = 50;
   const canvas = document.createElement("canvas");
   canvas.width = W;
   canvas.height = H;
   const ctx = canvas.getContext("2d")!;
 
-  ctx.fillStyle = "#094945";
+  // ── Background ─────────────────────────────────────────────────────────────
+  ctx.fillStyle = "#0082a3"; // Exact teal from image
   ctx.fillRect(0, 0, W, H);
-  const HEADER_H = 74;
-  ctx.fillStyle = "#0b5a54";
-  ctx.fillRect(0, 0, W, HEADER_H);
+
+  // ── Header ─────────────────────────────────────────────────────────────────
   ctx.fillStyle = "#ffffff";
   ctx.textAlign = "left";
-  ctx.font = "bold 26px sans-serif";
-  ctx.fillText("PASS AVENIR", PAD, 46);
+  ctx.font = "bold 34px sans-serif";
+  ctx.fillText("PASS AVENIR", PAD, 75);
 
-  const typeColors: Record<string, string> = {
-    standard: "#3b82f6",
-    vip: "#a855f7",
-    student: "#22d3ee",
-    virtual: "#06b6d4",
-  };
-  const badgeColor = typeColors[ticket.ticketType] ?? "#6b7280";
-  const typeLabel = ticket.ticketType.toUpperCase();
-  ctx.font = "bold 11px sans-serif";
-  const badgeW = ctx.measureText(typeLabel).width + 26;
-  const badgeX = W - PAD - badgeW;
-  ctx.fillStyle = badgeColor;
-  roundRect(ctx, badgeX, 26, badgeW, 24, 7);
+  // Top Right Info
+  const ticketId = `#${ticket.id.slice(0, 8).toUpperCase()}`;
+  const statusLabel = (ticket.ticketType || "STUDENT").toUpperCase();
+
+  // Badge
+  ctx.fillStyle = "#9ce4f2"; // Light cyan bg
+  const badgeW = 120;
+  const badgeH = 38;
+  roundRect(ctx, W - PAD - badgeW, 45, badgeW, badgeH, 10);
   ctx.fill();
-  ctx.fillStyle = "#ffffff";
-  ctx.textAlign = "right";
-  ctx.fillText(typeLabel, W - PAD - 13, 42);
-  ctx.fillStyle = "rgba(255,255,255,0.35)";
-  ctx.font = "10px monospace";
-  ctx.textAlign = "right";
-  ctx.fillText(`#${ticket.id.slice(0, 8).toUpperCase()}`, badgeX - 12, 42);
 
-  const hDash = (y: number, x0 = PAD, x1 = W - PAD) => {
+  ctx.fillStyle = "#0082a3"; // Teal text for badge
+  ctx.font = "bold 15px sans-serif";
+  ctx.textAlign = "center";
+  ctx.fillText(statusLabel, W - PAD - badgeW / 2, 70);
+
+  // Ticket ID next to badge
+  ctx.fillStyle = "rgba(255,255,255,0.4)";
+  ctx.font = "12px monospace";
+  ctx.textAlign = "right";
+  ctx.fillText(ticketId, W - PAD - badgeW - 15, 68);
+
+  // ── Dividers ───────────────────────────────────────────────────────────────
+  const drawDashedLine = (x1: number, y1: number, x2: number, y2: number) => {
     ctx.save();
-    ctx.strokeStyle = "rgba(255,255,255,0.15)";
-    ctx.setLineDash([4, 6]);
+    ctx.strokeStyle = "rgba(255,255,255,0.12)";
+    ctx.setLineDash([5, 8]);
     ctx.lineWidth = 1;
     ctx.beginPath();
-    ctx.moveTo(x0, y);
-    ctx.lineTo(x1, y);
+    ctx.moveTo(x1, y1);
+    ctx.lineTo(x2, y2);
     ctx.stroke();
     ctx.restore();
   };
-  hDash(HEADER_H + 1);
-  ctx.save();
-  ctx.strokeStyle = "rgba(255,255,255,0.15)";
-  ctx.setLineDash([4, 6]);
-  ctx.lineWidth = 1;
-  ctx.beginPath();
-  ctx.moveTo(DIVIDER_X, HEADER_H + 14);
-  ctx.lineTo(DIVIDER_X, H - 60);
-  ctx.stroke();
-  ctx.restore();
 
-  const LEFT_W = DIVIDER_X - PAD * 2;
-  let y = HEADER_H + 26;
+  drawDashedLine(PAD, 130, W - PAD, 130); // Top divider
 
+  // ── Left Side Content ──────────────────────────────────────────────────────
+  let y = 175;
   const label = (text: string) => {
-    ctx.fillStyle = "rgba(255,255,255,0.42)";
-    ctx.font = "9px sans-serif";
+    ctx.fillStyle = "rgba(255,255,255,0.5)";
+    ctx.font = "bold 11px sans-serif";
     ctx.textAlign = "left";
-    ctx.fillText(text, PAD, y);
-    y += 16;
+    ctx.fillText(text.toUpperCase(), PAD, y);
+    y += 24;
   };
-  const value = (text: string, fontSize = 16, alpha = 1, bold = true) => {
-    ctx.fillStyle = alpha < 1 ? `rgba(255,255,255,${alpha})` : "#ffffff";
-    ctx.font = `${bold ? "bold " : ""}${fontSize}px sans-serif`;
+  const val = (text: string, size = 28, bold = true) => {
+    ctx.fillStyle = "#ffffff";
+    ctx.font = `${bold ? "bold " : ""} ${size}px sans-serif`;
     ctx.textAlign = "left";
-    return wrapText(ctx, text, PAD, y, LEFT_W, fontSize + 5);
+    const lastY = wrapText(ctx, text, PAD, y, W * 0.58, size + 8);
+    y = lastY + 42;
   };
 
   label("ÉVÉNEMENT");
-  const lastTitleY = value(ticket.event?.title ?? "—", 19);
-  y = lastTitleY + 22;
+  val(ticket.event?.title ?? "Opening Keynote: Africa's Digital Future", 22);
 
-  if (ticket.event) {
-    const d = new Date(ticket.event.date);
-    label("DATE");
-    value(
-      d.toLocaleDateString("fr-FR", {
-        weekday: "long",
-        year: "numeric",
-        month: "long",
-        day: "numeric",
-      }),
-      13,
-    );
-    y += 22;
-  }
+  label("DATE & HEURE");
+  const eventDate = ticket.event ? new Date(ticket.event.date) : new Date();
+  const dateStr = eventDate.toLocaleDateString("fr-FR", {
+    weekday: "long",
+    day: "numeric",
+    month: "long",
+    year: "numeric"
+  });
+  val(dateStr, 17, true);
+  y -= 18; // Tighter spacing for time
+  val("18:00", 17, false);
 
-  hDash(y, PAD, DIVIDER_X - 20);
-  y += 14;
-  label("TYPE");
-  value(ticket.ticketType.toUpperCase(), 13);
-  y += 22;
-  label("QUANTITÉ");
-  value(String(ticket.quantity), 13);
-  y += 22;
-  label("TOTAL");
-  value(
-    ticket.price != null ? `${ticket.price.toLocaleString("fr-FR")} Ar` : "—",
-    13,
-  );
-  y += 22;
+  label("TITULAIRE");
+  val(user?.name ?? "Aina User", 17, true);
 
-  const FOOTER_Y = H - 52;
-  const rightCenterX = DIVIDER_X + (W - DIVIDER_X) / 2;
-  const qrSize = 190;
-  const qrX = rightCenterX - qrSize / 2;
-  const rightZoneTop = HEADER_H + 14,
-    rightZoneBot = H - 60;
-  const qrTop = rightZoneTop + (rightZoneBot - rightZoneTop - qrSize) / 2;
+  // ── Logo Section (Bottom Left) ─────────────────────────────────────────────
+  const logoX = PAD;
+  const logoY = H - 100;
+
+  const drawSophisticatedLogo = (x: number, y: number) => {
+    ctx.save();
+    ctx.translate(x, y);
+
+    // Nodes colors from image
+    const colors = ["#fdb813", "#4db848", "#00aeef", "#ec008c", "#8dc63f", "#1e96d4"];
+
+    // Central node
+    ctx.fillStyle = "#f26422";
+    ctx.beginPath(); ctx.arc(0, 0, 15, 0, Math.PI * 2); ctx.fill();
+
+    // Connecting lines and outer nodes
+    for (let i = 0; i < 8; i++) {
+      const angle = (i * Math.PI * 2) / 8;
+      const lineLen = i % 2 === 0 ? 45 : 32;
+      const nx = Math.cos(angle) * lineLen;
+      const ny = Math.sin(angle) * lineLen;
+
+      ctx.strokeStyle = "rgba(255, 255, 255, 0.1)";
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.moveTo(0, 0);
+      ctx.lineTo(nx, ny);
+      ctx.stroke();
+
+      ctx.fillStyle = colors[i % colors.length];
+      ctx.beginPath();
+      ctx.arc(nx, ny, 8, 0, Math.PI * 2);
+      ctx.fill();
+    }
+
+    ctx.restore();
+  };
+
+  drawSophisticatedLogo(logoX + 45, logoY + 15);
+
+  ctx.textAlign = "left";
+  ctx.font = "900 64px sans-serif";
+  ctx.fillStyle = "#0c332e"; // Dark forest green STEAM
+  ctx.fillText("STEAM", logoX + 120, logoY + 40);
+  ctx.fillStyle = "#f5a623"; // Orange HUB
+  ctx.fillText("HUB", logoX + 375, logoY + 40);
+
+  // ── Right SideContent (QR Section) ─────────────────────────────────────────
+  const contentDividerX = W * 0.64;
+  drawDashedLine(contentDividerX, 150, contentDividerX, H - 120);
+
+  const qrBoxSize = 280;
+  const qrBoxX = contentDividerX + (W - contentDividerX - qrBoxSize) / 2;
+  const qrBoxY = 160;
+
+  // QR Light Box
+  ctx.fillStyle = "#9ce4f2";
+  roundRect(ctx, qrBoxX, qrBoxY, qrBoxSize, qrBoxSize, 28);
+  ctx.fill();
+
+  const qrSize = 230;
+  const qrX = qrBoxX + (qrBoxSize - qrSize) / 2;
+  const qrY = qrBoxY + (qrBoxSize - qrSize) / 2;
 
   try {
     const qrImg = await loadImage(buildQRUrl(ticket));
-    ctx.fillStyle = "#ffffff";
-    roundRect(ctx, qrX - 10, qrTop - 10, qrSize + 20, qrSize + 20, 12);
-    ctx.fill();
-    ctx.drawImage(qrImg, qrX, qrTop, qrSize, qrSize);
+    ctx.drawImage(qrImg, qrX, qrY, qrSize, qrSize);
   } catch {
-    ctx.fillStyle = "rgba(255,255,255,0.08)";
-    roundRect(ctx, qrX - 10, qrTop - 10, qrSize + 20, qrSize + 20, 12);
-    ctx.fill();
-    ctx.fillStyle = "rgba(255,255,255,0.3)";
-    ctx.font = "11px sans-serif";
-    ctx.textAlign = "center";
-    ctx.fillText("QR Code unavailable", rightCenterX, qrTop + qrSize / 2);
+    ctx.fillStyle = "rgba(0,0,0,0.05)";
+    ctx.fillRect(qrX, qrY, qrSize, qrSize);
   }
 
-  ctx.fillStyle = "rgba(255,255,255,0.22)";
-  ctx.font = "8px monospace";
+  // Footer Instructions
+  const centerOfQRSection = contentDividerX + (W - contentDividerX) / 2;
+  ctx.fillStyle = "#ffffff";
   ctx.textAlign = "center";
-  ctx.fillText(ticket.qrCode, rightCenterX, H - 38);
-  hDash(FOOTER_Y, DIVIDER_X + 20, W - PAD);
-  ctx.fillStyle = "rgba(255,255,255,0.42)";
-  ctx.font = "8px sans-serif";
-  ctx.textAlign = "center";
-  ctx.fillText("SCAN QR CODE", rightCenterX, FOOTER_Y + 14);
-  ctx.fillStyle = "rgba(255,255,255,0.6)";
-  ctx.font = "10px sans-serif";
-  ctx.fillText("pour valider l'accès", rightCenterX, FOOTER_Y + 28);
+
+  // SCAN QR CODE
+  ctx.fillStyle = "rgba(255,255,255,0.7)";
+  ctx.font = "bold 15px sans-serif";
+  ctx.fillText("SCAN QR CODE", centerOfQRSection, qrBoxY + qrBoxSize + 45);
+
+  // Subtext
+  ctx.fillStyle = "rgba(255,255,255,0.45)";
+  ctx.font = "13px sans-serif";
+  ctx.fillText("pour valider l'accès", centerOfQRSection, qrBoxY + qrBoxSize + 65);
+
+  // Tiny ID at the bottom right
+  ctx.fillStyle = "rgba(255,255,255,0.2)";
+  ctx.font = "10px monospace";
+  ctx.textAlign = "right";
+  ctx.fillText(ticket.qrCode.slice(0, 16).toUpperCase(), W - PAD, H - 30);
 
   const link = document.createElement("a");
   link.download = `ticket-${ticket.id.slice(0, 8)}.png`;
@@ -309,7 +341,7 @@ const TYPE_LABELS: Record<string, string> = {
 // ── Component ────────────────────────────────────────────────────────────────
 
 export default function YouthTicketsPage() {
-  const { isLoading: authLoading } = useAuth();
+  const { user, isLoading: authLoading } = useAuth();
   const [tickets, setTickets] = useState<TicketOrder[]>([]);
   const [loading, setLoading] = useState(true);
   const [downloading, setDownloading] = useState<string | null>(null);
@@ -338,7 +370,7 @@ export default function YouthTicketsPage() {
   const handleDownload = async (ticket: TicketOrder) => {
     setDownloading(ticket.id);
     try {
-      await downloadTicketImage(ticket);
+      await downloadTicketImage(ticket, user);
     } catch {
       showToast("Erreur lors du téléchargement.");
     } finally {
@@ -348,9 +380,8 @@ export default function YouthTicketsPage() {
 
   return (
     <div className="space-y-6">
-      {/* Toast */}
       {toast && (
-        <div className="fixed bottom-6 right-6 bg-[#1a2e25] text-white text-sm font-medium px-4 py-3 rounded-xl shadow-xl z-50">
+        <div className="fixed bottom-6 right-6 bg-white border border-slate-200 text-slate-800 text-sm font-medium px-4 py-3 rounded-xl shadow-lg z-50">
           {toast}
         </div>
       )}
@@ -358,23 +389,23 @@ export default function YouthTicketsPage() {
       {/* Header */}
       <div className="flex items-center justify-between flex-wrap gap-4">
         <div>
-          <h1 className="text-2xl font-black text-[#1a2e25]">Mes billets</h1>
-          <p className="text-sm text-[#7aaa94] mt-0.5">
-            Suivez vos achats et téléchargez vos billets validés.
+          <h1 className="text-xl font-bold text-slate-900 tracking-tight">Mes billets</h1>
+          <p className="text-sm text-slate-400 mt-0.5">
+            Suivez vos achats et telechargez vos billets valides.
           </p>
         </div>
         <div className="flex gap-2">
           <button
             onClick={load}
-            className="flex items-center gap-1.5 text-xs border border-[#e2f0eb] bg-white px-3.5 py-2.5 rounded-xl hover:bg-[#f4fbf8] transition-colors font-semibold text-[#7aaa94]"
+            className="flex items-center gap-1.5 text-sm border border-slate-200 bg-white px-3.5 py-2 rounded-lg hover:bg-slate-50 transition-colors text-slate-500"
           >
             <RefreshCw className="w-3.5 h-3.5" /> Actualiser
           </button>
           <Link
             href="/youth/events"
-            className="flex items-center gap-1.5 text-xs bg-[#1a2e25] text-white font-bold px-3.5 py-2.5 rounded-xl hover:bg-[#2a4035] transition-colors shadow-sm"
+            className="flex items-center gap-1.5 text-sm bg-slate-900 text-white font-semibold px-3.5 py-2 rounded-lg hover:bg-slate-700 transition-colors"
           >
-            <Ticket className="w-3.5 h-3.5" /> Voir les événements
+            <Ticket className="w-3.5 h-3.5" /> Voir les evenements
           </Link>
         </div>
       </div>
@@ -382,19 +413,19 @@ export default function YouthTicketsPage() {
       {/* List */}
       {loading ? (
         <div className="flex items-center justify-center h-48">
-          <Loader2 className="w-8 h-8 animate-spin text-emerald-400" />
+          <div className="w-7 h-7 border-[3px] border-slate-200 border-t-slate-600 rounded-full animate-spin" />
         </div>
       ) : tickets.length === 0 ? (
-        <div className="text-center py-24 bg-white rounded-2xl border border-[#e2f0eb]">
-          <Ticket className="w-12 h-12 mx-auto mb-4 text-[#c5e0d5]" />
-          <p className="text-[#9dbfb0] text-base font-medium mb-2">
-            Vous n'avez pas encore de billets
+        <div className="text-center py-20 bg-white rounded-2xl border border-slate-200">
+          <Ticket className="w-10 h-10 mx-auto mb-3 text-slate-300" />
+          <p className="text-slate-400 text-sm mb-2">
+            Aucun billet pour le moment
           </p>
           <Link
             href="/youth/events"
-            className="text-sm text-emerald-600 font-bold hover:underline"
+            className="text-sm text-slate-700 font-semibold hover:underline"
           >
-            Parcourir les événements →
+            Parcourir les evenements
           </Link>
         </div>
       ) : (
@@ -407,32 +438,32 @@ export default function YouthTicketsPage() {
             return (
               <div
                 key={ticket.id}
-                className="bg-white border border-[#e2f0eb] rounded-2xl overflow-hidden"
+                className="bg-white border border-slate-200 rounded-2xl overflow-hidden"
               >
                 <div className="p-5 flex flex-col sm:flex-row sm:items-center gap-4">
                   {/* Left info */}
                   <div className="flex-1 space-y-2">
                     <div className="flex items-center gap-2 flex-wrap">
                       <span
-                        className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full border text-[11px] font-bold ${cfg.color}`}
+                        className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full border text-[11px] font-semibold ${cfg.color}`}
                       >
                         <StatusIcon className="w-3 h-3" />
                         {cfg.label}
                       </span>
-                      <span className="px-2 py-0.5 bg-emerald-50 text-emerald-700 rounded text-[11px] font-bold border border-emerald-200">
+                      <span className="px-2 py-0.5 bg-slate-100 text-slate-600 rounded text-[11px] font-semibold border border-slate-200">
                         {TYPE_LABELS[ticket.ticketType] ?? ticket.ticketType}
                       </span>
                     </div>
 
-                    <h3 className="font-bold text-base text-[#1a2e25]">
-                      {ticket.event?.title ?? "Événement supprimé"}
+                    <h3 className="font-bold text-sm text-slate-900">
+                      {ticket.event?.title ?? "Evenement supprime"}
                     </h3>
 
                     <div className="space-y-1">
                       {ticket.event && (
                         <>
-                          <div className="flex items-center gap-2 text-xs text-[#9dbfb0]">
-                            <Calendar className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
+                          <div className="flex items-center gap-2 text-xs text-slate-400">
+                            <Calendar className="w-3.5 h-3.5 text-slate-400 shrink-0" />
                             {new Date(ticket.event.date).toLocaleDateString(
                               "fr-FR",
                               {
@@ -444,23 +475,23 @@ export default function YouthTicketsPage() {
                             )}
                           </div>
                           {ticket.event.location && (
-                            <div className="flex items-center gap-2 text-xs text-[#9dbfb0]">
-                              <MapPin className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
+                            <div className="flex items-center gap-2 text-xs text-slate-400">
+                              <MapPin className="w-3.5 h-3.5 text-slate-400 shrink-0" />
                               {ticket.event.location}
                             </div>
                           )}
                         </>
                       )}
-                      <div className="flex items-center gap-4 text-xs text-[#9dbfb0] flex-wrap">
+                      <div className="flex items-center gap-4 text-xs text-slate-400 flex-wrap">
                         <span className="flex items-center gap-1">
-                          <Tag className="w-3.5 h-3.5 text-emerald-400" />
+                          <Tag className="w-3.5 h-3.5 text-slate-400" />
                           {ticket.quantity} billet
                           {ticket.quantity > 1 ? "s" : ""}
                         </span>
-                        <span className="font-semibold text-emerald-600">
+                        <span className="font-semibold text-slate-700">
                           {ticket.price != null
                             ? `${ticket.price.toLocaleString("fr-FR")} Ar`
-                            : "Gratuit"}
+                            : "3 000 Ar"}
                         </span>
                         <span className="flex items-center gap-1">
                           <Clock className="w-3 h-3" />
@@ -484,27 +515,27 @@ export default function YouthTicketsPage() {
                       <button
                         onClick={() => handleDownload(ticket)}
                         disabled={downloading === ticket.id}
-                        className="flex items-center gap-2 bg-emerald-500 hover:bg-emerald-600 text-white text-sm font-bold px-5 py-2.5 rounded-xl transition-colors disabled:opacity-50 shadow-md shadow-emerald-500/20"
+                        className="flex items-center gap-2 bg-slate-900 hover:bg-slate-700 text-white text-sm font-semibold px-4 py-2 rounded-xl transition-colors disabled:opacity-50"
                       >
                         {downloading === ticket.id ? (
-                          <Loader2 className="w-4 h-4 animate-spin" />
+                          <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
                         ) : (
                           <Download className="w-4 h-4" />
                         )}
                         {downloading === ticket.id
-                          ? "Génération…"
-                          : "Télécharger"}
+                          ? "Generation..."
+                          : "Telecharger"}
                       </button>
                     ) : ticket.status === "pending" ? (
-                      <div className="text-xs text-amber-600 font-medium text-right max-w-40">
-                        En attente de validation par l'administrateur
+                      <div className="text-xs text-slate-500 font-medium text-right max-w-40">
+                        En attente de validation
                       </div>
                     ) : (
-                      <div className="text-xs text-[#b0cfc5] text-right max-w-40">
-                        Ce billet n'est pas disponible au téléchargement
+                      <div className="text-xs text-slate-400 text-right max-w-40">
+                        Billet non disponible
                       </div>
                     )}
-                    <span className="text-[10px] text-[#c5e0d5] font-mono">
+                    <span className="text-[10px] text-slate-400 font-mono">
                       #{ticket.id.slice(0, 8).toUpperCase()}
                     </span>
                   </div>
