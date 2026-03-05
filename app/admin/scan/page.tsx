@@ -110,9 +110,15 @@ export default function AdminScanPage() {
         }
     };
 
+    const isProcessing = useRef(false);
+
     async function onScanSuccess(decodedText: string) {
-        // Prevent double scanning the same code immediately
-        if (lastScannedCode.current === decodedText && isValidating) return;
+        // Strict lock to prevent any concurrent processing
+        if (isProcessing.current) return;
+        isProcessing.current = true;
+
+        // Stop camera IMMEDIATELY to prevent library from firing more events
+        await stopScanning();
 
         // For digital tickets, content format:
         // PASS AVENIR — BILLET OFFICIEL
@@ -130,10 +136,8 @@ export default function AdminScanPage() {
             if (codeLine) qrToken = codeLine.split(":")[1]?.trim() || decodedText;
         }
 
-        if (isValidating) return;
-
-        lastScannedCode.current = decodedText;
         setIsValidating(true);
+        setScanResult(null); // Clear previous result UI
 
         // Brief haptic feedback if supported
         if ("vibrate" in navigator) navigator.vibrate(100);
@@ -157,23 +161,16 @@ export default function AdminScanPage() {
 
             if (res.ok) {
                 toast.success(result.message);
-                // Stop camera automatically after successful scan
-                stopScanning();
             } else {
                 toast.error(result.message);
-                // Also stop on error to avoid confusion, or keep it open? 
-                // User said "Si il termine un scan", so let's stop it.
-                stopScanning();
             }
         } catch (err) {
             toast.error("Erreur réseau");
         } finally {
             setIsValidating(false);
-            // Auto hide overlay after 3 seconds, allowing next scan
-            setTimeout(() => {
-                setScanResult(null);
-                lastScannedCode.current = null;
-            }, 3000);
+            isProcessing.current = false;
+            // Note: We no longer auto-hide or restart. 
+            // The user must click "Démarrer" manually for the next ticket.
         }
     }
 
