@@ -63,16 +63,15 @@ export default function SponsorDashboardPage() {
   const [activeTab, setActiveTab] = useState("overview")
 
   useEffect(() => {
-    if (!isLoading && !isAuthenticated) {
-      router.push("/signin")
+    if (!isLoading) {
+      if (!isAuthenticated) router.replace("/signin");
+      else if (user?.role !== "sponsor") {
+        router.replace(user?.role === "admin" ? "/admin" : "/youth");
+      }
     }
-    // Check if user is a sponsor
-    if (user && user.role !== "sponsor") {
-      router.push("/dashboard")
-    }
-  }, [isLoading, isAuthenticated, user, router])
+  }, [isLoading, isAuthenticated, user, router]);
 
-  if (isLoading || sponsorLoading || !sponsorData) {
+  if (isLoading || sponsorLoading || !sponsorData || user?.role !== "sponsor") {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="w-8 h-8 border-4 border-primary/30 border-t-primary rounded-full animate-spin" />
@@ -167,11 +166,10 @@ export default function SponsorDashboardPage() {
               <button
                 key={tab}
                 onClick={() => setActiveTab(tab)}
-                className={`px-4 py-3 font-medium border-b-2 transition-colors ${
-                  activeTab === tab
+                className={`px-4 py-3 font-medium border-b-2 transition-colors ${activeTab === tab
                     ? "border-primary text-primary"
                     : "border-transparent text-foreground/70 hover:text-foreground"
-                }`}
+                  }`}
               >
                 {tab.charAt(0).toUpperCase() + tab.slice(1)}
               </button>
@@ -329,11 +327,10 @@ export default function SponsorDashboardPage() {
                         <td className="px-6 py-4 text-foreground/70">{lead.date}</td>
                         <td className="px-6 py-4">
                           <span
-                            className={`px-3 py-1 rounded-full text-sm font-medium ${
-                              lead.interested
+                            className={`px-3 py-1 rounded-full text-sm font-medium ${lead.interested
                                 ? "bg-green-500/20 text-green-700"
                                 : "bg-yellow-500/20 text-yellow-700"
-                            }`}
+                              }`}
                           >
                             {lead.interested ? "Interested" : "Pending"}
                           </span>
@@ -376,9 +373,8 @@ export default function SponsorDashboardPage() {
               {messages.map((msg) => (
                 <div
                   key={msg.id}
-                  className={`bg-card border border-border rounded-lg p-4 hover:shadow-lg transition-shadow cursor-pointer ${
-                    msg.unread ? "bg-primary/5 border-primary/50" : ""
-                  }`}
+                  className={`bg-card border border-border rounded-lg p-4 hover:shadow-lg transition-shadow cursor-pointer ${msg.unread ? "bg-primary/5 border-primary/50" : ""
+                    }`}
                 >
                   <div className="flex items-start justify-between">
                     <div className="flex-1">

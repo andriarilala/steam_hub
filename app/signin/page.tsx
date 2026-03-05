@@ -22,7 +22,7 @@ function getRedirectPath(role?: string): string {
     case "sponsor":
       return "/sponsor-dashboard";
     default:
-      return "/dashboard";
+      return "/youth";
   }
 }
 
@@ -75,10 +75,12 @@ export default function SignInPage() {
         <div className="max-w-md mx-auto px-4">
           {/* Header */}
           <div className="text-center mb-8">
-            <div className="w-16 h-16 bg-primary rounded-lg flex items-center justify-center mx-auto mb-4">
-              <span className="text-primary-foreground font-bold text-2xl">
-                PA
-              </span>
+            <div className="flex justify-center mx-auto mb-6">
+              <img
+                src="/logo.png"
+                alt="Logo"
+                className="h-16 w-auto"
+              />
             </div>
             <h1 className="text-3xl font-bold text-foreground mb-2">
               {t("auth.signInTitle")}

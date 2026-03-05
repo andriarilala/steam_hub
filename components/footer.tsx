@@ -15,10 +15,10 @@ export function Footer() {
             <div className="flex items-center gap-2 mb-4">
               <div className="flex items-center justify-center">
                 <img
-  src="/logo.png"
-  alt="Logo"
-  className="h-12 w-auto self-center"
-/>
+                  src="/logo.png"
+                  alt="Logo"
+                  className="h-12 w-auto self-center"
+                />
               </div>
             </div>
             <p className="text-sm text-primary-foreground/70">{t("footer.tagline")}</p>
@@ -54,7 +54,6 @@ export function Footer() {
                 { key: "nav.partners", href: "/partners" },
                 { key: "nav.community", href: "/community" },
                 { key: "nav.media", href: "/media" },
-                { key: "nav.contact", href: "/contact" },
               ].map((item) => (
                 <li key={item.key}>
                   <Link
@@ -82,12 +81,12 @@ export function Footer() {
               </li>
               <li>
                 <a
-                  href="https://twitter.com"
+                  href="https://wa.me/261328175438"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="text-primary-foreground/70 hover:text-primary-foreground transition-colors"
                 >
-                  Twitter
+                  WhatsApp
                 </a>
               </li>
               <li>

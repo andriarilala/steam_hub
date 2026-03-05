@@ -39,11 +39,11 @@ export default function AdminLayout({
   const pathname = usePathname();
 
   useEffect(() => {
-    if (
-      !isLoading &&
-      (!isAuthenticated || (user && (user.role as string) !== "admin"))
-    ) {
-      router.replace("/dashboard");
+    if (!isLoading) {
+      if (!isAuthenticated) router.replace("/signin");
+      else if (user?.role !== "admin") {
+        router.replace(user?.role === "sponsor" ? "/sponsor-dashboard" : "/youth");
+      }
     }
   }, [isLoading, isAuthenticated, user, router]);
 

@@ -111,10 +111,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setLoading(false);
       return false;
     }
-    // automatically sign in after successful registration
-    const signed = await signIn(payload.email, payload.password);
     setLoading(false);
-    return signed;
+    return true;
   };
 
   const signOut = () => {
@@ -130,7 +128,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       // nextAuthSignIn will redirect the browser automatically
       const result = await nextAuthSignIn(provider, {
         redirect: true,
-        callbackUrl: "/dashboard",
+        callbackUrl: "/youth",
       });
       console.log(`${provider} sign-in result:`, result);
       return true;

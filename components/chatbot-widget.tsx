@@ -20,7 +20,7 @@ interface QuickOption {
 const initialMessage: Message = {
   id: "1",
   type: "bot",
-  text: "Hello! I'm PASS AVENIR's virtual assistant. How can I help you today?",
+  text: "Hello! I'm STEAM HUB's virtual assistant. How can I help you today?",
   options: [
     { id: "1", label: "Event Information", action: "event_info" },
     { id: "2", label: "Registration Help", action: "registration" },
@@ -33,7 +33,7 @@ const botResponses: Record<string, Message> = {
   event_info: {
     id: "",
     type: "bot",
-    text: "PASS AVENIR 2025 takes place on March 15-16 at the International Convention Center in Accra, Ghana. It's Africa's premier talent and opportunity summit connecting 10,000+ young talents with leading institutions and companies. What would you like to know more about?",
+    text: "STEAM HUB is the premier talent and opportunity summit connecting young talents with leading institutions and companies. What would you like to know more about?",
     options: [
       { id: "1", label: "Agenda & Sessions", action: "agenda" },
       { id: "2", label: "Venue & Location", action: "venue" },
@@ -44,7 +44,7 @@ const botResponses: Record<string, Message> = {
   registration: {
     id: "",
     type: "bot",
-    text: "Great! Registration is now open for PASS AVENIR 2025. We offer several ticket types:\n\n- Student Pass: 3000 AR\n- Standard Pass: 3000 AR\n- VIP Pass: 3000 AR\n- Virtual Pass: 3000 AR\n\nWould you like to register now or learn more about each ticket type?",
+    text: "Great! Registration is available for STEAM HUB. We offer several options including Student, Professional, and Virtual passes. Would you like to register now or learn more?",
     options: [
       { id: "1", label: "Register Now", action: "register_now" },
       { id: "2", label: "Ticket Details", action: "ticket_details" },
@@ -55,7 +55,7 @@ const botResponses: Record<string, Message> = {
   sponsorship: {
     id: "",
     type: "bot",
-    text: "Interested in sponsoring PASS AVENIR? We offer partnership packages starting from €25,000 to €200,000+, with options for custom partnerships. Benefits include booth presence, speaking opportunities, brand visibility, and access to Africa's top talent pool.",
+    text: "Interested in sponsoring STEAM HUB? We offer custom partnership packages. Benefits include booth presence, speaking opportunities, brand visibility, and access to top talent.",
     options: [
       { id: "1", label: "View Packages", action: "sponsor_packages" },
       { id: "2", label: "Download Prospectus", action: "download_prospectus" },
@@ -66,18 +66,17 @@ const botResponses: Record<string, Message> = {
   contact: {
     id: "",
     type: "bot",
-    text: "You can reach our team through:\n\n- Email: info@passavenir.com\n- Phone: +233 XX XXX XXXX\n- WhatsApp: +233 XX XXX XXXX\n\nOr would you prefer to speak directly with someone?",
+    text: "You can reach our team through:\n\n- Email: hello@passavenir.com\n- Phone: +261 32 81 754 38\n- WhatsApp: +261 32 81 754 38\n\nOr would you prefer to speak directly with someone?",
     options: [
       { id: "1", label: "Open WhatsApp", action: "whatsapp" },
       { id: "2", label: "Send Email", action: "email" },
-      { id: "3", label: "Contact Form", action: "contact_form" },
       { id: "4", label: "Back to Menu", action: "menu" },
     ],
   },
   agenda: {
     id: "",
     type: "bot",
-    text: "The event features 2 days of inspiring content:\n\nDay 1: Opening Keynotes, Panels, Workshops, Talent Showcase\nDay 2: Career Fair, Pitch Competition, Awards, Closing Celebration\n\nOver 50 sessions covering technology, innovation, careers, and more!",
+    text: "The event features inspiring content including Keynotes, Panels, Workshops, and Talent Showcases. Over 50 sessions covering technology, innovation, careers, and more!",
     options: [
       { id: "1", label: "View Full Agenda", action: "full_agenda" },
       { id: "2", label: "Speaker Lineup", action: "speakers" },
@@ -87,7 +86,7 @@ const botResponses: Record<string, Message> = {
   venue: {
     id: "",
     type: "bot",
-    text: "PASS AVENIR 2025 will be held at the International Convention Center in Accra, Ghana. The venue offers world-class facilities including:\n\n- Main auditorium (5,000 seats)\n- Exhibition halls\n- Workshop rooms\n- Networking lounges\n- Outdoor spaces\n\nConveniently located in the heart of Accra with easy access to hotels and transport.",
+    text: "STEAM HUB will be held at a premier venue offering world-class facilities including exhibition halls, networking lounges, and workshop rooms.",
     options: [
       { id: "1", label: "Hotels Nearby", action: "hotels" },
       { id: "2", label: "Getting There", action: "transport" },
@@ -97,7 +96,7 @@ const botResponses: Record<string, Message> = {
   audience: {
     id: "",
     type: "bot",
-    text: "PASS AVENIR welcomes:\n\n- Students & Young Professionals looking for opportunities\n- Companies & Recruiters seeking talent\n- Institutions & Government promoting programs\n- Mentors & Experts sharing knowledge\n- Sponsors & Partners building visibility\n\nWhich describes you best?",
+    text: "STEAM HUB welcomes:\n\n- Students & Young Professionals looking for opportunities\n- Companies & Recruiters seeking talent\n- Institutions & Government promoting programs\n- Mentors & Experts sharing knowledge\n- Sponsors & Partners building visibility\n\nWhich describes you best?",
     options: [
       { id: "1", label: "I'm a Student/Professional", action: "for_students" },
       { id: "2", label: "I'm from a Company", action: "for_companies" },
@@ -176,14 +175,10 @@ export function ChatbotWidget() {
       return
     }
     if (action === "whatsapp") {
-      window.open("https://wa.me/233XXXXXXXX?text=Hello!%20I%20have%20a%20question%20about%20PASS%20AVENIR", "_blank")
+      window.open("https://wa.me/261328175438?text=Hello!%20I%20have%20a%20question%20about%20STEAM%20HUB", "_blank")
     }
     if (action === "full_agenda") {
       window.location.href = "/agenda"
-      return
-    }
-    if (action === "contact_form") {
-      window.location.href = "/contact"
       return
     }
     if (action === "sponsor_packages") {
@@ -246,7 +241,7 @@ export function ChatbotWidget() {
   }
 
   const openWhatsApp = () => {
-    window.open("https://wa.me/233XXXXXXXX?text=Hello!%20I%20have%20a%20question%20about%20PASS%20AVENIR", "_blank")
+    window.open("https://wa.me/261328175438?text=Hello!%20I%20have%20a%20question%20about%20STEAM%20HUB", "_blank")
   }
 
   return (
@@ -265,9 +260,8 @@ export function ChatbotWidget() {
         {/* Chatbot Button */}
         <button
           onClick={() => setIsOpen(!isOpen)}
-          className={`w-14 h-14 rounded-full flex items-center justify-center shadow-lg transition-all ${
-            isOpen ? "bg-foreground text-background" : "bg-primary text-primary-foreground"
-          }`}
+          className={`w-14 h-14 rounded-full flex items-center justify-center shadow-lg transition-all ${isOpen ? "bg-foreground text-background" : "bg-primary text-primary-foreground"
+            }`}
           aria-label={isOpen ? "Close chat" : "Open chat"}
         >
           {isOpen ? <X className="w-6 h-6" /> : <MessageCircle className="w-6 h-6" />}
@@ -283,7 +277,7 @@ export function ChatbotWidget() {
               <Bot className="w-6 h-6 text-primary-foreground" />
             </div>
             <div className="flex-1">
-              <h3 className="font-bold text-primary-foreground">PASS AVENIR Assistant</h3>
+              <h3 className="font-bold text-primary-foreground">STEAM HUB Assistant</h3>
               <p className="text-xs text-primary-foreground/70">Online | Typically replies instantly</p>
             </div>
             <button onClick={() => setIsOpen(false)} className="p-1 hover:bg-primary-foreground/10 rounded">
@@ -297,9 +291,8 @@ export function ChatbotWidget() {
               <div key={message.id} className={`flex ${message.type === "user" ? "justify-end" : "justify-start"}`}>
                 <div className={`flex gap-2 max-w-[85%] ${message.type === "user" ? "flex-row-reverse" : ""}`}>
                   <div
-                    className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 ${
-                      message.type === "user" ? "bg-primary" : "bg-muted"
-                    }`}
+                    className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 ${message.type === "user" ? "bg-primary" : "bg-muted"
+                      }`}
                   >
                     {message.type === "user" ? (
                       <User className="w-4 h-4 text-primary-foreground" />
@@ -309,11 +302,10 @@ export function ChatbotWidget() {
                   </div>
                   <div>
                     <div
-                      className={`px-4 py-2.5 rounded-2xl text-sm whitespace-pre-line ${
-                        message.type === "user"
-                          ? "bg-primary text-primary-foreground rounded-br-sm"
-                          : "bg-muted text-foreground rounded-bl-sm"
-                      }`}
+                      className={`px-4 py-2.5 rounded-2xl text-sm whitespace-pre-line ${message.type === "user"
+                        ? "bg-primary text-primary-foreground rounded-br-sm"
+                        : "bg-muted text-foreground rounded-bl-sm"
+                        }`}
                     >
                       {message.text}
                     </div>

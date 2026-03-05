@@ -74,7 +74,7 @@ export function Navigation() {
                   {t("nav.signIn")}
                 </Link>
                 <Link
-                  href="/register"
+                  href="/signup"
                   className="bg-primary text-primary-foreground px-4 py-2 rounded-sm font-medium hover:opacity-90 transition-opacity"
                 >
                   {t("nav.register")}
@@ -137,7 +137,7 @@ export function Navigation() {
                     {t("nav.signIn")}
                   </Link>
                   <Link
-                    href="/register"
+                    href="/signup"
                     className="flex-1 bg-primary text-primary-foreground px-4 py-2 rounded-sm font-medium hover:opacity-90 transition-opacity text-center"
                     onClick={() => setIsOpen(false)}
                   >

@@ -32,12 +32,14 @@ export default function YouthLayout({
   const pathname = usePathname();
 
   useEffect(() => {
-    if (!isLoading && (!isAuthenticated || (user && user.role !== "youth"))) {
-      router.replace("/dashboard");
+    if (!isLoading) {
+      if (!isAuthenticated) router.replace("/signin");
+      else if (user?.role === "admin") router.replace("/admin");
+      else if (user?.role === "sponsor") router.replace("/sponsor-dashboard");
     }
   }, [isLoading, isAuthenticated, user, router]);
 
-  if (isLoading || !user || user.role !== "youth") {
+  if (isLoading || !user || user.role === "admin" || user.role === "sponsor") {
     return (
       <div className="min-h-screen bg-[#f8f9fb] flex items-center justify-center">
         <div className="w-7 h-7 border-[3px] border-slate-200 border-t-slate-600 rounded-full animate-spin" />
@@ -75,8 +77,8 @@ export default function YouthLayout({
                 href={item.href}
                 title={item.label}
                 className={`group relative flex items-center justify-center w-full h-10 rounded-lg transition-all ${isActive
-                    ? "bg-slate-900 text-white"
-                    : "text-slate-400 hover:text-slate-700 hover:bg-slate-100"
+                  ? "bg-slate-900 text-white"
+                  : "text-slate-400 hover:text-slate-700 hover:bg-slate-100"
                   }`}
               >
                 <item.icon className="w-[18px] h-[18px]" />
