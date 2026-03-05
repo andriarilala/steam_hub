@@ -33,6 +33,8 @@ export const metadata: Metadata = {
   },
 }
 
+import { Toaster } from "sonner"
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -45,6 +47,7 @@ export default function RootLayout({
           {children}
           <ChatbotWidget />
         </Providers>
+        <Toaster position="top-center" richColors />
         <Analytics />
       </body>
     </html>
