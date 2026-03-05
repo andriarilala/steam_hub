@@ -88,9 +88,9 @@ export default function AdminScanPage() {
     };
 
     const stopScanning = async () => {
+        setIsScanning(false); // Update state IMMEDIATELY
         if (html5QrCodeRef.current?.isScanning) {
             await html5QrCodeRef.current.stop();
-            setIsScanning(false);
             setFlashOn(false);
         }
     };
@@ -169,8 +169,15 @@ export default function AdminScanPage() {
         } finally {
             setIsValidating(false);
             isProcessing.current = false;
-            // Note: We no longer auto-hide or restart. 
-            // The user must click "Démarrer" manually for the next ticket.
+
+            // Auto-reset and restart camera after 3 seconds
+            setTimeout(async () => {
+                setScanResult(null);
+                // Automatically restart the camera ONLY IF the user hasn't explicitly stopped it
+                if (html5QrCodeRef.current && !html5QrCodeRef.current.isScanning) {
+                    await startScanning();
+                }
+            }, 3000);
         }
     }
 
