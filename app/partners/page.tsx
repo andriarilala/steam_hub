@@ -161,7 +161,7 @@ Email: sponsors@passavenir.com
 Phone: +233 XX XXX XXXX
 Website: www.passavenir.com
     `
-    
+
     const blob = new Blob([content], { type: "text/plain" })
     const url = URL.createObjectURL(blob)
     const a = document.createElement("a")
@@ -209,7 +209,7 @@ Brand Assets Available
 
 For full brand assets, contact: brand@passavenir.com
     `
-    
+
     const blob = new Blob([content], { type: "text/plain" })
     const url = URL.createObjectURL(blob)
     const a = document.createElement("a")
@@ -264,7 +264,7 @@ SPONSOR ACTIVATION OPPORTUNITIES
 
 For sponsorship inquiries: sponsors@passavenir.com
     `
-    
+
     const blob = new Blob([content], { type: "text/plain" })
     const url = URL.createObjectURL(blob)
     const a = document.createElement("a")
@@ -306,7 +306,7 @@ For sponsorship inquiries: sponsors@passavenir.com
         </div>
       </section>
 
-      {/* Sponsor Packages */}
+      {/* Sponsor Packages section hidden for now
       <section className="py-20 px-4 sm:px-6 lg:px-8 bg-card">
         <div className="max-w-6xl mx-auto">
           <h2 className="text-4xl font-bold mb-4 text-foreground text-center">{t("partners.packages")}</h2>
@@ -404,11 +404,12 @@ For sponsorship inquiries: sponsors@passavenir.com
           </div>
         </div>
       </section>
+      */}
 
       {/* Sponsor Contact Form Modal */}
       <SponsorFormModal isOpen={showSponsorForm} onClose={() => setShowSponsorForm(false)} />
 
-      {/* Download Resources Section */}
+      {/* Sponsor Resources section hidden for now
       <section className="py-20 px-4 sm:px-6 lg:px-8 bg-background">
         <div className="max-w-6xl mx-auto">
           <h2 className="text-3xl font-bold mb-8 text-foreground text-center">Sponsor Resources</h2>
@@ -466,6 +467,7 @@ For sponsorship inquiries: sponsors@passavenir.com
           </div>
         </div>
       </section>
+      */}
 
       {/* Why Partner */}
       <section className="py-20 px-4 sm:px-6 lg:px-8 bg-background">

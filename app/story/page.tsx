@@ -84,7 +84,7 @@ export default function StoryPage() {
       <HeroSection
         title={t("story.title")}
         subtitle={t("story.subtitle")}
-        backgroundImage="/african-youth-conference-inspiration.png"
+        backgroundImage="/african-youth-conference-inspiration.jpg"
       />
 
       {/* Origin Section */}

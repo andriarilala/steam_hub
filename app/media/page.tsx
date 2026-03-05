@@ -99,12 +99,11 @@ const categories = ["all", "event", "sessions", "sponsors", "behind-the-scenes",
 export default function MediaPage() {
   const { t } = useLanguage()
   const [selectedCategory, setSelectedCategory] = useState("all")
-  const [selectedType, setSelectedType] = useState<"all" | "photo" | "video" | "article">("all")
 
-  const filteredMedia = mediaItems.filter((item) => {
-    const categoryMatch = selectedCategory === "all" || item.category === selectedCategory
-    const typeMatch = selectedType === "all" || item.type === selectedType
-    return categoryMatch && typeMatch
+  const photosOnly = mediaItems.filter((item) => item.type === "photo")
+
+  const filteredMedia = photosOnly.filter((item) => {
+    return selectedCategory === "all" || item.category === selectedCategory
   })
 
   return (
@@ -129,31 +128,7 @@ export default function MediaPage() {
       <section className="py-12 px-4 sm:px-6 lg:px-8 bg-card sticky top-20 z-40 border-b border-border">
         <div className="max-w-6xl mx-auto">
           <div className="space-y-6">
-            {/* Type Filter */}
-            <div>
-              <div className="flex items-center gap-2 mb-3">
-                <Filter size={18} className="text-secondary" />
-                <label className="font-bold text-foreground">{t("media.mediaType")}</label>
-              </div>
-              <div className="flex flex-wrap gap-2">
-                {["all", "photo", "video", "article"].map((type) => (
-                  <button
-                    key={type}
-                    onClick={() => setSelectedType(type as any)}
-                    className={`px-4 py-2 rounded-sm font-medium transition-colors capitalize flex items-center gap-2 ${
-                      selectedType === type
-                        ? "bg-secondary text-secondary-foreground"
-                        : "bg-muted text-foreground hover:bg-border"
-                    }`}
-                  >
-                    {type === "photo" && <ImageIcon size={16} />}
-                    {type === "video" && <Video size={16} />}
-                    {type === "article" && <FileText size={16} />}
-                    {type === "all" ? "All Media" : type}
-                  </button>
-                ))}
-              </div>
-            </div>
+
 
             {/* Category Filter */}
             <div>
@@ -166,13 +141,12 @@ export default function MediaPage() {
                   <button
                     key={cat}
                     onClick={() => setSelectedCategory(cat)}
-                    className={`px-4 py-2 rounded-sm font-medium transition-colors capitalize ${
-                      selectedCategory === cat
-                        ? "bg-secondary text-secondary-foreground"
-                        : "bg-muted text-foreground hover:bg-border"
-                    }`}
+                    className={`px-4 py-2 rounded-sm font-medium transition-colors capitalize ${selectedCategory === cat
+                      ? "bg-secondary text-secondary-foreground"
+                      : "bg-muted text-foreground hover:bg-border"
+                      }`}
                   >
-                    {cat === "all" ? "All Categories" : cat.replace("-", " ")}
+                    {cat === "all" ? t("media.allCategories") : cat.replace("-", " ")}
                   </button>
                 ))}
               </div>
@@ -187,7 +161,7 @@ export default function MediaPage() {
           <p className="text-foreground/70 mb-8">
             {t("media.showing")
               .replace("{count}", filteredMedia.length.toString())
-              .replace("{total}", mediaItems.length.toString())}
+              .replace("{total}", photosOnly.length.toString())}
           </p>
 
           {filteredMedia.length > 0 ? (
@@ -204,111 +178,7 @@ export default function MediaPage() {
         </div>
       </section>
 
-      {/* Video Interviews Section */}
-      <section className="py-20 px-4 sm:px-6 lg:px-8 bg-background">
-        <div className="max-w-6xl mx-auto">
-          <h2 className="text-4xl font-bold mb-4 text-foreground text-center">Exclusive Interviews</h2>
-          <p className="text-center text-foreground/70 mb-12 max-w-2xl mx-auto">
-            Hear directly from speakers, sponsors, and participants about their experience at PASS AVENIR
-          </p>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            {[
-              {
-                name: "Dr. Kwame Asante",
-                title: "Tech Entrepreneur & Keynote Speaker",
-                topic: "Building Africa's Tech Future",
-                duration: "12:45",
-              },
-              {
-                name: "Amina Mohamed",
-                title: "HR Director, Global Tech Corp",
-                topic: "Recruiting Top African Talent",
-                duration: "8:30",
-              },
-              {
-                name: "Samuel Okonkwo",
-                title: "Startup Founder & Pitch Winner",
-                topic: "From PASS AVENIR to Series A Funding",
-                duration: "15:20",
-              },
-              {
-                name: "Dr. Fatima Diallo",
-                title: "Education Minister, Senegal",
-                topic: "Youth Development & Innovation",
-                duration: "10:15",
-              },
-            ].map((interview, idx) => (
-              <div key={idx} className="group border border-border rounded-lg overflow-hidden hover:shadow-lg transition-all">
-                <div className="relative aspect-video bg-gradient-to-br from-primary to-accent flex items-center justify-center overflow-hidden">
-                  <button className="w-16 h-16 rounded-full bg-white/20 backdrop-blur-sm hover:bg-white/30 transition-colors flex items-center justify-center group-hover:scale-110">
-                    <Video className="w-8 h-8 text-white fill-white" />
-                  </button>
-                  <span className="absolute bottom-4 right-4 bg-black/60 text-white px-2 py-1 text-xs font-bold rounded">
-                    {interview.duration}
-                  </span>
-                </div>
-                <div className="p-6">
-                  <h3 className="text-lg font-bold text-foreground mb-1">{interview.name}</h3>
-                  <p className="text-sm text-secondary font-medium mb-3">{interview.title}</p>
-                  <p className="text-foreground/70 mb-4">{interview.topic}</p>
-                  <button className="text-primary font-medium text-sm flex items-center gap-2 hover:underline">
-                    Watch Interview
-                  </button>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Press Kit Section */}
-      <section className="py-20 px-4 sm:px-6 lg:px-8 bg-card">
-        <div className="max-w-6xl mx-auto">
-          <h2 className="text-4xl font-bold mb-12 text-foreground text-center">{t("media.pressKit")}</h2>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
-            {[
-              {
-                title: t("media.officialPress"),
-                description: "Download our official statement about PASS AVENIR 2025 and key achievements",
-                icon: "📄",
-              },
-              {
-                title: t("media.brandAssets"),
-                description: "Logos, banners, and brand guidelines for media coverage and promotion",
-                icon: "🎨",
-              },
-              {
-                title: t("media.speakerBios"),
-                description: "High-resolution photos and biographies of all keynote speakers and panelists",
-                icon: "👤",
-              },
-              {
-                title: t("media.eventStats"),
-                description: "Data and insights about attendance, engagement, and impact of the summit",
-                icon: "📊",
-              },
-            ].map((item, idx) => (
-              <div key={idx} className="bg-background p-8 rounded-sm border border-border">
-                <div className="text-4xl mb-4">{item.icon}</div>
-                <h3 className="text-lg font-bold mb-2 text-foreground">{item.title}</h3>
-                <p className="text-foreground/70 mb-6">{item.description}</p>
-                <button className="bg-primary text-primary-foreground px-6 py-2 rounded-sm font-bold hover:opacity-90 transition-opacity">
-                  Download
-                </button>
-              </div>
-            ))}
-          </div>
-
-          <div className="text-center">
-            <p className="text-foreground/70 mb-6">Need custom assets for media coverage?</p>
-            <button className="border-2 border-primary text-primary px-8 py-3 rounded-sm font-bold hover:bg-primary/5 transition-colors">
-              {t("media.contactPress")}
-            </button>
-          </div>
-        </div>
-      </section>
 
       <Footer />
     </main>
