@@ -22,6 +22,7 @@ import {
   Phone,
   X,
 } from "lucide-react";
+import { ConfirmModal } from "@/components/ui/confirm-modal";
 
 // ─── Additional types for edit modal ─────────────────────────────────────────
 
@@ -116,20 +117,20 @@ interface Partner {
 
 const CATEGORY_COLORS: Record<string, string> = {
   tech: "bg-blue-50 text-blue-700 border border-blue-200",
-  finance: "bg-emerald-50 text-emerald-700 border border-emerald-200",
+  finance: "bg-slate-100 text-slate-700 border border-slate-200",
   education: "bg-purple-50 text-purple-700 border border-purple-200",
-  ngo: "bg-orange-50 text-orange-700 border border-orange-200",
-  government: "bg-red-50 text-red-700 border border-red-200",
-  other: "bg-gray-50 text-gray-700 border border-gray-200",
+  ngo: "bg-blue-50/50 text-blue-600 border border-blue-100",
+  government: "bg-slate-900 text-white border border-slate-900",
+  other: "bg-slate-50 text-slate-500 border border-slate-200",
 };
 
 const STATUS_CONFIG: Record<
   string,
   { label: string; icon: any; color: string }
 > = {
-  ACTIVE: { label: "Active", icon: CheckCircle2, color: "text-emerald-600" },
+  ACTIVE: { label: "Active", icon: CheckCircle2, color: "text-slate-900" },
   PENDING: { label: "Pending", icon: Clock, color: "text-amber-500" },
-  INACTIVE: { label: "Inactive", icon: XCircle, color: "text-red-400" },
+  INACTIVE: { label: "Inactive", icon: XCircle, color: "text-slate-400" },
 };
 
 const CATEGORIES = [
@@ -180,6 +181,9 @@ export default function AdminPartnersPage() {
     "info" | "opportunities" | "testimonials" | "sponsor"
   >("info");
 
+  // Confirm delete modal
+  const [confirmDelete, setConfirmDelete] = useState<{ id: string; name: string } | null>(null);
+
   const showToast = (msg: string) => {
     setToast(msg);
     setTimeout(() => setToast(""), 3500);
@@ -210,11 +214,13 @@ export default function AdminPartnersPage() {
     setPage(1);
   }, [search, typeFilter, statusFilter, categoryFilter]);
 
-  const deletePartner = async (id: string, name: string) => {
-    if (!confirm(`Delete partner "${name}"? This cannot be undone.`)) return;
+  const deletePartner = async () => {
+    if (!confirmDelete) return;
+    const { id } = confirmDelete;
     setActionLoading(id);
     const res = await fetch(`/api/admin/partners/${id}`, { method: "DELETE" });
     setActionLoading(null);
+    setConfirmDelete(null);
     if (res.ok) {
       showToast("Partner deleted");
       load();
@@ -260,6 +266,14 @@ export default function AdminPartnersPage() {
     const d = await res.json();
     setEditForm({
       ...d,
+      phone: d.phone || "",
+      email: d.email || "",
+      website: d.website || "",
+      tagline: d.tagline || "",
+      description: d.description || "",
+      vision: d.vision || "",
+      impact: d.impact || "",
+      logo: d.logo || "",
       locations: Array.isArray(d.locations) ? d.locations.join(", ") : "",
       opportunities: d.opportunities || [],
       testimonials: d.testimonials || [],
@@ -405,14 +419,14 @@ export default function AdminPartnersPage() {
       {/* Header */}
       <div className="mb-8 flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-[#2d2d2d]">
+          <h1 className="text-xl font-bold text-slate-900 tracking-tight">
             Partners & Sponsors
           </h1>
-          <p className="text-sm text-[#8e8581] mt-1">{total} total partners</p>
+          <p className="text-sm text-slate-400 mt-0.5">{total} total partners</p>
         </div>
         <button
           onClick={() => setShowNew(true)}
-          className="flex items-center gap-2 bg-[#2d2d2d] text-white px-4 py-2.5 rounded-xl text-sm font-semibold hover:bg-[#ff5722] transition-colors"
+          className="flex items-center gap-2 bg-slate-900 text-white px-4 py-2.5 rounded-xl text-sm font-semibold hover:bg-slate-800 transition-all shadow-sm active:scale-95"
         >
           <Plus className="w-4 h-4" />
           Add Partner
@@ -422,18 +436,18 @@ export default function AdminPartnersPage() {
       {/* Filters */}
       <div className="flex flex-wrap gap-3 mb-6">
         <div className="relative flex-1 min-w-[200px]">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#c0b9b4]" />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
           <input
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Search partners…"
-            className="w-full pl-9 pr-4 py-2 rounded-xl border border-[#f0ece9] bg-white text-sm focus:outline-none focus:ring-2 focus:ring-[#ff5722]/30"
+            className="w-full pl-9 pr-4 py-2 rounded-xl border border-slate-200 bg-white text-sm focus:outline-none focus:ring-2 focus:ring-slate-900/10"
           />
         </div>
         <select
           value={typeFilter}
           onChange={(e) => setTypeFilter(e.target.value)}
-          className="px-3 py-2 rounded-xl border border-[#f0ece9] bg-white text-sm text-[#8e8581] focus:outline-none"
+          className="px-3 py-2 rounded-xl border border-slate-200 bg-white text-sm text-slate-500 focus:outline-none"
         >
           <option value="">All Types</option>
           {TYPES.map((t) => (
@@ -445,7 +459,7 @@ export default function AdminPartnersPage() {
         <select
           value={statusFilter}
           onChange={(e) => setStatusFilter(e.target.value)}
-          className="px-3 py-2 rounded-xl border border-[#f0ece9] bg-white text-sm text-[#8e8581] focus:outline-none"
+          className="px-3 py-2 rounded-xl border border-slate-200 bg-white text-sm text-slate-500 focus:outline-none"
         >
           <option value="">All Statuses</option>
           {STATUSES.map((s) => (
@@ -457,7 +471,7 @@ export default function AdminPartnersPage() {
         <select
           value={categoryFilter}
           onChange={(e) => setCategoryFilter(e.target.value)}
-          className="px-3 py-2 rounded-xl border border-[#f0ece9] bg-white text-sm text-[#8e8581] focus:outline-none"
+          className="px-3 py-2 rounded-xl border border-slate-200 bg-white text-sm text-slate-500 focus:outline-none"
         >
           <option value="">All Categories</option>
           {CATEGORIES.map((c) => (
@@ -468,49 +482,49 @@ export default function AdminPartnersPage() {
         </select>
         <button
           onClick={load}
-          className="p-2 rounded-xl border border-[#f0ece9] bg-white text-[#8e8581] hover:text-[#ff5722] transition-colors"
+          className="p-2 rounded-xl border border-slate-200 bg-white text-slate-400 hover:text-slate-900 hover:border-slate-400 transition-colors"
         >
           <RefreshCw className="w-4 h-4" />
         </button>
       </div>
 
       {/* Table */}
-      <div className="bg-white rounded-2xl border border-[#f0ece9] overflow-hidden">
+      <div className="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm">
         {loading ? (
           <div className="flex items-center justify-center h-48">
-            <div className="w-6 h-6 border-4 border-[#f0ece9] border-t-[#ff5722] rounded-full animate-spin" />
+            <div className="w-6 h-6 border-4 border-slate-100 border-t-slate-900 rounded-full animate-spin" />
           </div>
         ) : partners.length === 0 ? (
-          <div className="flex flex-col items-center justify-center h-48 text-[#8e8581]">
+          <div className="flex flex-col items-center justify-center h-48 text-[slate-400]">
             <Building2 className="w-10 h-10 mb-3 opacity-30" />
             <p className="text-sm">No partners found</p>
           </div>
         ) : (
           <table className="w-full text-sm">
             <thead>
-              <tr className="border-b border-[#f0ece9] bg-[#fbf9f8]">
-                <th className="text-left px-5 py-3 text-xs font-semibold text-[#8e8581] uppercase tracking-wide">
+              <tr className="border-b border-slate-100 bg-slate-50/50">
+                <th className="text-left px-5 py-4 text-[10px] font-bold text-slate-400 uppercase tracking-widest">
                   Partner
                 </th>
-                <th className="text-left px-4 py-3 text-xs font-semibold text-[#8e8581] uppercase tracking-wide">
+                <th className="text-left px-4 py-4 text-[10px] font-bold text-slate-400 uppercase tracking-widest">
                   Category
                 </th>
-                <th className="text-left px-4 py-3 text-xs font-semibold text-[#8e8581] uppercase tracking-wide">
+                <th className="text-left px-4 py-4 text-[10px] font-bold text-slate-400 uppercase tracking-widest">
                   Type
                 </th>
-                <th className="text-left px-4 py-3 text-xs font-semibold text-[#8e8581] uppercase tracking-wide">
+                <th className="text-left px-4 py-4 text-[10px] font-bold text-slate-400 uppercase tracking-widest">
                   Status
                 </th>
-                <th className="text-left px-4 py-3 text-xs font-semibold text-[#8e8581] uppercase tracking-wide">
+                <th className="text-left px-4 py-4 text-[10px] font-bold text-slate-400 uppercase tracking-widest">
                   Package
                 </th>
-                <th className="text-left px-4 py-3 text-xs font-semibold text-[#8e8581] uppercase tracking-wide">
+                <th className="text-left px-4 py-4 text-[10px] font-bold text-slate-400 uppercase tracking-widest">
                   Stats
                 </th>
-                <th className="px-4 py-3" />
+                <th className="px-4 py-4" />
               </tr>
             </thead>
-            <tbody className="divide-y divide-[#f0ece9]">
+            <tbody className="divide-y divide-slate-50">
               {partners.map((p) => {
                 const statusCfg =
                   STATUS_CONFIG[p.status] || STATUS_CONFIG.INACTIVE;
@@ -522,14 +536,14 @@ export default function AdminPartnersPage() {
                   >
                     <td className="px-5 py-4">
                       <div className="flex items-center gap-3">
-                        <div className="w-9 h-9 rounded-xl bg-[#f0ece9] flex items-center justify-center text-xs font-bold text-[#8e8581]">
+                        <div className="w-10 h-10 rounded-xl bg-slate-50 flex items-center justify-center text-xs font-bold text-slate-400 border border-slate-100">
                           {p.logo || p.name.slice(0, 2).toUpperCase()}
                         </div>
                         <div>
-                          <p className="font-semibold text-[#2d2d2d]">
+                          <p className="font-semibold text-sm text-slate-900">
                             {p.name}
                           </p>
-                          <p className="text-xs text-[#8e8581] truncate max-w-[180px]">
+                          <p className="text-xs text-slate-400 truncate max-w-[180px]">
                             {p.tagline || p.email || "—"}
                           </p>
                         </div>
@@ -544,7 +558,7 @@ export default function AdminPartnersPage() {
                     </td>
                     <td className="px-4 py-4">
                       <span
-                        className={`px-2.5 py-1 rounded-full text-xs font-semibold ${p.type === "SPONSOR" ? "bg-amber-50 text-amber-700 border border-amber-200" : "bg-slate-50 text-slate-600 border border-slate-200"}`}
+                        className={`px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-tight ${p.type === "SPONSOR" ? "bg-amber-50 text-amber-700 border border-amber-200" : "bg-slate-100 text-slate-600 border border-slate-200"}`}
                       >
                         {p.type}
                       </span>
@@ -557,14 +571,14 @@ export default function AdminPartnersPage() {
                         {statusCfg.label}
                       </div>
                     </td>
-                    <td className="px-4 py-4 text-xs text-[#8e8581]">
+                    <td className="px-4 py-4 text-xs text-slate-500 font-medium">
                       {p.sponsorPackage ? (
                         <div>
-                          <span className="font-semibold text-[#2d2d2d]">
+                          <span className="font-bold text-slate-900">
                             {p.sponsorPackage.packageType}
                           </span>
                           {p.sponsorPackage.budget && (
-                            <div className="text-emerald-600">
+                            <div className="text-slate-500 text-[10px]">
                               ${p.sponsorPackage.budget.toLocaleString()}
                             </div>
                           )}
@@ -574,17 +588,17 @@ export default function AdminPartnersPage() {
                       )}
                     </td>
                     <td className="px-4 py-4">
-                      <div className="flex gap-3 text-xs text-[#8e8581]">
-                        <span title="Opportunities">
-                          <Building2 className="w-3.5 h-3.5 inline mr-0.5" />
+                      <div className="flex gap-4 text-[11px] text-slate-400 font-medium">
+                        <span title="Opportunities" className="flex items-center gap-1">
+                          <Building2 className="w-3 h-3" />
                           {p._count.opportunities}
                         </span>
-                        <span title="Applications">
-                          <Mail className="w-3.5 h-3.5 inline mr-0.5" />
+                        <span title="Applications" className="flex items-center gap-1">
+                          <Mail className="w-3 h-3" />
                           {p._count.applications}
                         </span>
-                        <span title="Testimonials">
-                          <Star className="w-3.5 h-3.5 inline mr-0.5" />
+                        <span title="Testimonials" className="flex items-center gap-1">
+                          <Star className="w-3 h-3" />
                           {p._count.testimonials}
                         </span>
                       </div>
@@ -600,23 +614,23 @@ export default function AdminPartnersPage() {
                             }
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="p-1.5 rounded-lg hover:bg-[#f0ece9] text-[#8e8581] hover:text-[#2d2d2d] transition-colors"
+                            className="p-2 rounded-lg hover:bg-slate-100 text-slate-400 hover:text-slate-900 transition-colors"
                           >
-                            <Globe className="w-4 h-4" />
+                            <Globe className="w-3.5 h-3.5" />
                           </a>
                         )}
                         <button
                           onClick={() => openEdit(p.id)}
-                          className="p-1.5 rounded-lg hover:bg-[#f0ece9] text-[#8e8581] hover:text-[#2d2d2d] transition-colors"
+                          className="p-2 rounded-lg hover:bg-slate-100 text-slate-400 hover:text-slate-900 transition-colors"
                         >
-                          <Pencil className="w-4 h-4" />
+                          <Pencil className="w-3.5 h-3.5" />
                         </button>
                         <button
-                          onClick={() => deletePartner(p.id, p.name)}
+                          onClick={() => setConfirmDelete({ id: p.id, name: p.name })}
                           disabled={actionLoading === p.id}
-                          className="p-1.5 rounded-lg hover:bg-red-50 text-[#8e8581] hover:text-red-500 transition-colors disabled:opacity-40"
+                          className="p-2 rounded-lg hover:bg-red-50 text-slate-400 hover:text-red-500 transition-colors disabled:opacity-40"
                         >
-                          <Trash2 className="w-4 h-4" />
+                          <Trash2 className="w-3.5 h-3.5" />
                         </button>
                       </div>
                     </td>
@@ -630,7 +644,7 @@ export default function AdminPartnersPage() {
 
       {/* Pagination */}
       {totalPages > 1 && (
-        <div className="flex items-center justify-between mt-5 text-sm text-[#8e8581]">
+        <div className="flex items-center justify-between mt-5 text-sm text-[slate-400]">
           <span>
             Page {page} of {totalPages}
           </span>
@@ -638,14 +652,14 @@ export default function AdminPartnersPage() {
             <button
               onClick={() => setPage((p) => Math.max(1, p - 1))}
               disabled={page === 1}
-              className="p-2 rounded-lg border border-[#f0ece9] bg-white hover:border-[#ff5722] hover:text-[#ff5722] disabled:opacity-40 transition-colors"
+              className="p-2 rounded-lg border border-slate-200 bg-white hover:border-slate-900 hover:text-slate-900 disabled:opacity-40 transition-colors"
             >
               <ChevronLeft className="w-4 h-4" />
             </button>
             <button
               onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
               disabled={page === totalPages}
-              className="p-2 rounded-lg border border-[#f0ece9] bg-white hover:border-[#ff5722] hover:text-[#ff5722] disabled:opacity-40 transition-colors"
+              className="p-2 rounded-lg border border-slate-200 bg-white hover:border-slate-900 hover:text-slate-900 disabled:opacity-40 transition-colors"
             >
               <ChevronRight className="w-4 h-4" />
             </button>
@@ -657,18 +671,18 @@ export default function AdminPartnersPage() {
       {showNew && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm">
           <div className="bg-white rounded-2xl shadow-xl w-full max-w-lg overflow-y-auto max-h-[90vh]">
-            <div className="px-6 py-5 border-b border-[#f0ece9] flex items-center justify-between">
-              <h2 className="text-lg font-bold text-[#2d2d2d]">New Partner</h2>
+            <div className="px-6 py-5 border-b border-slate-100 flex items-center justify-between">
+              <h2 className="text-lg font-bold text-slate-900 tracking-tight">New Partner</h2>
               <button
                 onClick={() => setShowNew(false)}
-                className="text-[#8e8581] hover:text-[#2d2d2d] transition-colors text-xl leading-none"
+                className="text-slate-400 hover:text-slate-900 transition-colors p-1"
               >
-                &times;
+                <X className="w-5 h-5" />
               </button>
             </div>
             <form onSubmit={createPartner} className="p-6 space-y-4">
               <div>
-                <label className="block text-xs font-semibold text-[#8e8581] mb-1.5 uppercase tracking-wide">
+                <label className="block text-xs font-semibold text-[slate-400] mb-1.5 uppercase tracking-wide">
                   Name *
                 </label>
                 <input
@@ -677,12 +691,12 @@ export default function AdminPartnersPage() {
                   onChange={(e) =>
                     setNewForm({ ...newForm, name: e.target.value })
                   }
-                  className="w-full px-3 py-2.5 rounded-xl border border-[#f0ece9] text-sm focus:outline-none focus:ring-2 focus:ring-[#ff5722]/30"
+                  className="w-full px-3 py-2.5 rounded-xl border border-[slate-100] text-sm focus:outline-none focus:ring-2 focus:ring-[slate-900]/30"
                 />
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-xs font-semibold text-[#8e8581] mb-1.5 uppercase tracking-wide">
+                  <label className="block text-xs font-semibold text-[slate-400] mb-1.5 uppercase tracking-wide">
                     Category *
                   </label>
                   <select
@@ -691,7 +705,7 @@ export default function AdminPartnersPage() {
                     onChange={(e) =>
                       setNewForm({ ...newForm, category: e.target.value })
                     }
-                    className="w-full px-3 py-2.5 rounded-xl border border-[#f0ece9] text-sm focus:outline-none"
+                    className="w-full px-3 py-2.5 rounded-xl border border-[slate-100] text-sm focus:outline-none"
                   >
                     {CATEGORIES.map((c) => (
                       <option key={c} value={c} className="capitalize">
@@ -701,7 +715,7 @@ export default function AdminPartnersPage() {
                   </select>
                 </div>
                 <div>
-                  <label className="block text-xs font-semibold text-[#8e8581] mb-1.5 uppercase tracking-wide">
+                  <label className="block text-xs font-semibold text-[slate-400] mb-1.5 uppercase tracking-wide">
                     Type
                   </label>
                   <select
@@ -709,7 +723,7 @@ export default function AdminPartnersPage() {
                     onChange={(e) =>
                       setNewForm({ ...newForm, type: e.target.value })
                     }
-                    className="w-full px-3 py-2.5 rounded-xl border border-[#f0ece9] text-sm focus:outline-none"
+                    className="w-full px-3 py-2.5 rounded-xl border border-[slate-100] text-sm focus:outline-none"
                   >
                     {TYPES.map((t) => (
                       <option key={t} value={t}>
@@ -721,7 +735,7 @@ export default function AdminPartnersPage() {
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-xs font-semibold text-[#8e8581] mb-1.5 uppercase tracking-wide">
+                  <label className="block text-xs font-semibold text-[slate-400] mb-1.5 uppercase tracking-wide">
                     Status
                   </label>
                   <select
@@ -729,7 +743,7 @@ export default function AdminPartnersPage() {
                     onChange={(e) =>
                       setNewForm({ ...newForm, status: e.target.value })
                     }
-                    className="w-full px-3 py-2.5 rounded-xl border border-[#f0ece9] text-sm focus:outline-none"
+                    className="w-full px-3 py-2.5 rounded-xl border border-[slate-100] text-sm focus:outline-none"
                   >
                     {STATUSES.map((s) => (
                       <option key={s} value={s}>
@@ -739,7 +753,7 @@ export default function AdminPartnersPage() {
                   </select>
                 </div>
                 <div>
-                  <label className="block text-xs font-semibold text-[#8e8581] mb-1.5 uppercase tracking-wide">
+                  <label className="block text-xs font-semibold text-[slate-400] mb-1.5 uppercase tracking-wide">
                     Email
                   </label>
                   <input
@@ -748,12 +762,12 @@ export default function AdminPartnersPage() {
                     onChange={(e) =>
                       setNewForm({ ...newForm, email: e.target.value })
                     }
-                    className="w-full px-3 py-2.5 rounded-xl border border-[#f0ece9] text-sm focus:outline-none focus:ring-2 focus:ring-[#ff5722]/30"
+                    className="w-full px-3 py-2.5 rounded-xl border border-[slate-100] text-sm focus:outline-none focus:ring-2 focus:ring-[slate-900]/30"
                   />
                 </div>
               </div>
               <div>
-                <label className="block text-xs font-semibold text-[#8e8581] mb-1.5 uppercase tracking-wide">
+                <label className="block text-xs font-semibold text-[slate-400] mb-1.5 uppercase tracking-wide">
                   Tagline
                 </label>
                 <input
@@ -761,11 +775,11 @@ export default function AdminPartnersPage() {
                   onChange={(e) =>
                     setNewForm({ ...newForm, tagline: e.target.value })
                   }
-                  className="w-full px-3 py-2.5 rounded-xl border border-[#f0ece9] text-sm focus:outline-none focus:ring-2 focus:ring-[#ff5722]/30"
+                  className="w-full px-3 py-2.5 rounded-xl border border-[slate-100] text-sm focus:outline-none focus:ring-2 focus:ring-[slate-900]/30"
                 />
               </div>
               <div>
-                <label className="block text-xs font-semibold text-[#8e8581] mb-1.5 uppercase tracking-wide">
+                <label className="block text-xs font-semibold text-[slate-400] mb-1.5 uppercase tracking-wide">
                   Website
                 </label>
                 <input
@@ -774,21 +788,21 @@ export default function AdminPartnersPage() {
                     setNewForm({ ...newForm, website: e.target.value })
                   }
                   placeholder="https://"
-                  className="w-full px-3 py-2.5 rounded-xl border border-[#f0ece9] text-sm focus:outline-none focus:ring-2 focus:ring-[#ff5722]/30"
+                  className="w-full px-3 py-2.5 rounded-xl border border-[slate-100] text-sm focus:outline-none focus:ring-2 focus:ring-[slate-900]/30"
                 />
               </div>
               <div className="flex justify-end gap-3 pt-2">
                 <button
                   type="button"
                   onClick={() => setShowNew(false)}
-                  className="px-4 py-2.5 rounded-xl border border-[#f0ece9] text-sm text-[#8e8581] hover:bg-[#fbf9f8] transition-colors"
+                  className="px-4 py-2.5 rounded-xl border border-[slate-100] text-sm text-[slate-400] hover:bg-[#fbf9f8] transition-colors"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={creating}
-                  className="px-5 py-2.5 rounded-xl bg-[#2d2d2d] text-white text-sm font-semibold hover:bg-[#ff5722] transition-colors disabled:opacity-50"
+                  className="px-5 py-2.5 rounded-xl bg-slate-900 text-white text-sm font-semibold hover:bg-slate-800 transition-all shadow-sm active:scale-95 disabled:opacity-50"
                 >
                   {creating ? "Creating…" : "Create Partner"}
                 </button>
@@ -803,13 +817,13 @@ export default function AdminPartnersPage() {
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm">
           <div className="bg-white rounded-2xl shadow-xl w-full max-w-3xl flex flex-col max-h-[90vh]">
             {/* Header */}
-            <div className="px-6 py-4 border-b border-[#f0ece9] flex items-center justify-between shrink-0">
+            <div className="px-6 py-5 border-b border-slate-100 flex items-center justify-between shrink-0">
               <div>
-                <h2 className="text-lg font-bold text-[#2d2d2d]">
+                <h2 className="text-lg font-bold text-slate-900 tracking-tight">
                   {editForm.name || "Edit Partner"}
                 </h2>
                 {editForm.slug && (
-                  <p className="text-xs text-[#8e8581] mt-0.5">
+                  <p className="text-xs text-slate-400 mt-0.5 font-medium">
                     /{editForm.slug}
                   </p>
                 )}
@@ -818,14 +832,14 @@ export default function AdminPartnersPage() {
                 <button
                   onClick={saveEdit}
                   disabled={saving}
-                  className="flex items-center gap-2 px-4 py-2 rounded-xl bg-[#2d2d2d] text-white text-sm font-semibold hover:bg-[#ff5722] transition-colors disabled:opacity-50"
+                  className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-slate-900 text-white text-sm font-semibold hover:bg-slate-800 transition-all shadow-sm active:scale-95 disabled:opacity-50"
                 >
                   <Save className="w-4 h-4" />
                   {saving ? "Saving…" : "Save"}
                 </button>
                 <button
                   onClick={closeEdit}
-                  className="p-2 rounded-xl text-[#8e8581] hover:bg-[#f0ece9] transition-colors"
+                  className="p-2.5 rounded-xl text-slate-400 hover:text-slate-900 hover:bg-slate-50 transition-colors"
                 >
                   <X className="w-5 h-5" />
                 </button>
@@ -833,20 +847,19 @@ export default function AdminPartnersPage() {
             </div>
 
             {/* Tab bar */}
-            <div className="flex gap-1 px-6 pt-3 pb-0 border-b border-[#f0ece9] shrink-0 overflow-x-auto">
+            <div className="flex gap-2 px-6 pt-2 pb-0 border-b border-slate-100 shrink-0 overflow-x-auto">
               {editTabs.map((tab) => {
                 const Icon = tab.icon;
                 return (
                   <button
                     key={tab.id}
                     onClick={() => setEditTab(tab.id)}
-                    className={`flex items-center gap-1.5 px-3 py-2.5 text-sm font-semibold rounded-t-lg whitespace-nowrap transition-colors ${
-                      editTab === tab.id
-                        ? "text-[#ff5722] border-b-2 border-[#ff5722] bg-orange-50/50"
-                        : "text-[#8e8581] hover:text-[#2d2d2d]"
-                    }`}
+                    className={`flex items-center gap-2 px-3 py-3 text-sm font-bold whitespace-nowrap transition-all border-b-2 ${editTab === tab.id
+                      ? "text-slate-900 border-slate-900 bg-slate-50/50"
+                      : "text-slate-400 border-transparent hover:text-slate-600 hover:bg-slate-50/30"
+                      }`}
                   >
-                    <Icon className="w-4 h-4" />
+                    <Icon className="w-3.5 h-3.5" />
                     {tab.label}
                   </button>
                 );
@@ -857,7 +870,7 @@ export default function AdminPartnersPage() {
             <div className="overflow-y-auto flex-1 p-6">
               {editLoading ? (
                 <div className="flex items-center justify-center h-48">
-                  <div className="w-6 h-6 border-4 border-[#f0ece9] border-t-[#ff5722] rounded-full animate-spin" />
+                  <div className="w-6 h-6 border-4 border-slate-100 border-t-slate-900 rounded-full animate-spin" />
                 </div>
               ) : (
                 <>
@@ -866,7 +879,7 @@ export default function AdminPartnersPage() {
                     <div className="space-y-4">
                       <div className="grid grid-cols-2 gap-4">
                         <div>
-                          <label className="block text-xs font-semibold text-[#8e8581] mb-1.5 uppercase tracking-wide">
+                          <label className="block text-xs font-semibold text-[slate-400] mb-1.5 uppercase tracking-wide">
                             Name
                           </label>
                           <input
@@ -874,11 +887,11 @@ export default function AdminPartnersPage() {
                             onChange={(e) =>
                               setEditForm({ ...editForm, name: e.target.value })
                             }
-                            className="w-full px-3 py-2.5 rounded-xl border border-[#f0ece9] text-sm focus:outline-none focus:ring-2 focus:ring-[#ff5722]/30"
+                            className="w-full px-3 py-2.5 rounded-xl border border-[slate-100] text-sm focus:outline-none focus:ring-2 focus:ring-[slate-900]/30"
                           />
                         </div>
                         <div>
-                          <label className="block text-xs font-semibold text-[#8e8581] mb-1.5 uppercase tracking-wide">
+                          <label className="block text-xs font-semibold text-[slate-400] mb-1.5 uppercase tracking-wide">
                             Slug
                           </label>
                           <input
@@ -886,13 +899,13 @@ export default function AdminPartnersPage() {
                             onChange={(e) =>
                               setEditForm({ ...editForm, slug: e.target.value })
                             }
-                            className="w-full px-3 py-2.5 rounded-xl border border-[#f0ece9] text-sm focus:outline-none focus:ring-2 focus:ring-[#ff5722]/30"
+                            className="w-full px-3 py-2.5 rounded-xl border border-[slate-100] text-sm focus:outline-none focus:ring-2 focus:ring-[slate-900]/30"
                           />
                         </div>
                       </div>
                       <div className="grid grid-cols-3 gap-4">
                         <div>
-                          <label className="block text-xs font-semibold text-[#8e8581] mb-1.5 uppercase tracking-wide">
+                          <label className="block text-xs font-semibold text-[slate-400] mb-1.5 uppercase tracking-wide">
                             Category
                           </label>
                           <select
@@ -903,7 +916,7 @@ export default function AdminPartnersPage() {
                                 category: e.target.value,
                               })
                             }
-                            className="w-full px-3 py-2.5 rounded-xl border border-[#f0ece9] text-sm focus:outline-none"
+                            className="w-full px-3 py-2.5 rounded-xl border border-[slate-100] text-sm focus:outline-none"
                           >
                             {CATEGORIES.map((c) => (
                               <option key={c} value={c} className="capitalize">
@@ -913,7 +926,7 @@ export default function AdminPartnersPage() {
                           </select>
                         </div>
                         <div>
-                          <label className="block text-xs font-semibold text-[#8e8581] mb-1.5 uppercase tracking-wide">
+                          <label className="block text-xs font-semibold text-[slate-400] mb-1.5 uppercase tracking-wide">
                             Type
                           </label>
                           <select
@@ -921,7 +934,7 @@ export default function AdminPartnersPage() {
                             onChange={(e) =>
                               setEditForm({ ...editForm, type: e.target.value })
                             }
-                            className="w-full px-3 py-2.5 rounded-xl border border-[#f0ece9] text-sm focus:outline-none"
+                            className="w-full px-3 py-2.5 rounded-xl border border-[slate-100] text-sm focus:outline-none"
                           >
                             {TYPES.map((t) => (
                               <option key={t} value={t}>
@@ -931,7 +944,7 @@ export default function AdminPartnersPage() {
                           </select>
                         </div>
                         <div>
-                          <label className="block text-xs font-semibold text-[#8e8581] mb-1.5 uppercase tracking-wide">
+                          <label className="block text-xs font-semibold text-[slate-400] mb-1.5 uppercase tracking-wide">
                             Status
                           </label>
                           <select
@@ -942,7 +955,7 @@ export default function AdminPartnersPage() {
                                 status: e.target.value,
                               })
                             }
-                            className="w-full px-3 py-2.5 rounded-xl border border-[#f0ece9] text-sm focus:outline-none"
+                            className="w-full px-3 py-2.5 rounded-xl border border-[slate-100] text-sm focus:outline-none"
                           >
                             {STATUSES.map((s) => (
                               <option key={s} value={s}>
@@ -953,7 +966,7 @@ export default function AdminPartnersPage() {
                         </div>
                       </div>
                       <div>
-                        <label className="block text-xs font-semibold text-[#8e8581] mb-1.5 uppercase tracking-wide">
+                        <label className="block text-xs font-semibold text-[slate-400] mb-1.5 uppercase tracking-wide">
                           Tagline
                         </label>
                         <input
@@ -964,11 +977,11 @@ export default function AdminPartnersPage() {
                               tagline: e.target.value,
                             })
                           }
-                          className="w-full px-3 py-2.5 rounded-xl border border-[#f0ece9] text-sm focus:outline-none focus:ring-2 focus:ring-[#ff5722]/30"
+                          className="w-full px-3 py-2.5 rounded-xl border border-[slate-100] text-sm focus:outline-none focus:ring-2 focus:ring-[slate-900]/30"
                         />
                       </div>
                       <div>
-                        <label className="block text-xs font-semibold text-[#8e8581] mb-1.5 uppercase tracking-wide">
+                        <label className="block text-xs font-semibold text-[slate-400] mb-1.5 uppercase tracking-wide">
                           Description
                         </label>
                         <textarea
@@ -980,12 +993,12 @@ export default function AdminPartnersPage() {
                               description: e.target.value,
                             })
                           }
-                          className="w-full px-3 py-2.5 rounded-xl border border-[#f0ece9] text-sm focus:outline-none focus:ring-2 focus:ring-[#ff5722]/30 resize-none"
+                          className="w-full px-3 py-2.5 rounded-xl border border-[slate-100] text-sm focus:outline-none focus:ring-2 focus:ring-[slate-900]/30 resize-none"
                         />
                       </div>
                       <div className="grid grid-cols-2 gap-4">
                         <div>
-                          <label className="block text-xs font-semibold text-[#8e8581] mb-1.5 uppercase tracking-wide">
+                          <label className="block text-xs font-semibold text-[slate-400] mb-1.5 uppercase tracking-wide">
                             Vision
                           </label>
                           <textarea
@@ -997,11 +1010,11 @@ export default function AdminPartnersPage() {
                                 vision: e.target.value,
                               })
                             }
-                            className="w-full px-3 py-2.5 rounded-xl border border-[#f0ece9] text-sm focus:outline-none focus:ring-2 focus:ring-[#ff5722]/30 resize-none"
+                            className="w-full px-3 py-2.5 rounded-xl border border-[slate-100] text-sm focus:outline-none focus:ring-2 focus:ring-[slate-900]/30 resize-none"
                           />
                         </div>
                         <div>
-                          <label className="block text-xs font-semibold text-[#8e8581] mb-1.5 uppercase tracking-wide">
+                          <label className="block text-xs font-semibold text-[slate-400] mb-1.5 uppercase tracking-wide">
                             Impact
                           </label>
                           <textarea
@@ -1013,13 +1026,13 @@ export default function AdminPartnersPage() {
                                 impact: e.target.value,
                               })
                             }
-                            className="w-full px-3 py-2.5 rounded-xl border border-[#f0ece9] text-sm focus:outline-none focus:ring-2 focus:ring-[#ff5722]/30 resize-none"
+                            className="w-full px-3 py-2.5 rounded-xl border border-[slate-100] text-sm focus:outline-none focus:ring-2 focus:ring-[slate-900]/30 resize-none"
                           />
                         </div>
                       </div>
                       <div className="grid grid-cols-2 gap-4">
                         <div>
-                          <label className="block text-xs font-semibold text-[#8e8581] mb-1.5 uppercase tracking-wide">
+                          <label className="block text-xs font-semibold text-[slate-400] mb-1.5 uppercase tracking-wide">
                             <Mail className="w-3.5 h-3.5 inline mr-1" />
                             Email
                           </label>
@@ -1032,11 +1045,11 @@ export default function AdminPartnersPage() {
                                 email: e.target.value,
                               })
                             }
-                            className="w-full px-3 py-2.5 rounded-xl border border-[#f0ece9] text-sm focus:outline-none focus:ring-2 focus:ring-[#ff5722]/30"
+                            className="w-full px-3 py-2.5 rounded-xl border border-[slate-100] text-sm focus:outline-none focus:ring-2 focus:ring-[slate-900]/30"
                           />
                         </div>
                         <div>
-                          <label className="block text-xs font-semibold text-[#8e8581] mb-1.5 uppercase tracking-wide">
+                          <label className="block text-xs font-semibold text-[slate-400] mb-1.5 uppercase tracking-wide">
                             <Phone className="w-3.5 h-3.5 inline mr-1" />
                             Phone
                           </label>
@@ -1048,13 +1061,13 @@ export default function AdminPartnersPage() {
                                 phone: e.target.value,
                               })
                             }
-                            className="w-full px-3 py-2.5 rounded-xl border border-[#f0ece9] text-sm focus:outline-none focus:ring-2 focus:ring-[#ff5722]/30"
+                            className="w-full px-3 py-2.5 rounded-xl border border-[slate-100] text-sm focus:outline-none focus:ring-2 focus:ring-[slate-900]/30"
                           />
                         </div>
                       </div>
                       <div className="grid grid-cols-2 gap-4">
                         <div>
-                          <label className="block text-xs font-semibold text-[#8e8581] mb-1.5 uppercase tracking-wide">
+                          <label className="block text-xs font-semibold text-[slate-400] mb-1.5 uppercase tracking-wide">
                             <Globe className="w-3.5 h-3.5 inline mr-1" />
                             Website
                           </label>
@@ -1067,11 +1080,11 @@ export default function AdminPartnersPage() {
                               })
                             }
                             placeholder="https://"
-                            className="w-full px-3 py-2.5 rounded-xl border border-[#f0ece9] text-sm focus:outline-none focus:ring-2 focus:ring-[#ff5722]/30"
+                            className="w-full px-3 py-2.5 rounded-xl border border-[slate-100] text-sm focus:outline-none focus:ring-2 focus:ring-[slate-900]/30"
                           />
                         </div>
                         <div>
-                          <label className="block text-xs font-semibold text-[#8e8581] mb-1.5 uppercase tracking-wide">
+                          <label className="block text-xs font-semibold text-[slate-400] mb-1.5 uppercase tracking-wide">
                             Locations
                           </label>
                           <input
@@ -1083,12 +1096,12 @@ export default function AdminPartnersPage() {
                               })
                             }
                             placeholder="Paris, London, Dakar"
-                            className="w-full px-3 py-2.5 rounded-xl border border-[#f0ece9] text-sm focus:outline-none focus:ring-2 focus:ring-[#ff5722]/30"
+                            className="w-full px-3 py-2.5 rounded-xl border border-[slate-100] text-sm focus:outline-none focus:ring-2 focus:ring-[slate-900]/30"
                           />
                         </div>
                       </div>
                       <div>
-                        <label className="block text-xs font-semibold text-[#8e8581] mb-1.5 uppercase tracking-wide">
+                        <label className="block text-xs font-semibold text-[slate-400] mb-1.5 uppercase tracking-wide">
                           Logo URL
                         </label>
                         <input
@@ -1097,7 +1110,7 @@ export default function AdminPartnersPage() {
                             setEditForm({ ...editForm, logo: e.target.value })
                           }
                           placeholder="https://…"
-                          className="w-full px-3 py-2.5 rounded-xl border border-[#f0ece9] text-sm focus:outline-none focus:ring-2 focus:ring-[#ff5722]/30"
+                          className="w-full px-3 py-2.5 rounded-xl border border-[slate-100] text-sm focus:outline-none focus:ring-2 focus:ring-[slate-900]/30"
                         />
                       </div>
                     </div>
@@ -1109,17 +1122,17 @@ export default function AdminPartnersPage() {
                       {editForm.opportunities.map((op, i) => (
                         <div
                           key={i}
-                          className="p-4 rounded-xl border border-[#f0ece9] space-y-3 relative"
+                          className="p-4 rounded-xl border border-[slate-100] space-y-3 relative"
                         >
                           <button
                             onClick={() => removeOpportunity(i)}
-                            className="absolute top-3 right-3 text-[#c0b9b4] hover:text-red-500 transition-colors"
+                            className="absolute top-3 right-3 text-[slate-300] hover:text-red-500 transition-colors"
                           >
                             <X className="w-4 h-4" />
                           </button>
                           <div className="grid grid-cols-2 gap-3">
                             <div>
-                              <label className="block text-xs font-semibold text-[#8e8581] mb-1 uppercase tracking-wide">
+                              <label className="block text-xs font-semibold text-[slate-400] mb-1 uppercase tracking-wide">
                                 Title
                               </label>
                               <input
@@ -1127,11 +1140,11 @@ export default function AdminPartnersPage() {
                                 onChange={(e) =>
                                   updateOpportunity(i, "title", e.target.value)
                                 }
-                                className="w-full px-3 py-2 rounded-xl border border-[#f0ece9] text-sm focus:outline-none focus:ring-2 focus:ring-[#ff5722]/30"
+                                className="w-full px-3 py-2 rounded-xl border border-[slate-100] text-sm focus:outline-none focus:ring-2 focus:ring-[slate-900]/30"
                               />
                             </div>
                             <div>
-                              <label className="block text-xs font-semibold text-[#8e8581] mb-1 uppercase tracking-wide">
+                              <label className="block text-xs font-semibold text-[slate-400] mb-1 uppercase tracking-wide">
                                 Type
                               </label>
                               <input
@@ -1140,12 +1153,12 @@ export default function AdminPartnersPage() {
                                   updateOpportunity(i, "type", e.target.value)
                                 }
                                 placeholder="internship, grant…"
-                                className="w-full px-3 py-2 rounded-xl border border-[#f0ece9] text-sm focus:outline-none focus:ring-2 focus:ring-[#ff5722]/30"
+                                className="w-full px-3 py-2 rounded-xl border border-[slate-100] text-sm focus:outline-none focus:ring-2 focus:ring-[slate-900]/30"
                               />
                             </div>
                           </div>
                           <div>
-                            <label className="block text-xs font-semibold text-[#8e8581] mb-1 uppercase tracking-wide">
+                            <label className="block text-xs font-semibold text-[slate-400] mb-1 uppercase tracking-wide">
                               Level
                             </label>
                             <input
@@ -1154,11 +1167,11 @@ export default function AdminPartnersPage() {
                                 updateOpportunity(i, "level", e.target.value)
                               }
                               placeholder="junior, senior…"
-                              className="w-full px-3 py-2 rounded-xl border border-[#f0ece9] text-sm focus:outline-none focus:ring-2 focus:ring-[#ff5722]/30"
+                              className="w-full px-3 py-2 rounded-xl border border-[slate-100] text-sm focus:outline-none focus:ring-2 focus:ring-[slate-900]/30"
                             />
                           </div>
                           <div>
-                            <label className="block text-xs font-semibold text-[#8e8581] mb-1 uppercase tracking-wide">
+                            <label className="block text-xs font-semibold text-[slate-400] mb-1 uppercase tracking-wide">
                               Description
                             </label>
                             <textarea
@@ -1171,14 +1184,14 @@ export default function AdminPartnersPage() {
                                   e.target.value,
                                 )
                               }
-                              className="w-full px-3 py-2 rounded-xl border border-[#f0ece9] text-sm focus:outline-none focus:ring-2 focus:ring-[#ff5722]/30 resize-none"
+                              className="w-full px-3 py-2 rounded-xl border border-[slate-100] text-sm focus:outline-none focus:ring-2 focus:ring-[slate-900]/30 resize-none"
                             />
                           </div>
                         </div>
                       ))}
                       <button
                         onClick={addOpportunity}
-                        className="w-full py-2.5 rounded-xl border-2 border-dashed border-[#f0ece9] text-sm text-[#8e8581] hover:border-[#ff5722] hover:text-[#ff5722] transition-colors flex items-center justify-center gap-2"
+                        className="w-full py-3 rounded-xl border-2 border-dashed border-slate-100 text-sm font-bold text-slate-400 hover:border-slate-300 hover:text-slate-900 transition-all flex items-center justify-center gap-2 bg-slate-50/30"
                       >
                         <Plus className="w-4 h-4" /> Add Opportunity
                       </button>
@@ -1191,16 +1204,16 @@ export default function AdminPartnersPage() {
                       {editForm.testimonials.map((ts, i) => (
                         <div
                           key={i}
-                          className="p-4 rounded-xl border border-[#f0ece9] space-y-3 relative"
+                          className="p-4 rounded-xl border border-[slate-100] space-y-3 relative"
                         >
                           <button
                             onClick={() => removeTestimonial(i)}
-                            className="absolute top-3 right-3 text-[#c0b9b4] hover:text-red-500 transition-colors"
+                            className="absolute top-3 right-3 text-[slate-300] hover:text-red-500 transition-colors"
                           >
                             <X className="w-4 h-4" />
                           </button>
                           <div>
-                            <label className="block text-xs font-semibold text-[#8e8581] mb-1 uppercase tracking-wide">
+                            <label className="block text-xs font-semibold text-[slate-400] mb-1 uppercase tracking-wide">
                               Quote
                             </label>
                             <textarea
@@ -1209,12 +1222,12 @@ export default function AdminPartnersPage() {
                               onChange={(e) =>
                                 updateTestimonial(i, "quote", e.target.value)
                               }
-                              className="w-full px-3 py-2 rounded-xl border border-[#f0ece9] text-sm focus:outline-none focus:ring-2 focus:ring-[#ff5722]/30 resize-none"
+                              className="w-full px-3 py-2 rounded-xl border border-[slate-100] text-sm focus:outline-none focus:ring-2 focus:ring-[slate-900]/30 resize-none"
                             />
                           </div>
                           <div className="grid grid-cols-2 gap-3">
                             <div>
-                              <label className="block text-xs font-semibold text-[#8e8581] mb-1 uppercase tracking-wide">
+                              <label className="block text-xs font-semibold text-[slate-400] mb-1 uppercase tracking-wide">
                                 Author
                               </label>
                               <input
@@ -1222,11 +1235,11 @@ export default function AdminPartnersPage() {
                                 onChange={(e) =>
                                   updateTestimonial(i, "author", e.target.value)
                                 }
-                                className="w-full px-3 py-2 rounded-xl border border-[#f0ece9] text-sm focus:outline-none focus:ring-2 focus:ring-[#ff5722]/30"
+                                className="w-full px-3 py-2 rounded-xl border border-[slate-100] text-sm focus:outline-none focus:ring-2 focus:ring-[slate-900]/30"
                               />
                             </div>
                             <div>
-                              <label className="block text-xs font-semibold text-[#8e8581] mb-1 uppercase tracking-wide">
+                              <label className="block text-xs font-semibold text-[slate-400] mb-1 uppercase tracking-wide">
                                 Role
                               </label>
                               <input
@@ -1235,7 +1248,7 @@ export default function AdminPartnersPage() {
                                   updateTestimonial(i, "role", e.target.value)
                                 }
                                 placeholder="CEO, Manager…"
-                                className="w-full px-3 py-2 rounded-xl border border-[#f0ece9] text-sm focus:outline-none focus:ring-2 focus:ring-[#ff5722]/30"
+                                className="w-full px-3 py-2 rounded-xl border border-[slate-100] text-sm focus:outline-none focus:ring-2 focus:ring-[slate-900]/30"
                               />
                             </div>
                           </div>
@@ -1243,7 +1256,7 @@ export default function AdminPartnersPage() {
                       ))}
                       <button
                         onClick={addTestimonial}
-                        className="w-full py-2.5 rounded-xl border-2 border-dashed border-[#f0ece9] text-sm text-[#8e8581] hover:border-[#ff5722] hover:text-[#ff5722] transition-colors flex items-center justify-center gap-2"
+                        className="w-full py-3 rounded-xl border-2 border-dashed border-slate-100 text-sm font-bold text-slate-400 hover:border-slate-300 hover:text-slate-900 transition-all flex items-center justify-center gap-2 bg-slate-50/30"
                       >
                         <Plus className="w-4 h-4" /> Add Testimonial
                       </button>
@@ -1255,7 +1268,7 @@ export default function AdminPartnersPage() {
                     <div className="space-y-4">
                       <div className="grid grid-cols-2 gap-4">
                         <div>
-                          <label className="block text-xs font-semibold text-[#8e8581] mb-1.5 uppercase tracking-wide">
+                          <label className="block text-xs font-semibold text-[slate-400] mb-1.5 uppercase tracking-wide">
                             Package Type
                           </label>
                           <select
@@ -1266,7 +1279,7 @@ export default function AdminPartnersPage() {
                                 packageType: e.target.value,
                               })
                             }
-                            className="w-full px-3 py-2.5 rounded-xl border border-[#f0ece9] text-sm focus:outline-none"
+                            className="w-full px-3 py-2.5 rounded-xl border border-[slate-100] text-sm focus:outline-none"
                           >
                             {PACKAGES.map((p) => (
                               <option key={p} value={p}>
@@ -1276,7 +1289,7 @@ export default function AdminPartnersPage() {
                           </select>
                         </div>
                         <div>
-                          <label className="block text-xs font-semibold text-[#8e8581] mb-1.5 uppercase tracking-wide">
+                          <label className="block text-xs font-semibold text-[slate-400] mb-1.5 uppercase tracking-wide">
                             Budget ($)
                           </label>
                           <input
@@ -1285,13 +1298,13 @@ export default function AdminPartnersPage() {
                             onChange={(e) =>
                               setEditPkg({ ...editPkg, budget: e.target.value })
                             }
-                            className="w-full px-3 py-2.5 rounded-xl border border-[#f0ece9] text-sm focus:outline-none focus:ring-2 focus:ring-[#ff5722]/30"
+                            className="w-full px-3 py-2.5 rounded-xl border border-[slate-100] text-sm focus:outline-none focus:ring-2 focus:ring-[slate-900]/30"
                           />
                         </div>
                       </div>
                       <div className="grid grid-cols-2 gap-4">
                         <div>
-                          <label className="block text-xs font-semibold text-[#8e8581] mb-1.5 uppercase tracking-wide">
+                          <label className="block text-xs font-semibold text-[slate-400] mb-1.5 uppercase tracking-wide">
                             Start Date
                           </label>
                           <input
@@ -1303,11 +1316,11 @@ export default function AdminPartnersPage() {
                                 startDate: e.target.value,
                               })
                             }
-                            className="w-full px-3 py-2.5 rounded-xl border border-[#f0ece9] text-sm focus:outline-none"
+                            className="w-full px-3 py-2.5 rounded-xl border border-[slate-100] text-sm focus:outline-none"
                           />
                         </div>
                         <div>
-                          <label className="block text-xs font-semibold text-[#8e8581] mb-1.5 uppercase tracking-wide">
+                          <label className="block text-xs font-semibold text-[slate-400] mb-1.5 uppercase tracking-wide">
                             End Date
                           </label>
                           <input
@@ -1319,12 +1332,12 @@ export default function AdminPartnersPage() {
                                 endDate: e.target.value,
                               })
                             }
-                            className="w-full px-3 py-2.5 rounded-xl border border-[#f0ece9] text-sm focus:outline-none"
+                            className="w-full px-3 py-2.5 rounded-xl border border-[slate-100] text-sm focus:outline-none"
                           />
                         </div>
                       </div>
                       <div>
-                        <label className="block text-xs font-semibold text-[#8e8581] mb-1.5 uppercase tracking-wide">
+                        <label className="block text-xs font-semibold text-[slate-400] mb-1.5 uppercase tracking-wide">
                           Benefits (comma-separated)
                         </label>
                         <input
@@ -1333,11 +1346,11 @@ export default function AdminPartnersPage() {
                             setEditPkg({ ...editPkg, benefits: e.target.value })
                           }
                           placeholder="Logo placement, Speaking slot…"
-                          className="w-full px-3 py-2.5 rounded-xl border border-[#f0ece9] text-sm focus:outline-none focus:ring-2 focus:ring-[#ff5722]/30"
+                          className="w-full px-3 py-2.5 rounded-xl border border-[slate-100] text-sm focus:outline-none focus:ring-2 focus:ring-[slate-900]/30"
                         />
                       </div>
                       <div>
-                        <label className="block text-xs font-semibold text-[#8e8581] mb-1.5 uppercase tracking-wide">
+                        <label className="block text-xs font-semibold text-[slate-400] mb-1.5 uppercase tracking-wide">
                           Notes
                         </label>
                         <textarea
@@ -1346,7 +1359,7 @@ export default function AdminPartnersPage() {
                           onChange={(e) =>
                             setEditPkg({ ...editPkg, notes: e.target.value })
                           }
-                          className="w-full px-3 py-2.5 rounded-xl border border-[#f0ece9] text-sm focus:outline-none focus:ring-2 focus:ring-[#ff5722]/30 resize-none"
+                          className="w-full px-3 py-2.5 rounded-xl border border-[slate-100] text-sm focus:outline-none focus:ring-2 focus:ring-[slate-900]/30 resize-none"
                         />
                       </div>
                     </div>
@@ -1357,6 +1370,16 @@ export default function AdminPartnersPage() {
           </div>
         </div>
       )}
+
+      {/* Delete Confirmation Modal */}
+      <ConfirmModal
+        isOpen={!!confirmDelete}
+        title="Supprimer le partenaire"
+        message={`Êtes-vous sûr de vouloir supprimer le partenaire "${confirmDelete?.name}" ? Cette action est irréversible.`}
+        confirmLabel="Supprimer"
+        onConfirm={deletePartner}
+        onCancel={() => setConfirmDelete(null)}
+      />
     </div>
   );
 }

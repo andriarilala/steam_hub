@@ -12,6 +12,7 @@ import {
   Phone,
   DollarSign,
 } from "lucide-react";
+import { ConfirmModal } from "@/components/ui/confirm-modal";
 
 interface Event {
   id: string;
@@ -55,6 +56,7 @@ export default function AdminEventsPage() {
   const [saving, setSaving] = useState(false);
   const [deleting, setDeleting] = useState<string | null>(null);
   const [toast, setToast] = useState("");
+  const [confirmDelete, setConfirmDelete] = useState<{ id: string; title: string } | null>(null);
 
   const showToast = (msg: string) => {
     setToast(msg);
@@ -121,11 +123,13 @@ export default function AdminEventsPage() {
     }
   };
 
-  const deleteEvent = async (id: string, title: string) => {
-    if (!confirm(`Delete event "${title}"?`)) return;
+  const deleteEvent = async () => {
+    if (!confirmDelete) return;
+    const { id } = confirmDelete;
     setDeleting(id);
     const res = await fetch(`/api/admin/events?id=${id}`, { method: "DELETE" });
     setDeleting(null);
+    setConfirmDelete(null);
     if (res.ok) {
       showToast("Event deleted");
       load();
@@ -425,7 +429,7 @@ export default function AdminEventsPage() {
                         <Pencil className="w-4 h-4" />
                       </button>
                       <button
-                        onClick={() => deleteEvent(ev.id, ev.title)}
+                        onClick={() => setConfirmDelete({ id: ev.id, title: ev.title })}
                         disabled={deleting === ev.id}
                         className="p-1.5 rounded-lg text-foreground/30 hover:text-red-400 hover:bg-red-500/10 transition-colors disabled:opacity-50"
                       >
@@ -439,6 +443,15 @@ export default function AdminEventsPage() {
           </div>
         )}
       </div>
+
+      <ConfirmModal
+        isOpen={!!confirmDelete}
+        title="Supprimer l'événement"
+        message={`Êtes-vous sûr de vouloir supprimer l'événement "${confirmDelete?.title}" ?`}
+        confirmLabel="Supprimer"
+        onConfirm={deleteEvent}
+        onCancel={() => setConfirmDelete(null)}
+      />
     </div>
   );
 }

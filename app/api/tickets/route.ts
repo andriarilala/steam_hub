@@ -87,10 +87,16 @@ export async function POST(req: NextRequest) {
   const unitPrice = event.price ?? 0;
   const total = unitPrice * data.quantity;
 
+  // Generate sequential ticket number: PA 00001, etc.
+  const count = await prisma.ticketOrder.count();
+  const ticketNumber = `PA ${String(count + 1).padStart(5, "0")}`;
+
   const ticket = await prisma.ticketOrder.create({
     data: {
       userId: user.id,
       eventId: event.id,
+      // @ts-ignore
+      ticketNumber,
       ticketType: data.ticketType,
       quantity: data.quantity,
       price: total, // total cost stored as price

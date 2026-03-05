@@ -15,6 +15,8 @@ import {
   AlertCircle,
   Tag,
   Hash,
+  X,
+  Eye,
 } from "lucide-react";
 import Link from "next/link";
 
@@ -31,6 +33,7 @@ interface TicketOrder {
   id: string;
   userId: string;
   eventId: string | null;
+  ticketNumber: string | null; // "PA 00001"
   ticketType: string;
   quantity: number;
   price: number;
@@ -44,20 +47,24 @@ interface TicketOrder {
 
 // ── Canvas helpers ────────────────────────────────────────────────────────────
 
-function buildQRUrl(ticket: TicketOrder): string {
+function buildQRUrl(ticket: TicketOrder, user: any): string {
   const data = [
-    "PASS AVENIR",
-    `Ticket: ${ticket.id.slice(0, 8).toUpperCase()}`,
-    `Type: ${ticket.ticketType.toUpperCase()}`,
-    ticket.event ? `Event: ${ticket.event.title}` : "No event",
+    "PASS AVENIR — BILLET OFFICIEL",
+    `N°: ${ticket.ticketNumber || ticket.id.slice(0, 8).toUpperCase()}`,
+    `Titulaire: ${user?.name || "Aina User"}`,
+    ticket.event ? `Événement: ${ticket.event.title}` : "Aucun événement",
     ticket.event
-      ? `Date: ${new Date(ticket.event.date).toLocaleDateString()}`
+      ? `Date: ${new Date(ticket.event.date).toLocaleDateString("fr-FR", { weekday: "long", day: "numeric", month: "long", year: "numeric" })}`
       : "",
-    `Code: ${ticket.qrCode}`,
+    ticket.event?.location ? `Lieu: ${ticket.event.location}` : "Lieu: Antananarivo",
+    `Type: ${ticket.ticketType.toUpperCase()}`,
+    `Émis le: ${new Date(ticket.createdAt).toLocaleDateString("fr-FR")}`,
+    `ID: ${ticket.id}`,
+    `CODE: ${ticket.qrCode}`,
   ]
     .filter(Boolean)
     .join("\n");
-  return `https://api.qrserver.com/v1/create-qr-code/?size=220x220&margin=10&data=${encodeURIComponent(data)}`;
+  return `https://api.qrserver.com/v1/create-qr-code/?size=300x300&margin=10&data=${encodeURIComponent(data)}`;
 }
 
 function loadImage(src: string): Promise<HTMLImageElement> {
@@ -116,7 +123,7 @@ function wrapText(
   return yPos;
 }
 
-async function downloadTicketImage(ticket: TicketOrder, user: any): Promise<void> {
+async function generateTicketImageBase64(ticket: TicketOrder, user: any): Promise<string> {
   const W = 1000,
     H = 500,
     PAD = 50;
@@ -129,14 +136,31 @@ async function downloadTicketImage(ticket: TicketOrder, user: any): Promise<void
   ctx.fillStyle = "#0082a3"; // Exact teal from image
   ctx.fillRect(0, 0, W, H);
 
-  // ── Header ─────────────────────────────────────────────────────────────────
-  ctx.fillStyle = "#ffffff";
+  // ── Header: "Pass Avenir" Wordmark ──────────────────────────────────────────
+  // "Pass" — white, light weight, with shadow for readability
+  ctx.save();
+  ctx.shadowColor = "rgba(0,0,0,0.45)";
+  ctx.shadowBlur = 10;
+  ctx.shadowOffsetY = 2;
   ctx.textAlign = "left";
-  ctx.font = "bold 34px sans-serif";
-  ctx.fillText("PASS AVENIR", PAD, 75);
+  ctx.font = "300 32px sans-serif";
+  ctx.fillStyle = "rgba(255,255,255,0.96)";
+  ctx.fillText("Pass", PAD, 78);
+  // "Avenir" — bold cyan
+  ctx.font = "bold 32px sans-serif";
+  ctx.fillStyle = "#9ce4f2";
+  const passW = ctx.measureText("Pass ").width;
+  ctx.fillText("Avenir", PAD + passW - 2, 78);
+  ctx.restore();
+  // Subtle tagline
+  ctx.font = "10px sans-serif";
+  ctx.fillStyle = "rgba(255,255,255,0.32)";
+  ctx.letterSpacing = "2px";
+  ctx.fillText("VOTRE PASS NUMÉRIQUE", PAD, 92);
+  ctx.letterSpacing = "0px";
 
   // Top Right Info
-  const ticketId = `#${ticket.id.slice(0, 8).toUpperCase()}`;
+  const ticketIdString = ticket.ticketNumber || `#${ticket.id.slice(0, 8).toUpperCase()}`;
   const statusLabel = (ticket.ticketType || "STUDENT").toUpperCase();
 
   // Badge
@@ -151,11 +175,11 @@ async function downloadTicketImage(ticket: TicketOrder, user: any): Promise<void
   ctx.textAlign = "center";
   ctx.fillText(statusLabel, W - PAD - badgeW / 2, 70);
 
-  // Ticket ID next to badge
-  ctx.fillStyle = "rgba(255,255,255,0.4)";
-  ctx.font = "12px monospace";
+  // Ticket number — clearly visible to the left of the badge
+  ctx.fillStyle = "rgba(255,255,255,0.85)";
+  ctx.font = "bold 14px monospace";
   ctx.textAlign = "right";
-  ctx.fillText(ticketId, W - PAD - badgeW - 15, 68);
+  ctx.fillText(ticketIdString, W - PAD - badgeW - 16, 69);
 
   // ── Dividers ───────────────────────────────────────────────────────────────
   const drawDashedLine = (x1: number, y1: number, x2: number, y2: number) => {
@@ -207,52 +231,59 @@ async function downloadTicketImage(ticket: TicketOrder, user: any): Promise<void
   label("TITULAIRE");
   val(user?.name ?? "Aina User", 17, true);
 
-  // ── Logo Section (Bottom Left) ─────────────────────────────────────────────
-  const logoX = PAD;
-  const logoY = H - 100;
+  // ── Bottom Logos Section ───────────────────────────────────────────────────
+  const logoAreaY = H - 100;
 
+  // Left: STEAM HUB sophisticated logo
   const drawSophisticatedLogo = (x: number, y: number) => {
     ctx.save();
     ctx.translate(x, y);
-
-    // Nodes colors from image
     const colors = ["#fdb813", "#4db848", "#00aeef", "#ec008c", "#8dc63f", "#1e96d4"];
-
-    // Central node
     ctx.fillStyle = "#f26422";
-    ctx.beginPath(); ctx.arc(0, 0, 15, 0, Math.PI * 2); ctx.fill();
-
-    // Connecting lines and outer nodes
+    ctx.beginPath(); ctx.arc(0, 0, 13, 0, Math.PI * 2); ctx.fill();
     for (let i = 0; i < 8; i++) {
       const angle = (i * Math.PI * 2) / 8;
-      const lineLen = i % 2 === 0 ? 45 : 32;
+      const lineLen = i % 2 === 0 ? 38 : 26;
       const nx = Math.cos(angle) * lineLen;
       const ny = Math.sin(angle) * lineLen;
-
-      ctx.strokeStyle = "rgba(255, 255, 255, 0.1)";
-      ctx.lineWidth = 2;
-      ctx.beginPath();
-      ctx.moveTo(0, 0);
-      ctx.lineTo(nx, ny);
-      ctx.stroke();
-
+      ctx.strokeStyle = "rgba(255,255,255,0.12)";
+      ctx.lineWidth = 1.5;
+      ctx.beginPath(); ctx.moveTo(0, 0); ctx.lineTo(nx, ny); ctx.stroke();
       ctx.fillStyle = colors[i % colors.length];
-      ctx.beginPath();
-      ctx.arc(nx, ny, 8, 0, Math.PI * 2);
-      ctx.fill();
+      ctx.beginPath(); ctx.arc(nx, ny, 6, 0, Math.PI * 2); ctx.fill();
     }
-
     ctx.restore();
   };
 
-  drawSophisticatedLogo(logoX + 45, logoY + 15);
-
+  const steamX = PAD;
+  drawSophisticatedLogo(steamX + 28, logoAreaY + 13);
   ctx.textAlign = "left";
-  ctx.font = "900 64px sans-serif";
-  ctx.fillStyle = "#0c332e"; // Dark forest green STEAM
-  ctx.fillText("STEAM", logoX + 120, logoY + 40);
-  ctx.fillStyle = "#f5a623"; // Orange HUB
-  ctx.fillText("HUB", logoX + 375, logoY + 40);
+  ctx.font = "900 36px sans-serif";
+  ctx.fillStyle = "rgba(255,255,255,0.18)";
+  ctx.fillText("STEAM", steamX + 78, logoAreaY + 29);
+  ctx.fillStyle = "rgba(253,184,19,0.5)";
+  ctx.fillText("HUB", steamX + 230, logoAreaY + 29);
+
+  // Vertical separator
+  ctx.strokeStyle = "rgba(255,255,255,0.18)";
+  ctx.lineWidth = 1;
+  ctx.beginPath();
+  ctx.moveTo(steamX + 330, logoAreaY + 2);
+  ctx.lineTo(steamX + 330, logoAreaY + 46);
+  ctx.stroke();
+
+  // MJS Logo (bigger, shifted right)
+  try {
+    const mjsImg = await loadImage("/logo_mjs.png");
+    const mjsH = 80;
+    const mjsW = (mjsImg.width / mjsImg.height) * mjsH;
+    ctx.drawImage(mjsImg, steamX + 370, logoAreaY - 14, mjsW, mjsH);
+  } catch {
+    ctx.fillStyle = "rgba(255,255,255,0.4)";
+    ctx.font = "bold 22px sans-serif";
+    ctx.textAlign = "left";
+    ctx.fillText("MJS", steamX + 370, logoAreaY + 32);
+  }
 
   // ── Right SideContent (QR Section) ─────────────────────────────────────────
   const contentDividerX = W * 0.64;
@@ -272,38 +303,15 @@ async function downloadTicketImage(ticket: TicketOrder, user: any): Promise<void
   const qrY = qrBoxY + (qrBoxSize - qrSize) / 2;
 
   try {
-    const qrImg = await loadImage(buildQRUrl(ticket));
+    const qrImg = await loadImage(buildQRUrl(ticket, user));
     ctx.drawImage(qrImg, qrX, qrY, qrSize, qrSize);
   } catch {
     ctx.fillStyle = "rgba(0,0,0,0.05)";
     ctx.fillRect(qrX, qrY, qrSize, qrSize);
   }
 
-  // Footer Instructions
-  const centerOfQRSection = contentDividerX + (W - contentDividerX) / 2;
-  ctx.fillStyle = "#ffffff";
-  ctx.textAlign = "center";
 
-  // SCAN QR CODE
-  ctx.fillStyle = "rgba(255,255,255,0.7)";
-  ctx.font = "bold 15px sans-serif";
-  ctx.fillText("SCAN QR CODE", centerOfQRSection, qrBoxY + qrBoxSize + 45);
-
-  // Subtext
-  ctx.fillStyle = "rgba(255,255,255,0.45)";
-  ctx.font = "13px sans-serif";
-  ctx.fillText("pour valider l'accès", centerOfQRSection, qrBoxY + qrBoxSize + 65);
-
-  // Tiny ID at the bottom right
-  ctx.fillStyle = "rgba(255,255,255,0.2)";
-  ctx.font = "10px monospace";
-  ctx.textAlign = "right";
-  ctx.fillText(ticket.qrCode.slice(0, 16).toUpperCase(), W - PAD, H - 30);
-
-  const link = document.createElement("a");
-  link.download = `ticket-${ticket.id.slice(0, 8)}.png`;
-  link.href = canvas.toDataURL("image/png");
-  link.click();
+  return canvas.toDataURL("image/png");
 }
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
@@ -316,7 +324,7 @@ const STATUS_CONFIG = {
   },
   completed: {
     label: "Validé",
-    color: "bg-emerald-50 text-emerald-600 border-emerald-200",
+    color: "bg-slate-900 text-white border-slate-900",
     icon: CheckCircle,
   },
   failed: {
@@ -344,7 +352,9 @@ export default function YouthTicketsPage() {
   const { user, isLoading: authLoading } = useAuth();
   const [tickets, setTickets] = useState<TicketOrder[]>([]);
   const [loading, setLoading] = useState(true);
-  const [downloading, setDownloading] = useState<string | null>(null);
+  const [generating, setGenerating] = useState<string | null>(null);
+  const [previewTicket, setPreviewTicket] = useState<TicketOrder | null>(null);
+  const [previewDataUrl, setPreviewDataUrl] = useState<string | null>(null);
   const [toast, setToast] = useState("");
 
   const showToast = (msg: string) => {
@@ -367,14 +377,16 @@ export default function YouthTicketsPage() {
     if (!authLoading) load();
   }, [authLoading, load]);
 
-  const handleDownload = async (ticket: TicketOrder) => {
-    setDownloading(ticket.id);
+  const openPreview = async (ticket: TicketOrder) => {
+    setGenerating(ticket.id);
     try {
-      await downloadTicketImage(ticket, user);
+      const dataUrl = await generateTicketImageBase64(ticket, user);
+      setPreviewDataUrl(dataUrl);
+      setPreviewTicket(ticket);
     } catch {
-      showToast("Erreur lors du téléchargement.");
+      showToast("Erreur lors de la génération de l'aperçu.");
     } finally {
-      setDownloading(null);
+      setGenerating(null);
     }
   };
 
@@ -513,18 +525,18 @@ export default function YouthTicketsPage() {
                   <div className="flex flex-col items-end gap-2 shrink-0">
                     {isValidated ? (
                       <button
-                        onClick={() => handleDownload(ticket)}
-                        disabled={downloading === ticket.id}
+                        onClick={() => openPreview(ticket)}
+                        disabled={generating === ticket.id}
                         className="flex items-center gap-2 bg-slate-900 hover:bg-slate-700 text-white text-sm font-semibold px-4 py-2 rounded-xl transition-colors disabled:opacity-50"
                       >
-                        {downloading === ticket.id ? (
-                          <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                        {generating === ticket.id ? (
+                          <Loader2 className="w-4 h-4 animate-spin" />
                         ) : (
-                          <Download className="w-4 h-4" />
+                          <Eye className="w-4 h-4" />
                         )}
-                        {downloading === ticket.id
-                          ? "Generation..."
-                          : "Telecharger"}
+                        {generating === ticket.id
+                          ? "Génération..."
+                          : "Voir le billet"}
                       </button>
                     ) : ticket.status === "pending" ? (
                       <div className="text-xs text-slate-500 font-medium text-right max-w-40">
@@ -552,6 +564,57 @@ export default function YouthTicketsPage() {
               </div>
             );
           })}
+        </div>
+      )}
+
+      {/* Preview Modal */}
+      {previewTicket && previewDataUrl && (
+        <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-[100] p-4 backdrop-blur-sm">
+          <div className="bg-white border border-slate-200 rounded-2xl w-full max-w-3xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
+            <div className="flex items-center justify-between p-5 border-b border-slate-100 shrink-0">
+              <div className="flex items-center gap-3">
+                <Ticket className="w-5 h-5 text-slate-400" />
+                <h2 className="font-bold text-base text-slate-800">Aperçu du billet</h2>
+              </div>
+              <button
+                onClick={() => {
+                  setPreviewTicket(null);
+                  setPreviewDataUrl(null);
+                }}
+                className="text-slate-400 hover:text-slate-700 hover:bg-slate-100 p-2 rounded-full transition-colors"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <div className="p-6 bg-slate-50/50 flex-1 overflow-y-auto flex flex-col items-center justify-center">
+              <img
+                src={previewDataUrl}
+                alt="Ticket Preview"
+                className="w-full max-w-2xl h-auto rounded-xl shadow-md border border-slate-200 object-contain"
+              />
+            </div>
+
+            <div className="p-5 border-t border-slate-100 bg-white shrink-0 flex justify-end gap-3">
+              <button
+                onClick={() => {
+                  setPreviewTicket(null);
+                  setPreviewDataUrl(null);
+                }}
+                className="px-5 py-2.5 text-sm font-bold text-slate-600 hover:bg-slate-100 rounded-xl transition-colors"
+              >
+                Fermer
+              </button>
+              <a
+                href={previewDataUrl}
+                download={`ticket-${previewTicket.id.slice(0, 8)}.png`}
+                className="flex items-center gap-2 bg-slate-900 hover:bg-slate-700 text-white text-sm font-bold px-6 py-2.5 rounded-xl transition-colors shadow-sm"
+              >
+                <Download className="w-4 h-4" />
+                Télécharger l'image PNG
+              </a>
+            </div>
+          </div>
         </div>
       )}
     </div>

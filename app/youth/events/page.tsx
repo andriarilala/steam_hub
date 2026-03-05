@@ -39,7 +39,7 @@ type TicketType = "standard" | "vip" | "student" | "virtual";
 const TYPE_COLORS: Record<string, string> = {
   Keynote: "bg-purple-50 text-purple-600 border-purple-200",
   Workshop: "bg-blue-50   text-blue-600   border-blue-200",
-  Networking: "bg-emerald-50 text-emerald-600 border-emerald-200",
+  Networking: "bg-slate-100 text-slate-600 border-slate-200",
   Panel: "bg-amber-50  text-amber-600  border-amber-200",
   Showcase: "bg-cyan-50   text-cyan-600   border-cyan-200",
   Ceremony: "bg-rose-50   text-rose-600   border-rose-200",
@@ -244,8 +244,8 @@ export default function YouthEventsPage() {
           <div className="bg-white border border-slate-200 rounded-2xl w-full max-w-md shadow-2xl">
             {success ? (
               <div className="p-8 flex flex-col items-center gap-4 text-center">
-                <div className="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center">
-                  <CheckCircle className="w-9 h-9 text-slate-500" />
+                <div className="w-16 h-16 bg-slate-100 rounded-full flex items-center justify-center">
+                  <CheckCircle className="w-9 h-9 text-slate-900" />
                 </div>
                 <h2 className="text-xl font-bold text-slate-900">
                   Commande envoyee
@@ -319,7 +319,7 @@ export default function YouthEventsPage() {
 
                   {/* Ticket type */}
                   <div>
-                    <label className="block text-[10px] font-black text-[#9dbfb0] mb-2 uppercase tracking-wider">
+                    <label className="block text-[10px] font-bold text-slate-400 mb-2 uppercase tracking-widest">
                       Type de billet
                     </label>
                     <div className="grid grid-cols-2 gap-2">
@@ -340,7 +340,7 @@ export default function YouthEventsPage() {
 
                   {/* Quantity */}
                   <div>
-                    <label className="block text-[10px] font-black text-[#9dbfb0] mb-2 uppercase tracking-wider">
+                    <label className="block text-[10px] font-bold text-slate-400 mb-2 uppercase tracking-widest">
                       Quantité
                     </label>
                     <div className="flex items-center gap-3">
@@ -364,9 +364,9 @@ export default function YouthEventsPage() {
 
                   {/* Reference */}
                   <div>
-                    <label className="block text-[10px] font-black text-[#9dbfb0] mb-2 uppercase tracking-wider">
+                    <label className="block text-[10px] font-bold text-slate-400 mb-2 uppercase tracking-widest">
                       Référence de paiement{" "}
-                      <span className="font-normal text-[#c5e0d5]">
+                      <span className="font-normal text-slate-300">
                         (optionnel)
                       </span>
                     </label>

@@ -9,6 +9,7 @@ import {
   RefreshCw,
   UserCog,
 } from "lucide-react";
+import { ConfirmModal } from "@/components/ui/confirm-modal";
 
 interface User {
   id: string;
@@ -30,12 +31,12 @@ const ALL_ROLES = [
 ];
 
 const ROLE_COLORS: Record<string, string> = {
-  admin: "bg-red-50 text-red-600 border border-red-200", // Red from 'A'
-  youth: "bg-emerald-50 text-emerald-600 border border-emerald-200", // Teal from 'S'
-  company: "bg-blue-50 text-blue-600 border border-blue-200", // Blue from 'E'
-  institution: "bg-purple-50 text-purple-600 border border-purple-200", // Purple from 'M'
-  mentor: "bg-orange-50 text-orange-600 border border-orange-200", // Orange from 'T'
-  sponsor: "bg-primary/5 text-primary border border-primary/20", // Navy from 'HUB'
+  admin: "bg-slate-900 text-white border border-slate-900",
+  youth: "bg-blue-50 text-blue-700 border border-blue-200",
+  company: "bg-slate-100 text-slate-700 border border-slate-200",
+  institution: "bg-purple-50 text-purple-700 border border-purple-200",
+  mentor: "bg-blue-50/50 text-blue-600 border border-blue-100",
+  sponsor: "bg-amber-50 text-amber-700 border border-amber-200",
 };
 
 export default function AdminUsersPage() {
@@ -48,6 +49,7 @@ export default function AdminUsersPage() {
   const [loading, setLoading] = useState(true);
   const [actionLoading, setActionLoading] = useState<string | null>(null); // userId
   const [toast, setToast] = useState("");
+  const [confirmDelete, setConfirmDelete] = useState<{ id: string; name: string } | null>(null);
 
   const showToast = (msg: string) => {
     setToast(msg);
@@ -95,13 +97,15 @@ export default function AdminUsersPage() {
     }
   };
 
-  const deleteUser = async (userId: string, name: string) => {
-    if (!confirm(`Delete user "${name}"? This cannot be undone.`)) return;
+  const deleteUser = async () => {
+    if (!confirmDelete) return;
+    const { id: userId } = confirmDelete;
     setActionLoading(userId);
     const res = await fetch(`/api/admin/users?id=${userId}`, {
       method: "DELETE",
     });
     setActionLoading(null);
+    setConfirmDelete(null);
     if (res.ok) {
       showToast("User deleted");
       load();
@@ -235,9 +239,9 @@ export default function AdminUsersPage() {
                     </td>
                     <td className="px-6 py-4">
                       <span
-                        className={`text-[10px] font-bold px-2 py-0.5 rounded-md ${u.emailVerified ? "bg-emerald-500/20 text-emerald-400" : "bg-foreground/10 text-foreground/30"}`}
+                        className={`text-[10px] font-bold px-2.5 py-1 rounded-md uppercase tracking-tight ${u.emailVerified ? "bg-slate-100 text-slate-900" : "bg-slate-50 text-slate-400 border border-slate-100"}`}
                       >
-                        {u.emailVerified ? "Yes" : "No"}
+                        {u.emailVerified ? "Verified" : "Unverified"}
                       </span>
                     </td>
                     <td className="px-6 py-4 text-xs text-foreground/40">
@@ -245,7 +249,7 @@ export default function AdminUsersPage() {
                     </td>
                     <td className="px-6 py-4 text-right">
                       <button
-                        onClick={() => deleteUser(u.id, u.name || u.email)}
+                        onClick={() => setConfirmDelete({ id: u.id, name: u.name || u.email })}
                         disabled={actionLoading === u.id}
                         className="p-1.5 rounded-lg text-foreground/30 hover:text-red-400 hover:bg-red-500/10 transition-colors disabled:opacity-50"
                       >
@@ -284,6 +288,15 @@ export default function AdminUsersPage() {
           </div>
         )}
       </div>
+
+      <ConfirmModal
+        isOpen={!!confirmDelete}
+        title="Supprimer l'utilisateur"
+        message={`Êtes-vous sûr de vouloir supprimer l'utilisateur "${confirmDelete?.name}" ? Cette action est irréversible.`}
+        confirmLabel="Supprimer"
+        onConfirm={deleteUser}
+        onCancel={() => setConfirmDelete(null)}
+      />
     </div>
   );
 }

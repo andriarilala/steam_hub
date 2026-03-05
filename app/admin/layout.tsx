@@ -14,6 +14,7 @@ import {
   Ticket,
   Handshake,
   FileInput,
+  QrCode,
 } from "lucide-react";
 import { useAuth } from "@/lib/auth-context";
 
@@ -25,6 +26,7 @@ const navItems = [
   { href: "/admin/tickets", icon: Ticket, label: "Tickets" },
   { href: "/admin/partners", icon: Handshake, label: "Partners" },
   { href: "/admin/applications", icon: FileInput, label: "Applications" },
+  { href: "/admin/scan", icon: QrCode, label: "Scanner" },
 ];
 
 export default function AdminLayout({
@@ -83,8 +85,8 @@ export default function AdminLayout({
                 href={item.href}
                 title={item.label}
                 className={`group relative flex items-center justify-center w-full h-10 rounded-lg transition-all ${isActive
-                    ? "bg-slate-900 text-white"
-                    : "text-slate-400 hover:text-slate-700 hover:bg-slate-100"
+                  ? "bg-slate-900 text-white"
+                  : "text-slate-400 hover:text-slate-700 hover:bg-slate-100"
                   }`}
               >
                 <item.icon className="w-[18px] h-[18px]" />

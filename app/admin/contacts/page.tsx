@@ -11,6 +11,7 @@ import {
   X,
   CheckCheck,
 } from "lucide-react";
+import { ConfirmModal } from "@/components/ui/confirm-modal";
 
 interface ContactMessage {
   id: string;
@@ -38,6 +39,7 @@ export default function AdminContactsPage() {
   const [selected, setSelected] = useState<ContactMessage | null>(null);
   const [actionLoading, setActionLoading] = useState<string | null>(null);
   const [toast, setToast] = useState("");
+  const [confirmDelete, setConfirmDelete] = useState<string | null>(null);
 
   const showToast = (msg: string) => {
     setToast(msg);
@@ -84,13 +86,15 @@ export default function AdminContactsPage() {
     }
   };
 
-  const deleteMsg = async (id: string) => {
-    if (!confirm("Delete this message?")) return;
+  const deleteMsg = async () => {
+    if (!confirmDelete) return;
+    const id = confirmDelete;
     setActionLoading(id);
     const res = await fetch(`/api/admin/contacts?id=${id}`, {
       method: "DELETE",
     });
     setActionLoading(null);
+    setConfirmDelete(null);
     if (res.ok) {
       showToast("Message deleted");
       if (selected?.id === id) setSelected(null);
@@ -168,7 +172,7 @@ export default function AdminContactsPage() {
                 </button>
               )}
               <button
-                onClick={() => deleteMsg(selected.id)}
+                onClick={() => setConfirmDelete(selected.id)}
                 disabled={actionLoading === selected.id}
                 className="flex items-center gap-2 px-4 py-2 bg-red-500/10 text-red-400 text-xs font-bold rounded-xl hover:bg-red-500/20 transition-colors disabled:opacity-50 ml-auto"
               >
@@ -286,7 +290,7 @@ export default function AdminContactsPage() {
                           </button>
                         )}
                         <button
-                          onClick={() => deleteMsg(msg.id)}
+                          onClick={() => setConfirmDelete(msg.id)}
                           disabled={actionLoading === msg.id}
                           className="p-1.5 rounded-lg text-foreground/30 hover:text-red-400 hover:bg-red-500/10 transition-colors disabled:opacity-50"
                         >
@@ -325,6 +329,15 @@ export default function AdminContactsPage() {
           </div>
         )}
       </div>
+
+      <ConfirmModal
+        isOpen={!!confirmDelete}
+        title="Supprimer le message"
+        message="Êtes-vous sûr de vouloir supprimer ce message ?"
+        confirmLabel="Supprimer"
+        onConfirm={deleteMsg}
+        onCancel={() => setConfirmDelete(null)}
+      />
     </div>
   );
 }

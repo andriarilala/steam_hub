@@ -101,25 +101,35 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Event not found" }, { status: 404 });
   }
 
-  const ticket = await prisma.ticketOrder.create({
-    data: {
-      userId: data.userId,
-      eventId: data.eventId || null,
-      ticketType: data.ticketType,
-      quantity: data.quantity,
-      price: data.price,
-      total: data.total,
-      status: data.status,
-      reference: data.reference ?? null,
-      qrCode: randomUUID(), // unique QR token
-    },
-    include: {
-      user: { select: { id: true, name: true, email: true } },
-      event: { select: { id: true, title: true, date: true } },
-    },
-  });
+  try {
+    const count = await prisma.ticketOrder.count();
+    const ticketNumber = `PA ${String(count + 1).padStart(5, "0")}`;
 
-  return NextResponse.json(ticket, { status: 201 });
+    const ticket = await prisma.ticketOrder.create({
+      data: {
+        userId: data.userId,
+        eventId: data.eventId || null,
+        // @ts-ignore
+        ticketNumber,
+        ticketType: data.ticketType,
+        quantity: data.quantity,
+        price: data.price,
+        total: data.total,
+        status: data.status,
+        reference: data.reference ?? null,
+        qrCode: randomUUID(),
+      },
+      include: {
+        user: { select: { id: true, name: true, email: true } },
+        event: { select: { id: true, title: true, date: true } },
+      },
+    });
+
+    return NextResponse.json(ticket, { status: 201 });
+  } catch (error: any) {
+    console.error("[ADMIN_TICKET_POST]", error);
+    return NextResponse.json({ error: error.message || "Internal Error" }, { status: 500 });
+  }
 }
 
 // PATCH /api/admin/tickets — update ticket fields
@@ -131,39 +141,44 @@ export async function PATCH(req: NextRequest) {
   const { id, ...rest } = body;
   if (!id) return NextResponse.json({ error: "id required" }, { status: 400 });
 
-  const data = TicketSchema.partial().parse(rest);
+  try {
+    const data = TicketSchema.partial().parse(rest);
 
-  // If a new userId is provided, verify the user exists
-  if (data.userId) {
-    const userExists = await prisma.user.findUnique({
-      where: { id: data.userId },
-      select: { id: true },
+    // If a new userId is provided, verify the user exists
+    if (data.userId) {
+      const userExists = await prisma.user.findUnique({
+        where: { id: data.userId },
+        select: { id: true },
+      });
+      if (!userExists)
+        return NextResponse.json({ error: "User not found" }, { status: 404 });
+    }
+
+    const ticket = await prisma.ticketOrder.update({
+      where: { id },
+      data: {
+        ...(data.userId ? { userId: data.userId } : {}),
+        ...(data.eventId !== undefined ? { eventId: data.eventId || null } : {}),
+        ...(data.ticketType ? { ticketType: data.ticketType } : {}),
+        ...(data.quantity !== undefined ? { quantity: data.quantity } : {}),
+        ...(data.price !== undefined ? { price: data.price } : {}),
+        ...(data.total !== undefined ? { total: data.total } : {}),
+        ...(data.status ? { status: data.status } : {}),
+        ...(data.reference !== undefined
+          ? { reference: data.reference || null }
+          : {}),
+      },
+      include: {
+        user: { select: { id: true, name: true, email: true } },
+        event: { select: { id: true, title: true, date: true } },
+      },
     });
-    if (!userExists)
-      return NextResponse.json({ error: "User not found" }, { status: 404 });
+
+    return NextResponse.json(ticket);
+  } catch (error: any) {
+    console.error("[ADMIN_TICKET_PATCH]", error);
+    return NextResponse.json({ error: error.message || "Internal Error" }, { status: 500 });
   }
-
-  const ticket = await prisma.ticketOrder.update({
-    where: { id },
-    data: {
-      ...(data.userId ? { userId: data.userId } : {}),
-      ...(data.eventId !== undefined ? { eventId: data.eventId || null } : {}),
-      ...(data.ticketType ? { ticketType: data.ticketType } : {}),
-      ...(data.quantity !== undefined ? { quantity: data.quantity } : {}),
-      ...(data.price !== undefined ? { price: data.price } : {}),
-      ...(data.total !== undefined ? { total: data.total } : {}),
-      ...(data.status ? { status: data.status } : {}),
-      ...(data.reference !== undefined
-        ? { reference: data.reference || null }
-        : {}),
-    },
-    include: {
-      user: { select: { id: true, name: true, email: true } },
-      event: { select: { id: true, title: true, date: true } },
-    },
-  });
-
-  return NextResponse.json(ticket);
 }
 
 // DELETE /api/admin/tickets?id=

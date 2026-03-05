@@ -122,7 +122,7 @@ export default function EventsPage() {
   const TYPE_COLORS: Record<string, string> = {
     Keynote: "bg-purple-50 text-purple-600 border-purple-200",
     Workshop: "bg-blue-50 text-blue-600 border-blue-200",
-    Networking: "bg-emerald-50 text-emerald-600 border-emerald-200",
+    Networking: "bg-slate-50 text-slate-600 border-slate-200",
     Panel: "bg-amber-50 text-amber-600 border-amber-200",
     Showcase: "bg-cyan-50 text-cyan-600 border-cyan-200",
     Ceremony: "bg-rose-50 text-rose-600 border-rose-200",
@@ -133,9 +133,9 @@ export default function EventsPage() {
     <main className="min-h-screen bg-background">
       <Navigation />
 
-      <section className="py-16 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-6xl mx-auto">
-          <div className="mb-10">
+      <section className="py-16">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col items-center text-center">
+          <div className="mb-10 w-full max-w-4xl">
             <h1 className="text-4xl font-bold text-foreground mb-2">
               Événements disponibles
             </h1>
@@ -144,10 +144,10 @@ export default function EventsPage() {
             </p>
             {isYouth && (
               <a
-                href="/my-tickets"
-                className="inline-flex items-center gap-2 mt-4 text-sm text-primary font-semibold hover:underline"
+                href="/youth/tickets"
+                className="inline-flex items-center gap-2 mt-4 text-sm text-slate-900 font-semibold hover:underline"
               >
-                <Ticket className="w-4 h-4" /> Voir mes billets →
+                <Ticket className="w-4 h-4 text-slate-400" /> Voir mes billets →
               </a>
             )}
           </div>
@@ -164,7 +164,7 @@ export default function EventsPage() {
               </p>
             </div>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="flex flex-col gap-6 w-full max-w-5xl">
               {events.map((ev) => {
                 const isPast = new Date(ev.date) < new Date();
                 return (
@@ -172,95 +172,94 @@ export default function EventsPage() {
                     key={ev.id}
                     className="bg-card border border-border rounded-2xl overflow-hidden flex flex-col hover:shadow-lg transition-shadow"
                   >
-                    {/* Color band */}
-                    <div className="h-1.5 bg-primary w-full" />
-
-                    <div className="p-6 flex flex-col flex-1 gap-3">
-                      {/* Type badge */}
-                      <div className="flex items-center gap-2">
-                        {ev.type && (
-                          <span
-                            className={`px-2 py-0.5 text-[11px] font-bold rounded border ${TYPE_COLORS[ev.type] ?? TYPE_COLORS["Other"]}`}
-                          >
-                            {ev.type}
-                          </span>
-                        )}
-                        {isPast && (
-                          <span className="px-2 py-0.5 text-[11px] font-bold rounded border bg-slate-50 text-slate-400 border-slate-200">
-                            Passé
-                          </span>
-                        )}
-                      </div>
-
-                      <h2 className="text-lg font-bold text-foreground leading-tight">
-                        {ev.title}
-                      </h2>
-
-                      {ev.description && (
-                        <p className="text-sm text-foreground/60 line-clamp-2">
-                          {ev.description}
-                        </p>
-                      )}
-
-                      <div className="space-y-1.5 mt-1">
-                        <div className="flex items-center gap-2 text-xs text-foreground/60">
-                          <Calendar className="w-3.5 h-3.5 text-primary/50 shrink-0" />
-                          {new Date(ev.date).toLocaleDateString("fr-FR", {
-                            weekday: "long",
-                            year: "numeric",
-                            month: "long",
-                            day: "numeric",
-                          })}
-                          {ev.time && (
-                            <>
-                              <Clock className="w-3.5 h-3.5 text-primary/50 ml-1" />
-                              {ev.time}
-                            </>
+                    <div className="p-6 md:p-8 flex flex-col md:flex-row gap-6">
+                      <div className="flex-1 flex flex-col gap-3">
+                        {/* Type badge */}
+                        <div className="flex items-center gap-2">
+                          {ev.type && (
+                            <span
+                              className={`px-2 py-0.5 text-[11px] font-bold rounded border ${TYPE_COLORS[ev.type] ?? TYPE_COLORS["Other"]}`}
+                            >
+                              {ev.type}
+                            </span>
+                          )}
+                          {isPast && (
+                            <span className="px-2 py-0.5 text-[11px] font-bold rounded border bg-slate-50 text-slate-400 border-slate-200">
+                              Passé
+                            </span>
                           )}
                         </div>
 
-                        {ev.location && (
-                          <div className="flex items-center gap-2 text-xs text-foreground/60">
-                            <MapPin className="w-3.5 h-3.5 text-primary/50 shrink-0" />
-                            {ev.location}
-                          </div>
+                        <h2 className="text-lg font-bold text-foreground leading-tight">
+                          {ev.title}
+                        </h2>
+
+                        {ev.description && (
+                          <p className="text-sm text-foreground/60 line-clamp-2">
+                            {ev.description}
+                          </p>
                         )}
 
-                        {ev.phone_number && (
+                        <div className="space-y-1.5 mt-1">
                           <div className="flex items-center gap-2 text-xs text-foreground/60">
-                            <Phone className="w-3.5 h-3.5 text-primary/50 shrink-0" />
-                            {ev.phone_number}
+                            <Calendar className="w-3.5 h-3.5 text-primary/50 shrink-0" />
+                            {new Date(ev.date).toLocaleDateString("fr-FR", {
+                              weekday: "long",
+                              year: "numeric",
+                              month: "long",
+                              day: "numeric",
+                            })}
+                            {ev.time && (
+                              <>
+                                <Clock className="w-3.5 h-3.5 text-primary/50 ml-1" />
+                                {ev.time}
+                              </>
+                            )}
                           </div>
-                        )}
-                      </div>
 
-                      <div className="mt-auto pt-4 flex items-center justify-between">
-                        <div className="flex items-center gap-1.5 text-primary font-bold">
-                          <Tag className="w-4 h-4" />
-                          {ev.price != null
-                            ? `${ev.price.toLocaleString("fr-FR")} FCFA`
-                            : "Gratuit"}
+                          {ev.location && (
+                            <div className="flex items-center gap-2 text-xs text-foreground/60">
+                              <MapPin className="w-3.5 h-3.5 text-primary/50 shrink-0" />
+                              {ev.location}
+                            </div>
+                          )}
+
+                          {ev.phone_number && (
+                            <div className="flex items-center gap-2 text-xs text-foreground/60">
+                              <Phone className="w-3.5 h-3.5 text-primary/50 shrink-0" />
+                              {ev.phone_number}
+                            </div>
+                          )}
                         </div>
 
-                        {isYouth && !isPast && (
-                          <button
-                            onClick={() => openBuy(ev)}
-                            className="flex items-center gap-1.5 text-sm bg-primary text-primary-foreground font-bold px-4 py-2 rounded-xl hover:opacity-90 transition-opacity"
-                          >
-                            <ShoppingCart className="w-4 h-4" />
-                            Acheter
-                          </button>
-                        )}
+                        <div className="md:w-64 flex flex-col justify-center items-start md:items-end gap-4 md:border-l border-border md:pl-6 pt-4 md:pt-0 border-t md:border-t-0 mt-4 md:mt-0">
+                          <div className="flex items-center gap-1.5 text-primary font-bold text-xl">
+                            <Tag className="w-4 h-4" />
+                            {ev.price != null
+                              ? `${ev.price.toLocaleString("fr-FR")} FCFA`
+                              : "Gratuit"}
+                          </div>
 
-                        {!session && !isPast && (
-                          <button
-                            onClick={() => router.push("/signin")}
-                            className="flex items-center gap-1.5 text-sm border border-primary text-primary font-bold px-4 py-2 rounded-xl hover:bg-primary/5 transition-colors"
-                          >
-                            <Ticket className="w-4 h-4" />
-                            Se connecter
-                          </button>
-                        )}
+                          {isYouth && !isPast && (
+                            <button
+                              onClick={() => openBuy(ev)}
+                              className="flex items-center gap-1.5 text-sm bg-primary text-primary-foreground font-bold px-4 py-2 rounded-xl hover:opacity-90 transition-opacity"
+                            >
+                              <ShoppingCart className="w-4 h-4" />
+                              Acheter
+                            </button>
+                          )}
+
+                          {!session && !isPast && (
+                            <button
+                              onClick={() => router.push("/signin")}
+                              className="flex items-center gap-1.5 text-sm border border-primary text-primary font-bold px-4 py-2 rounded-xl hover:bg-primary/5 transition-colors"
+                            >
+                              <Ticket className="w-4 h-4" />
+                              Se connecter
+                            </button>
+                          )}
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -277,7 +276,7 @@ export default function EventsPage() {
           <div className="bg-card border border-border rounded-2xl w-full max-w-md shadow-2xl">
             {success ? (
               <div className="p-8 flex flex-col items-center gap-4 text-center">
-                <CheckCircle className="w-14 h-14 text-emerald-500" />
+                <CheckCircle className="w-14 h-14 text-blue-500" />
                 <h2 className="text-xl font-bold">Commande envoyée !</h2>
                 <p className="text-foreground/60 text-sm">
                   Votre demande de billet est en attente de validation par
@@ -292,8 +291,8 @@ export default function EventsPage() {
                     Fermer
                   </button>
                   <a
-                    href="/my-tickets"
-                    className="px-5 py-2.5 text-sm bg-primary text-primary-foreground font-bold rounded-xl hover:opacity-90 transition-opacity"
+                    href="/youth/tickets"
+                    className="px-5 py-2.5 text-sm bg-slate-900 text-white font-bold rounded-xl hover:bg-slate-800 transition-all"
                   >
                     Mes billets →
                   </a>
@@ -353,11 +352,10 @@ export default function EventsPage() {
                         <button
                           key={t.value}
                           onClick={() => setTicketType(t.value)}
-                          className={`py-2 px-3 rounded-xl border text-sm font-semibold transition-colors text-left ${
-                            ticketType === t.value
-                              ? "border-primary bg-primary/10 text-primary"
-                              : "border-border hover:bg-foreground/5"
-                          }`}
+                          className={`py-2 px-3 rounded-xl border text-sm font-semibold transition-colors text-left ${ticketType === t.value
+                            ? "border-primary bg-primary/10 text-primary"
+                            : "border-border hover:bg-foreground/5"
+                            }`}
                         >
                           {t.label}
                         </button>

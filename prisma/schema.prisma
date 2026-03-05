@@ -85,6 +85,7 @@ model Event {
   phone_number String? // Contact phone number for the event
   createdAt    DateTime      @default(now())
   ticketOrders TicketOrder[]
+  physicalTickets PhysicalTicket[]
 }
 
 // user-to-user connections (many-to-many through this join table)
@@ -127,19 +128,37 @@ model Notification {
 
 // ticket orders (persisted purchases)
 model TicketOrder {
-  id         String   @id @default(uuid())
-  userId     String
-  eventId    String? // linked event
-  ticketType String // "standard" | "vip" | "student" | "virtual"
-  quantity   Int      @default(1)
-  price      Float // price per ticket (= event.price * quantity)
-  total      Float // kept for backward compat (same as price)
-  reference  String? // optional payment reference (e.g. 1133223564476)
-  status     String   @default("pending") // "pending" | "completed" | "failed" | "cancelled"
-  qrCode     String   @unique @default(uuid()) // unique token encoded in QR
-  createdAt  DateTime @default(now())
+  id           String    @id @default(uuid())
+  userId       String
+  eventId      String?   // linked event
+  ticketNumber String?   @unique // "PA 00001" — sequential human-readable ID
+  ticketType   String    // "standard" | "vip" | "student" | "virtual"
+  quantity     Int       @default(1)
+  price        Float     // price per ticket (= event.price * quantity)
+  total        Float     // kept for backward compat (same as price)
+  reference    String?   // optional payment reference (e.g. 1133223564476)
+  status       String    @default("pending") // "pending" | "completed" | "failed" | "cancelled"
+  qrCode       String    @unique @default(uuid()) // unique token encoded in QR
+  usedAt       DateTime? // null = not yet used; set when scanned at entry
+  usedBy       String?   // identifier of the device/agent that scanned
+  createdAt    DateTime  @default(now())
 
   user  User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  event Event? @relation(fields: [eventId], references: [id], onDelete: SetNull)
+}
+
+// physical tickets sold on terrain (streets, shops, partners)
+model PhysicalTicket {
+  id           String    @id @default(uuid())
+  ticketNumber String    @unique // "PA-P-00001" — sequential
+  eventId      String?
+  ticketType   String    @default("standard")
+  batchId      String    // groups a print run, e.g. "BATCH-001"
+  status       String    @default("active") // "active" | "used" | "cancelled"
+  usedAt       DateTime?
+  usedBy       String?
+  createdAt    DateTime  @default(now())
+
   event Event? @relation(fields: [eventId], references: [id], onDelete: SetNull)
 }
 

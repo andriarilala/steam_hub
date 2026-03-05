@@ -16,7 +16,6 @@ export function Navigation() {
   const navItems = [
     { href: "/", label: "nav.home" },
     { href: "/story", label: "nav.story" },
-    { href: "/event", label: "nav.event" },
     { href: "/events", label: "nav.events" },
     { href: "/agenda", label: "nav.agenda" },
     { href: "/partners", label: "nav.partners" },
@@ -54,7 +53,7 @@ export function Navigation() {
             <LanguageSwitcher />
             {isYouth && (
               <Link
-                href="/my-tickets"
+                href="/youth/tickets"
                 className="text-sm font-medium text-foreground/70 hover:text-primary transition-colors flex items-center gap-1"
               >
                 🎫 Mes billets
@@ -112,7 +111,7 @@ export function Navigation() {
               <LanguageSwitcher />
               {isYouth && (
                 <Link
-                  href="/my-tickets"
+                  href="/youth/tickets"
                   className="flex-1 text-sm font-medium border border-primary text-primary px-4 py-2 rounded-sm hover:bg-primary/5 transition-colors text-center"
                   onClick={() => setIsOpen(false)}
                 >
