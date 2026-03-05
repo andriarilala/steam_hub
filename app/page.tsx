@@ -84,7 +84,7 @@ export default function Home() {
             </div>
             <div className="bg-muted rounded-sm overflow-hidden h-96">
               <img
-                src="/professional-conference-speakers-stage.png"
+                src="/professional-conference-speakers-stage.jpg"
                 alt="PASS AVENIR Event"
                 className="w-full h-full object-cover"
               />
