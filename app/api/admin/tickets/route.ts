@@ -44,6 +44,8 @@ export async function GET(req: NextRequest) {
   const statusFilter = searchParams.get("status") || "";
   const eventId = searchParams.get("eventId") || "";
   const search = searchParams.get("search") || "";
+  const sortField = searchParams.get("sortField") || "createdAt";
+  const sortOrder = (searchParams.get("sortOrder") || "desc") as "asc" | "desc";
   const pageSize = 20;
 
   const where: any = {};
@@ -53,13 +55,25 @@ export async function GET(req: NextRequest) {
     where.OR = [
       { user: { name: { contains: search, mode: "insensitive" } } },
       { user: { email: { contains: search, mode: "insensitive" } } },
+      { ticketNumber: { contains: search, mode: "insensitive" } },
+      { event: { title: { contains: search, mode: "insensitive" } } }
     ];
+  }
+
+  // Build prisma orderBy
+  let orderBy: any = {};
+  if (sortField === "event") {
+    orderBy = { event: { title: sortOrder } };
+  } else if (sortField === "user") {
+    orderBy = { user: { name: sortOrder } };
+  } else {
+    orderBy = { [sortField]: sortOrder };
   }
 
   const [tickets, total] = await Promise.all([
     prisma.ticketOrder.findMany({
       where,
-      orderBy: { createdAt: "desc" },
+      orderBy,
       skip: (page - 1) * pageSize,
       take: pageSize,
       include: {

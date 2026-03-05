@@ -543,6 +543,16 @@ export default function AdminTicketsPage() {
   const [statusFilter, setStatusFilter] = useState("");
   const [eventFilter, setEventFilter] = useState("");
   const [loading, setLoading] = useState(true);
+
+  // Sorting state
+  const [sortField, setSortField] = useState("createdAt");
+  const [sortOrder, setSortOrder] = useState<"asc" | "desc">("desc");
+  const [physicalSortField, setPhysicalSortField] = useState("createdAt");
+  const [physicalSortOrder, setPhysicalSortOrder] = useState<"asc" | "desc">("desc");
+
+  // Autocomplete state
+  const [suggestions, setSuggestions] = useState<string[]>([]);
+  const [showSuggestions, setShowSuggestions] = useState(false);
   const [events, setEvents] = useState<EventOption[]>([]);
   const [users, setUsers] = useState<UserOption[]>([]);
 
@@ -1291,10 +1301,26 @@ export default function AdminTicketsPage() {
                 <input
                   type="text"
                   value={search}
+                  onFocus={() => setShowSuggestions(true)}
+                  onBlur={() => setTimeout(() => setShowSuggestions(false), 200)}
                   onChange={(e) => setSearch(e.target.value)}
-                  placeholder="Search by user name or email…"
+                  placeholder="Recherche par nom, email ou n° de ticket…"
                   className="w-full bg-card border border-border rounded-xl py-2.5 pl-10 pr-4 text-sm focus:outline-none focus:border-primary/50 transition-colors"
                 />
+                {showSuggestions && suggestions.length > 0 && (
+                  <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-slate-200 rounded-xl shadow-xl z-50 overflow-hidden divide-y divide-slate-50">
+                    {suggestions.map((s, i) => (
+                      <button
+                        key={i}
+                        onClick={() => setSearch(s)}
+                        className="w-full text-left px-4 py-2 text-xs hover:bg-slate-50 text-slate-700 flex items-center justify-between"
+                      >
+                        <span>{s}</span>
+                        <ArrowRight className="w-3 h-3 text-slate-300" />
+                      </button>
+                    ))}
+                  </div>
+                )}
               </div>
               <select
                 value={statusFilter}
@@ -1841,12 +1867,36 @@ export default function AdminTicketsPage() {
                   <table className="w-full text-left border-collapse">
                     <thead>
                       <tr className="border-b border-border bg-slate-50/50">
-                        <th className="px-6 py-4 text-[11px] font-bold text-slate-400 uppercase tracking-wider">N° Ticket</th>
-                        <th className="px-6 py-4 text-[11px] font-bold text-slate-400 uppercase tracking-wider">Événement</th>
-                        <th className="px-6 py-4 text-[11px] font-bold text-slate-400 uppercase tracking-wider">Type</th>
-                        <th className="px-6 py-4 text-[11px] font-bold text-slate-400 uppercase tracking-wider">Lot (Batch)</th>
-                        <th className="px-6 py-4 text-[11px] font-bold text-slate-400 uppercase tracking-wider">Statut</th>
-                        <th className="px-6 py-4 text-[11px] font-bold text-slate-400 uppercase tracking-wider">Date d'Utilisation</th>
+                        <th className="px-6 py-4 text-[11px] font-bold text-slate-400 uppercase tracking-wider">
+                          <button onClick={() => handleSort("ticketNumber")} className="flex items-center gap-1 hover:text-slate-900 transition-colors">
+                            N° Ticket <SortIcon field="ticketNumber" activeField={physicalSortField} activeOrder={physicalSortOrder} />
+                          </button>
+                        </th>
+                        <th className="px-6 py-4 text-[11px] font-bold text-slate-400 uppercase tracking-wider">
+                          <button onClick={() => handleSort("event")} className="flex items-center gap-1 hover:text-slate-900 transition-colors">
+                            Événement <SortIcon field="event" activeField={physicalSortField} activeOrder={physicalSortOrder} />
+                          </button>
+                        </th>
+                        <th className="px-6 py-4 text-[11px] font-bold text-slate-400 uppercase tracking-wider">
+                          <button onClick={() => handleSort("ticketType")} className="flex items-center gap-1 hover:text-slate-900 transition-colors">
+                            Type <SortIcon field="ticketType" activeField={physicalSortField} activeOrder={physicalSortOrder} />
+                          </button>
+                        </th>
+                        <th className="px-6 py-4 text-[11px] font-bold text-slate-400 uppercase tracking-wider">
+                          <button onClick={() => handleSort("batchId")} className="flex items-center gap-1 hover:text-slate-900 transition-colors">
+                            Lot <SortIcon field="batchId" activeField={physicalSortField} activeOrder={physicalSortOrder} />
+                          </button>
+                        </th>
+                        <th className="px-6 py-4 text-[11px] font-bold text-slate-400 uppercase tracking-wider">
+                          <button onClick={() => handleSort("status")} className="flex items-center gap-1 hover:text-slate-900 transition-colors">
+                            Statut <SortIcon field="status" activeField={physicalSortField} activeOrder={physicalSortOrder} />
+                          </button>
+                        </th>
+                        <th className="px-6 py-4 text-[11px] font-bold text-slate-400 uppercase tracking-wider">
+                          <button onClick={() => handleSort("usedAt")} className="flex items-center gap-1 hover:text-slate-900 transition-colors">
+                            Date d'Utilisation <SortIcon field="usedAt" activeField={physicalSortField} activeOrder={physicalSortOrder} />
+                          </button>
+                        </th>
                         <th className="px-6 py-4 text-[11px] font-bold text-slate-400 uppercase tracking-wider text-right">Actions</th>
                       </tr>
                     </thead>

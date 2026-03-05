@@ -75,14 +75,32 @@ export async function GET(req: NextRequest) {
 
     const { searchParams } = new URL(req.url);
     const batchId = searchParams.get("batchId");
+    const search = searchParams.get("search") || "";
+    const sortField = searchParams.get("sortField") || "createdAt";
+    const sortOrder = (searchParams.get("sortOrder") || "desc") as "asc" | "desc";
 
     const where: any = {};
     if (batchId) where.batchId = batchId;
+    if (search) {
+        where.OR = [
+            { ticketNumber: { contains: search, mode: "insensitive" } },
+            { batchId: { contains: search, mode: "insensitive" } },
+            { event: { title: { contains: search, mode: "insensitive" } } }
+        ];
+    }
+
+    // Build prisma orderBy
+    let orderBy: any = {};
+    if (sortField === "event") {
+        orderBy = { event: { title: sortOrder } };
+    } else {
+        orderBy = { [sortField]: sortOrder };
+    }
 
     // @ts-ignore
     const tickets = await prisma.physicalTicket.findMany({
         where,
-        orderBy: { createdAt: 'desc' },
+        orderBy,
         include: { event: { select: { title: true } } }
     });
 
