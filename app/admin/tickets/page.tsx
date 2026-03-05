@@ -24,6 +24,9 @@ import {
   Download,
   Loader2,
   Printer,
+  ChevronUp,
+  ChevronDown,
+  ArrowRight,
 } from "lucide-react";
 import { ConfirmModal } from "@/components/ui/confirm-modal";
 
@@ -628,10 +631,15 @@ export default function AdminTicketsPage() {
 
   const load = useCallback(() => {
     setLoading(true);
-    const params = new URLSearchParams({ page: String(page) });
+    const params = new URLSearchParams({
+      page: String(page),
+      sortField,
+      sortOrder
+    });
     if (search) params.set("search", search);
     if (statusFilter) params.set("status", statusFilter);
     if (eventFilter) params.set("eventId", eventFilter);
+
     fetch(`/api/admin/tickets?${params}`)
       .then((r) => r.json())
       .then((d) => {
@@ -641,23 +649,70 @@ export default function AdminTicketsPage() {
         setLoading(false);
       })
       .catch(() => setLoading(false));
-  }, [page, search, statusFilter, eventFilter]);
+  }, [page, search, statusFilter, eventFilter, sortField, sortOrder]);
 
   const loadPhysical = useCallback(() => {
     setLoadingPhysical(true);
-    fetch("/api/admin/tickets/physical")
+    const params = new URLSearchParams({
+      sortField: physicalSortField,
+      sortOrder: physicalSortOrder
+    });
+    if (search) params.set("search", search);
+    if (batchFilter) params.set("batchId", batchFilter);
+
+    fetch(`/api/admin/tickets/physical?${params}`)
       .then((r) => r.json())
       .then((d) => {
         setPhysicalTickets(Array.isArray(d.tickets) ? d.tickets : []);
         setLoadingPhysical(false);
       })
       .catch(() => setLoadingPhysical(false));
-  }, []);
+  }, [search, batchFilter, physicalSortField, physicalSortOrder]);
 
   useEffect(() => {
     load();
     loadPhysical();
   }, [load, loadPhysical]);
+
+  // Autocomplete logic
+  useEffect(() => {
+    if (search.length < 2) {
+      setSuggestions([]);
+      return;
+    }
+    const s = new Set<string>();
+    tickets.forEach(t => {
+      if (t.ticketNumber?.toLowerCase().includes(search.toLowerCase())) s.add(t.ticketNumber);
+      if (t.user.name?.toLowerCase().includes(search.toLowerCase())) s.add(t.user.name);
+    });
+    physicalTickets.forEach(t => {
+      if (t.ticketNumber?.toLowerCase().includes(search.toLowerCase())) s.add(t.ticketNumber);
+    });
+    setSuggestions(Array.from(s).slice(0, 5));
+  }, [search, tickets, physicalTickets]);
+
+  const handleSort = (field: string) => {
+    if (activeTab === "digital") {
+      if (sortField === field) {
+        setSortOrder(sortOrder === "asc" ? "desc" : "asc");
+      } else {
+        setSortField(field);
+        setSortOrder("asc");
+      }
+    } else {
+      if (physicalSortField === field) {
+        setPhysicalSortOrder(physicalSortOrder === "asc" ? "desc" : "asc");
+      } else {
+        setPhysicalSortField(field);
+        setPhysicalSortOrder("asc");
+      }
+    }
+  };
+
+  const SortIcon = ({ field, activeField, activeOrder }: { field: string, activeField: string, activeOrder: string }) => {
+    if (field !== activeField) return <ChevronDown className="w-3 h-3 opacity-20" />;
+    return activeOrder === "asc" ? <ChevronUp className="w-3 h-3 text-blue-600" /> : <ChevronDown className="w-3 h-3 text-blue-600" />;
+  };
   useEffect(() => {
     setPage(1);
   }, [search, statusFilter, eventFilter]);
@@ -1312,7 +1367,10 @@ export default function AdminTicketsPage() {
                     {suggestions.map((s, i) => (
                       <button
                         key={i}
-                        onClick={() => setSearch(s)}
+                        onClick={() => {
+                          setSearch(s);
+                          setShowSuggestions(false);
+                        }}
                         className="w-full text-left px-4 py-2 text-xs hover:bg-slate-50 text-slate-700 flex items-center justify-between"
                       >
                         <span>{s}</span>
@@ -1322,261 +1380,221 @@ export default function AdminTicketsPage() {
                   </div>
                 )}
               </div>
-              <select
-                value={statusFilter}
-                onChange={(e) => setStatusFilter(e.target.value)}
-                className="bg-card border border-border rounded-xl py-2.5 px-4 text-sm focus:outline-none focus:border-primary/50"
-              >
-                <option value="">All statuses</option>
-                {TICKET_STATUSES.map((s) => (
-                  <option key={s} value={s}>
-                    {STATUS_CONFIG[s].label}
-                  </option>
-                ))}
-              </select>
-              <select
-                value={eventFilter}
-                onChange={(e) => setEventFilter(e.target.value)}
-                className="bg-card border border-border rounded-xl py-2.5 px-4 text-sm focus:outline-none focus:border-primary/50 max-w-[220px]"
-              >
-                <option value="">All events</option>
-                {events.map((ev) => (
-                  <option key={ev.id} value={ev.id}>
-                    {ev.title}
-                  </option>
-                ))}
-              </select>
+
+              <div className="flex flex-wrap gap-3">
+                <select
+                  value={`${sortField}-${sortOrder}`}
+                  onChange={(e) => {
+                    const [f, o] = e.target.value.split("-");
+                    setSortField(f);
+                    setSortOrder(o as "asc" | "desc");
+                  }}
+                  className="bg-card border border-border rounded-xl py-2.5 px-4 text-xs font-bold focus:outline-none focus:border-primary/50"
+                >
+                  <option value="createdAt-desc">Plus récents</option>
+                  <option value="createdAt-asc">Plus anciens</option>
+                  <option value="ticketNumber-asc">N° Ticket (A-Z)</option>
+                  <option value="ticketNumber-desc">N° Ticket (Z-A)</option>
+                  <option value="user-asc">Nom (A-Z)</option>
+                  <option value="user-desc">Nom (Z-A)</option>
+                  <option value="status-asc">Statut</option>
+                </select>
+
+                <select
+                  value={statusFilter}
+                  onChange={(e) => setStatusFilter(e.target.value)}
+                  className="bg-card border border-border rounded-xl py-2.5 px-4 text-xs font-bold focus:outline-none focus:border-primary/50"
+                >
+                  <option value="">Tous les statuts</option>
+                  {TICKET_STATUSES.map((s) => (
+                    <option key={s} value={s}>
+                      {STATUS_CONFIG[s].label}
+                    </option>
+                  ))}
+                </select>
+
+                <select
+                  value={eventFilter}
+                  onChange={(e) => setEventFilter(e.target.value)}
+                  className="bg-card border border-border rounded-xl py-2.5 px-4 text-xs font-bold focus:outline-none focus:border-primary/50 max-w-[200px]"
+                >
+                  <option value="">Tous les événements</option>
+                  {events.map((ev) => (
+                    <option key={ev.id} value={ev.id}>
+                      {ev.title}
+                    </option>
+                  ))}
+                </select>
+              </div>
             </div>
 
             {/* Table */}
-            <div className="bg-card border border-border rounded-2xl overflow-hidden">
+            <div className="bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-sm">
               {loading ? (
                 <div className="flex items-center justify-center h-40">
-                  <div className="w-6 h-6 border-4 border-primary/30 border-t-primary rounded-full animate-spin" />
+                  <div className="w-6 h-6 border-4 border-blue-600/30 border-t-blue-600 rounded-full animate-spin" />
                 </div>
               ) : tickets.length === 0 ? (
                 <div className="text-center py-16">
-                  <Ticket className="w-10 h-10 text-foreground/10 mx-auto mb-3" />
-                  <p className="text-foreground/30 text-sm">No tickets found</p>
+                  <Ticket className="w-10 h-10 text-slate-200 mx-auto mb-3" />
+                  <p className="text-slate-400 text-sm">Aucun billet trouvé</p>
                   <button
                     onClick={openCreate}
-                    className="mt-4 text-xs text-primary font-bold"
+                    className="mt-4 text-xs text-blue-600 font-bold hover:underline"
                   >
-                    Create the first ticket →
+                    Créer le premier billet →
                   </button>
                 </div>
               ) : (
-                <div className="p-4 space-y-4">
-                  {tickets.map((ticket) => {
-                    const cfg = STATUS_CONFIG[ticket.status] ?? STATUS_CONFIG.pending;
-                    const StatusIcon = cfg.icon;
+                <div className="overflow-x-auto">
+                  <table className="w-full text-left border-collapse">
+                    <thead>
+                      <tr className="border-b border-slate-100 bg-slate-50/50">
+                        <th className="px-6 py-4 text-[11px] font-bold text-slate-400 uppercase tracking-wider">
+                          <button onClick={() => handleSort("ticketNumber")} className="flex items-center gap-1 hover:text-slate-900 transition-colors">
+                            N° Ticket <SortIcon field="ticketNumber" activeField={sortField} activeOrder={sortOrder} />
+                          </button>
+                        </th>
+                        <th className="px-6 py-4 text-[11px] font-bold text-slate-400 uppercase tracking-wider">
+                          <button onClick={() => handleSort("user")} className="flex items-center gap-1 hover:text-slate-900 transition-colors">
+                            Participant <SortIcon field="user" activeField={sortField} activeOrder={sortOrder} />
+                          </button>
+                        </th>
+                        <th className="px-6 py-4 text-[11px] font-bold text-slate-400 uppercase tracking-wider">
+                          <button onClick={() => handleSort("event")} className="flex items-center gap-1 hover:text-slate-900 transition-colors">
+                            Événement <SortIcon field="event" activeField={sortField} activeOrder={sortOrder} />
+                          </button>
+                        </th>
+                        <th className="px-6 py-4 text-[11px] font-bold text-slate-400 uppercase tracking-wider">
+                          <button onClick={() => handleSort("ticketType")} className="flex items-center gap-1 hover:text-slate-900 transition-colors">
+                            Type <SortIcon field="ticketType" activeField={sortField} activeOrder={sortOrder} />
+                          </button>
+                        </th>
+                        <th className="px-6 py-4 text-[11px] font-bold text-slate-400 uppercase tracking-wider">
+                          <button onClick={() => handleSort("status")} className="flex items-center gap-1 hover:text-slate-900 transition-colors">
+                            Statut <SortIcon field="status" activeField={sortField} activeOrder={sortOrder} />
+                          </button>
+                        </th>
+                        <th className="px-6 py-4 text-[11px] font-bold text-slate-400 uppercase tracking-wider">
+                          <button onClick={() => handleSort("usedAt")} className="flex items-center gap-1 hover:text-slate-900 transition-colors">
+                            Utilisation <SortIcon field="usedAt" activeField={sortField} activeOrder={sortOrder} />
+                          </button>
+                        </th>
+                        <th className="px-6 py-4 text-[11px] font-bold text-slate-400 uppercase tracking-wider text-right">Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-slate-50">
+                      {tickets.map((ticket) => {
+                        const cfg = STATUS_CONFIG[ticket.status] ?? STATUS_CONFIG.pending;
+                        const StatusIcon = cfg.icon;
+                        const isUsed = !!ticket.usedAt;
 
-                    return (
-                      <div
-                        key={ticket.id}
-                        className="bg-white hover:bg-slate-50 transition-all border border-slate-200 rounded-2xl overflow-hidden"
-                      >
-                        <div className="p-5 flex flex-col sm:flex-row gap-4">
-                          {/* Left info - Same card architecture as youth space */}
-                          <div className="flex-1 space-y-2">
-                            <div className="flex items-center gap-2 flex-wrap">
-                              <span
-                                className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full border text-[11px] font-semibold ${cfg.color}`}
-                              >
+                        return (
+                          <tr key={ticket.id} className="hover:bg-slate-50/80 transition-colors text-sm">
+                            <td className="px-6 py-4 font-mono text-[11px] font-bold text-slate-600">
+                              {ticket.ticketNumber || "—"}
+                            </td>
+                            <td className="px-6 py-4">
+                              <div className="flex flex-col">
+                                <span className="font-bold text-slate-900">{ticket.user.name || "Utilisateur"}</span>
+                                <span className="text-[10px] text-slate-400">{ticket.user.email}</span>
+                              </div>
+                            </td>
+                            <td className="px-6 py-4">
+                              <span className="font-medium text-slate-700">{ticket.event?.title || "Special Access"}</span>
+                            </td>
+                            <td className="px-6 py-4">
+                              <span className="px-2 py-0.5 bg-slate-100 text-slate-600 rounded text-[10px] font-bold uppercase border border-slate-200">
+                                {TYPE_LABELS[ticket.ticketType] ?? ticket.ticketType}
+                              </span>
+                            </td>
+                            <td className="px-6 py-4">
+                              <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full border text-[10px] font-bold ${cfg.color}`}>
                                 <StatusIcon className="w-3 h-3" />
                                 {cfg.label}
                               </span>
-                              {ticket.status === "completed" && (
-                                <span className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full border text-[11px] font-semibold ${ticket.usedAt
-                                  ? "bg-slate-100 text-slate-500 border-slate-200"
-                                  : "bg-emerald-50 text-emerald-600 border-emerald-100"
-                                  }`}>
-                                  {ticket.usedAt ? "Consommé" : "Valide / Prêt"}
-                                </span>
-                              )}
-                              <span className="px-2 py-0.5 bg-slate-100 text-slate-600 rounded text-[11px] font-semibold border border-slate-200 uppercase">
-                                {TYPE_LABELS[ticket.ticketType] ?? ticket.ticketType}
-                              </span>
-                              <span className="px-2 py-0.5 bg-slate-100 text-slate-500 rounded text-[11px] font-mono border border-slate-200">
-                                {ticket.ticketNumber || `#${ticket.id.slice(0, 8).toUpperCase()}`}
-                              </span>
-                            </div>
-
-                            <div className="flex items-baseline justify-between mb-2">
-                              <h3 className="font-bold text-sm text-slate-900">
-                                {ticket.event?.title ?? "Evenement supprime"}
-                              </h3>
-                            </div>
-
-                            <div className="space-y-1">
-                              <div className="flex items-center gap-2 text-xs text-slate-600 font-medium pb-1">
-                                <span className="flex items-center justify-center w-5 h-5 bg-primary/10 text-primary rounded-full shrink-0">
-                                  {ticket.user.name ? ticket.user.name.charAt(0).toUpperCase() : ticket.user.email.charAt(0).toUpperCase()}
-                                </span>
-                                {ticket.user.name || ticket.user.email}
-                                {ticket.user.name && <span className="text-slate-400 font-normal">({ticket.user.email})</span>}
-                              </div>
-
-                              {ticket.event && (
-                                <>
-                                  <div className="flex items-center gap-2 text-xs text-slate-400">
-                                    <Calendar className="w-3.5 h-3.5 text-slate-400 shrink-0" />
-                                    {new Date(ticket.event.date).toLocaleDateString(
-                                      "fr-FR",
-                                      {
-                                        weekday: "long",
-                                        year: "numeric",
-                                        month: "long",
-                                        day: "numeric",
-                                      },
-                                    )}
-                                  </div>
-                                </>
-                              )}
-                              <div className="flex items-center gap-4 text-xs text-slate-400 flex-wrap pt-1">
-                                <span className="flex items-center gap-1">
-                                  <Tag className="w-3.5 h-3.5 text-slate-400" />
-                                  {ticket.quantity} billet{ticket.quantity > 1 ? "s" : ""}
-                                </span>
-                                <span className="font-semibold text-slate-700">
-                                  {ticket.price != null
-                                    ? `Ar ${ticket.total.toLocaleString("fr-FR", { minimumFractionDigits: 2 })}`
-                                    : "Free"}
-                                </span>
-                                <span className="flex items-center gap-1">
-                                  <Clock className="w-3 h-3" />
-                                  {new Date(ticket.createdAt).toLocaleDateString("fr-FR")}
-                                </span>
-                                {ticket.usedAt && (
-                                  <span className="flex items-center gap-1.5 px-2 py-0.5 bg-slate-100 text-slate-800 rounded-md font-bold border border-slate-200 animate-in fade-in slide-in-from-left-2 duration-300">
-                                    <CheckCircle className="w-3 h-3 text-emerald-500" />
-                                    Utilisé le {new Date(ticket.usedAt).toLocaleString('fr-FR', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' })}
+                            </td>
+                            <td className="px-6 py-4">
+                              {isUsed ? (
+                                <div className="flex flex-col">
+                                  <span className="text-rose-600 font-bold text-[10px] uppercase">Consommé</span>
+                                  <span className="text-[9px] text-slate-400">
+                                    {new Date(ticket.usedAt!).toLocaleString('fr-FR', {
+                                      day: '2-digit', month: '2-digit', year: '2-digit', hour: '2-digit', minute: '2-digit'
+                                    })}
                                   </span>
-                                )}
-                              </div>
-                              {ticket.reference && (
-                                <div className="flex items-center gap-2 text-xs text-[#b0cfc5] pt-1">
-                                  <Hash className="w-3.5 h-3.5 shrink-0" />
-                                  Réf : {ticket.reference}
                                 </div>
+                              ) : (
+                                <span className="text-emerald-600 font-bold text-[10px] uppercase">Valide / Prêt</span>
                               )}
-                            </div>
-                          </div>
-
-                          {/* Right actions - Admin specific actions */}
-                          <div className="flex flex-row sm:flex-col items-end gap-2 shrink-0 border-t sm:border-t-0 sm:border-l border-border pt-4 sm:pt-0 sm:pl-4 mt-4 sm:mt-0">
-                            <div className="flex sm:flex-col items-center sm:items-stretch gap-2 w-full">
-                              {ticket.status === "pending" && (
-                                <button
-                                  onClick={async () => {
-                                    const res = await fetch("/api/admin/tickets", {
-                                      method: "PATCH",
-                                      headers: { "Content-Type": "application/json" },
-                                      body: JSON.stringify({
-                                        id: ticket.id,
-                                        status: "completed",
-                                      }),
-                                    });
-                                    if (res.ok) {
-                                      showToast("Ticket validé !");
-                                      load();
-                                    } else {
-                                      let errorMsg = "Erreur lors de la validation";
-                                      try {
-                                        const d = await res.json();
-                                        errorMsg = d.error || errorMsg;
-                                      } catch (e) {
-                                        errorMsg = `Erreur serveur (${res.status})`;
-                                      }
-                                      showToast(errorMsg);
-                                    }
-                                  }}
-                                  title="Valider"
-                                  className="flex items-center justify-center gap-1 text-[10px] px-3 py-1.5 rounded-lg bg-slate-50 text-slate-900 font-bold hover:bg-slate-100 transition-colors w-full border border-slate-100"
-                                >
-                                  <CheckCircle className="w-3.5 h-3.5" />
-                                  <span className="hidden sm:inline">Valider</span>
-                                </button>
-                              )}
-                              <button
-                                onClick={() => openPreview(ticket)}
-                                disabled={generating}
-                                title="View Ticket Preview"
-                                className="flex items-center justify-center gap-1 text-xs px-3 py-1.5 rounded-lg bg-slate-100 text-slate-600 font-medium hover:bg-slate-200 transition-colors w-full disabled:opacity-50"
-                              >
-                                {generating && selectedTicket?.id === ticket.id ? (
-                                  <Loader2 className="w-3.5 h-3.5 animate-spin" />
-                                ) : (
-                                  <Eye className="w-3.5 h-3.5" />
+                            </td>
+                            <td className="px-6 py-4 text-right">
+                              <div className="flex items-center justify-end gap-2">
+                                {ticket.status === "completed" && !isUsed && (
+                                  <button
+                                    onClick={() => handleManualCheckIn(ticket.qrCode, false)}
+                                    className="p-2 bg-emerald-50 text-emerald-600 rounded-lg hover:bg-emerald-100 transition-colors"
+                                    title="Check-in"
+                                  >
+                                    <CheckCircle className="w-4 h-4" />
+                                  </button>
                                 )}
-                                <span className="hidden sm:inline">Aperçu</span>
-                              </button>
-                              {ticket.status === "completed" && !ticket.usedAt && (
                                 <button
-                                  onClick={() => handleManualCheckIn(ticket.qrCode, false)}
-                                  disabled={saving}
-                                  title="Check-in Manuel"
-                                  className="flex items-center justify-center gap-1 text-xs px-3 py-1.5 rounded-lg bg-emerald-600 text-white font-bold hover:bg-emerald-700 transition-colors w-full disabled:opacity-50"
+                                  onClick={() => openPreview(ticket)}
+                                  className="p-2 bg-slate-50 text-slate-600 rounded-lg hover:bg-slate-100 transition-colors"
+                                  title="Aperçu"
                                 >
-                                  <CheckCircle className="w-3.5 h-3.5" />
-                                  <span className="hidden sm:inline">Check-in</span>
+                                  <Eye className="w-4 h-4" />
                                 </button>
-                              )}
-                              <button
-                                onClick={() => openEdit(ticket)}
-                                title="Edit"
-                                className="flex items-center justify-center gap-1 text-xs px-3 py-1.5 rounded-lg bg-blue-50 text-blue-600 font-medium hover:bg-blue-100 transition-colors w-full"
-                              >
-                                <Pencil className="w-3.5 h-3.5" />
-                                <span className="hidden sm:inline">Modifier</span>
-                              </button>
-                              <button
-                                onClick={() => setConfirmDelete(ticket.id)}
-                                disabled={deleting === ticket.id}
-                                title="Delete"
-                                className="flex items-center justify-center gap-1 text-xs px-3 py-1.5 rounded-lg bg-red-50 text-red-600 font-medium hover:bg-red-100 transition-colors disabled:opacity-50 w-full"
-                              >
-                                {deleting === ticket.id ? (
-                                  <div className="w-3.5 h-3.5 border-2 border-red-600/30 border-t-red-600 rounded-full animate-spin" />
-                                ) : (
-                                  <Trash2 className="w-3.5 h-3.5" />
-                                )}
-                                <span className="hidden sm:inline">Supprimer</span>
-                              </button>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
-              )}
-
-              {/* Pagination */}
-              {activeTab === "digital" && totalPages > 1 && (
-                <div className="flex items-center justify-between px-6 py-4 border-t border-border">
-                  <span className="text-xs text-foreground/40">
-                    Page {page} of {totalPages} ({total} tickets)
-                  </span>
-                  <div className="flex gap-2">
-                    <button
-                      onClick={() => setPage((p) => Math.max(1, p - 1))}
-                      disabled={page === 1}
-                      className="p-1.5 rounded-lg border border-border disabled:opacity-30 hover:bg-foreground/5 transition-colors"
-                    >
-                      <ChevronLeft className="w-4 h-4" />
-                    </button>
-                    <button
-                      onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
-                      disabled={page === totalPages}
-                      className="p-1.5 rounded-lg border border-border disabled:opacity-30 hover:bg-foreground/5 transition-colors"
-                    >
-                      <ChevronRight className="w-4 h-4" />
-                    </button>
-                  </div>
+                                <button
+                                  onClick={() => openEdit(ticket)}
+                                  className="p-2 bg-blue-50 text-blue-600 rounded-lg hover:bg-blue-100 transition-colors"
+                                  title="Modifier"
+                                >
+                                  <Pencil className="w-4 h-4" />
+                                </button>
+                                <button
+                                  onClick={() => setConfirmDelete(ticket.id)}
+                                  className="p-2 bg-red-50 text-red-600 rounded-lg hover:bg-red-100 transition-colors"
+                                  title="Supprimer"
+                                >
+                                  <Trash2 className="w-4 h-4" />
+                                </button>
+                              </div>
+                            </td>
+                          </tr>
+                        );
+                      })}
+                    </tbody>
+                  </table>
                 </div>
               )}
             </div>
+
+            {/* Pagination */}
+            {totalPages > 1 && (
+              <div className="flex items-center justify-between px-6 py-4 border-t border-border mt-4 bg-white rounded-2xl border border-slate-200 shadow-sm">
+                <span className="text-xs text-slate-400">
+                  Page {page} of {totalPages} ({total} tickets)
+                </span>
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => setPage((p) => Math.max(1, p - 1))}
+                    disabled={page === 1}
+                    className="p-1.5 rounded-lg border border-slate-200 disabled:opacity-30 hover:bg-slate-50 transition-colors"
+                  >
+                    <ChevronLeft className="w-4 h-4" />
+                  </button>
+                  <button
+                    onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+                    disabled={page === totalPages}
+                    className="p-1.5 rounded-lg border border-slate-200 disabled:opacity-30 hover:bg-slate-50 transition-colors"
+                  >
+                    <ChevronRight className="w-4 h-4" />
+                  </button>
+                </div>
+              </div>
+            )}
           </>
         ) : (
           <div className="space-y-6">
@@ -1827,13 +1845,43 @@ export default function AdminTicketsPage() {
               </div>
             </div>
 
-            <div className="flex items-center gap-4 bg-white p-4 border border-slate-200 rounded-2xl shadow-sm">
-              <div className="flex-1 flex items-center gap-2 px-3 bg-slate-50 border border-slate-100 rounded-xl">
+            <div className="flex flex-col sm:flex-row gap-4 mb-6">
+              <div className="relative flex-1">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-foreground/30" />
+                <input
+                  type="text"
+                  value={search}
+                  onFocus={() => setShowSuggestions(true)}
+                  onBlur={() => setTimeout(() => setShowSuggestions(false), 200)}
+                  onChange={(e) => setSearch(e.target.value)}
+                  placeholder="Rechercher par n° de ticket, lot ou événement…"
+                  className="w-full bg-white border border-slate-200 rounded-xl py-2.5 pl-10 pr-4 text-sm focus:outline-none focus:border-blue-500/50 transition-colors shadow-sm"
+                />
+                {showSuggestions && suggestions.length > 0 && (
+                  <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-slate-200 rounded-xl shadow-xl z-50 overflow-hidden divide-y divide-slate-50">
+                    {suggestions.map((s, i) => (
+                      <button
+                        key={i}
+                        onClick={() => {
+                          setSearch(s);
+                          setShowSuggestions(false);
+                        }}
+                        className="w-full text-left px-4 py-2 text-xs hover:bg-slate-50 text-slate-700 flex items-center justify-between"
+                      >
+                        <span>{s}</span>
+                        <ArrowRight className="w-3 h-3 text-slate-300" />
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              <div className="flex items-center gap-2 px-3 bg-white border border-slate-200 rounded-xl shadow-sm min-w-[200px]">
                 <QrCode className="w-4 h-4 text-slate-400" />
                 <select
                   value={batchFilter}
                   onChange={(e) => setBatchFilter(e.target.value)}
-                  className="w-full bg-transparent py-2.5 text-sm focus:outline-none"
+                  className="w-full bg-transparent py-2.5 text-xs font-bold focus:outline-none"
                 >
                   <option value="">Tous les lots (batches)</option>
                   {Array.from(new Set(physicalTickets.map(t => t.batchId))).map(b => (
@@ -1841,10 +1889,11 @@ export default function AdminTicketsPage() {
                   ))}
                 </select>
               </div>
+
               {batchFilter && (
                 <button
                   onClick={() => setConfirmDeleteBatch(batchFilter)}
-                  className="px-4 py-2.5 bg-red-50 text-red-600 border border-red-100 rounded-xl text-sm font-bold hover:bg-red-100 transition-colors flex items-center gap-2"
+                  className="px-4 py-2.5 bg-red-50 text-red-600 border border-red-100 rounded-xl text-xs font-bold hover:bg-red-100 transition-colors flex items-center gap-2 shadow-sm"
                 >
                   <Trash2 className="w-4 h-4" />
                   Supprimer ce lot
