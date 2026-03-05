@@ -157,8 +157,13 @@ export default function AdminScanPage() {
 
             if (res.ok) {
                 toast.success(result.message);
+                // Stop camera automatically after successful scan
+                stopScanning();
             } else {
                 toast.error(result.message);
+                // Also stop on error to avoid confusion, or keep it open? 
+                // User said "Si il termine un scan", so let's stop it.
+                stopScanning();
             }
         } catch (err) {
             toast.error("Erreur réseau");
