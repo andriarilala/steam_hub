@@ -43,10 +43,8 @@ COPY --from=builder /app/.next/static ./.next/static
 # Prisma schema
 COPY --from=builder /app/prisma ./prisma
 
-# Prisma client binaries (pnpm path)
-RUN mkdir -p ./node_modules/@prisma ./node_modules/.prisma
-COPY --from=builder /app/node_modules/.pnpm/@prisma+client@5.22.0_prisma@5.22.0/node_modules/.prisma/ ./node_modules/.prisma/
-COPY --from=builder /app/node_modules/.pnpm/@prisma+client@5.22.0_prisma@5.22.0/node_modules/@prisma/ ./node_modules/@prisma/
+# Copier node_modules complet pour éviter les conflits de chemins pnpm
+COPY --from=builder /app/node_modules ./node_modules
 
 USER nextjs
 
