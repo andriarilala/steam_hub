@@ -1,8 +1,7 @@
 "use client"
 
 import { useState, useEffect, useRef } from "react"
-import { MessageCircle, X, Send, Bot, User, Phone, HelpCircle, Calendar, Ticket, Building } from "lucide-react"
-import { useLanguage } from "@/lib/language-context"
+import { MessageCircle, X, Send, Bot, User } from "lucide-react"
 
 interface Message {
   id: string
@@ -20,12 +19,11 @@ interface QuickOption {
 const initialMessage: Message = {
   id: "1",
   type: "bot",
-  text: "Hello! I'm STEAM HUB's virtual assistant. How can I help you today?",
+  text: "Bonjour, je suis l’assistant PASS AVENIR. Comment puis-je vous aider ?",
   options: [
-    { id: "1", label: "Event Information", action: "event_info" },
-    { id: "2", label: "Registration Help", action: "registration" },
-    { id: "3", label: "Sponsorship", action: "sponsorship" },
-    { id: "4", label: "Contact Team", action: "contact" },
+    { id: "1", label: "Infos sur l’événement", action: "event_info" },
+    { id: "2", label: "Comment participer", action: "registration" },
+    { id: "3", label: "Contact / aide", action: "contact" },
   ],
 }
 
@@ -33,120 +31,96 @@ const botResponses: Record<string, Message> = {
   event_info: {
     id: "",
     type: "bot",
-    text: "STEAM HUB is the premier talent and opportunity summit connecting young talents with leading institutions and companies. What would you like to know more about?",
+    text:
+      "PASS AVENIR est une journée pour découvrir des métiers, rencontrer des professionnels et préparer ton avenir. Tu veux des précisions sur le programme, le lieu ou l’horaire ?",
     options: [
-      { id: "1", label: "Agenda & Sessions", action: "agenda" },
-      { id: "2", label: "Venue & Location", action: "venue" },
-      { id: "3", label: "Who Should Attend", action: "audience" },
-      { id: "4", label: "Back to Menu", action: "menu" },
+      { id: "1", label: "Programme de la journée", action: "agenda" },
+      { id: "2", label: "Lieu et accès", action: "venue" },
+      { id: "3", label: "Qui peut venir ?", action: "audience" },
+      { id: "4", label: "Revenir au menu", action: "menu" },
     ],
   },
   registration: {
     id: "",
     type: "bot",
-    text: "Great! Registration is available for STEAM HUB. We offer several options including Student, Professional, and Virtual passes. Would you like to register now or learn more?",
+    text:
+      "Pour participer, il suffit de payer ton billet par Mvola puis de remplir le formulaire ‘Participer’ sur le site avec ton nom, ton email et la référence de paiement.",
     options: [
-      { id: "1", label: "Register Now", action: "register_now" },
-      { id: "2", label: "Ticket Details", action: "ticket_details" },
-      { id: "3", label: "Group Discounts", action: "group_discounts" },
-      { id: "4", label: "Back to Menu", action: "menu" },
-    ],
-  },
-  sponsorship: {
-    id: "",
-    type: "bot",
-    text: "Interested in sponsoring STEAM HUB? We offer custom partnership packages. Benefits include booth presence, speaking opportunities, brand visibility, and access to top talent.",
-    options: [
-      { id: "1", label: "View Packages", action: "sponsor_packages" },
-      { id: "2", label: "Download Prospectus", action: "download_prospectus" },
-      { id: "3", label: "Contact Sales Team", action: "contact_sales" },
-      { id: "4", label: "Back to Menu", action: "menu" },
+      { id: "1", label: "Ouvrir la page Participer", action: "register_now" },
+      { id: "2", label: "Revenir au menu", action: "menu" },
     ],
   },
   contact: {
     id: "",
     type: "bot",
-    text: "You can reach our team through:\n\n- Email: hello@passavenir.com\n- Phone: +261 32 81 754 38\n- WhatsApp: +261 32 81 754 38\n\nOr would you prefer to speak directly with someone?",
+    text:
+      "Pour toute question sur l’événement, tu peux nous contacter :\n\n- Email : steamhubinitiative@gmail.com\n- Infoline : +261 38 57 53 87 / +261 34 97 59 468\n- Facebook : ww.facebook.com/SteamHub\n\nSouhaites-tu revenir au menu ?",
     options: [
-      { id: "1", label: "Open WhatsApp", action: "whatsapp" },
-      { id: "2", label: "Send Email", action: "email" },
-      { id: "4", label: "Back to Menu", action: "menu" },
+      { id: "1", label: "Revenir au menu", action: "menu" },
     ],
   },
   agenda: {
     id: "",
     type: "bot",
-    text: "The event features inspiring content including Keynotes, Panels, Workshops, and Talent Showcases. Over 50 sessions covering technology, innovation, careers, and more!",
+    text:
+      "La journée PASS AVENIR est rythmée par des stands, des ateliers, des rencontres avec des professionnels et des temps d’échanges pour t’aider à clarifier ton projet.",
     options: [
-      { id: "1", label: "View Full Agenda", action: "full_agenda" },
-      { id: "2", label: "Speaker Lineup", action: "speakers" },
-      { id: "3", label: "Back to Menu", action: "menu" },
+      { id: "1", label: "Infos pratiques", action: "venue" },
+      { id: "2", label: "Revenir au menu", action: "menu" },
     ],
   },
   venue: {
     id: "",
     type: "bot",
-    text: "STEAM HUB will be held at a premier venue offering world-class facilities including exhibition halls, networking lounges, and workshop rooms.",
+    text:
+      "L’événement se tient à Antananarivo (lieu précis communiqué sur l’affiche et le site). Tu y trouveras des stands, des espaces de rencontre et des ateliers tout au long de la journée.",
     options: [
-      { id: "1", label: "Hotels Nearby", action: "hotels" },
-      { id: "2", label: "Getting There", action: "transport" },
-      { id: "3", label: "Back to Menu", action: "menu" },
+      { id: "1", label: "Programme", action: "agenda" },
+      { id: "2", label: "Revenir au menu", action: "menu" },
     ],
   },
   audience: {
     id: "",
     type: "bot",
-    text: "STEAM HUB welcomes:\n\n- Students & Young Professionals looking for opportunities\n- Companies & Recruiters seeking talent\n- Institutions & Government promoting programs\n- Mentors & Experts sharing knowledge\n- Sponsors & Partners building visibility\n\nWhich describes you best?",
+    text:
+      "PASS AVENIR s’adresse surtout aux collégiens, lycéens et jeunes qui veulent mieux comprendre les métiers et parler avec des professionnels.",
     options: [
-      { id: "1", label: "I'm a Student/Professional", action: "for_students" },
-      { id: "2", label: "I'm from a Company", action: "for_companies" },
-      { id: "3", label: "I want to Sponsor", action: "sponsorship" },
-      { id: "4", label: "Back to Menu", action: "menu" },
+      { id: "1", label: "Comment participer", action: "registration" },
+      { id: "2", label: "Revenir au menu", action: "menu" },
     ],
   },
   menu: {
     id: "",
     type: "bot",
-    text: "What else can I help you with?",
+    text: "Que veux-tu savoir sur PASS AVENIR ?",
     options: [
-      { id: "1", label: "Event Information", action: "event_info" },
-      { id: "2", label: "Registration Help", action: "registration" },
-      { id: "3", label: "Sponsorship", action: "sponsorship" },
-      { id: "4", label: "Contact Team", action: "contact" },
+      { id: "1", label: "Infos sur l’événement", action: "event_info" },
+      { id: "2", label: "Comment participer", action: "registration" },
+      { id: "3", label: "Contact / aide", action: "contact" },
     ],
   },
   register_now: {
     id: "",
     type: "bot",
-    text: "Let me redirect you to our registration page where you can select your ticket and complete your registration securely.",
+    text: "Je t’ouvre la page de participation pour acheter ton billet.",
     options: [
-      { id: "1", label: "Go to Registration", action: "redirect_register" },
-      { id: "2", label: "Back to Menu", action: "menu" },
-    ],
-  },
-  whatsapp: {
-    id: "",
-    type: "bot",
-    text: "Opening WhatsApp to connect you with our team...",
-    options: [
-      { id: "1", label: "Back to Menu", action: "menu" },
+      { id: "1", label: "Aller sur Participer", action: "redirect_register" },
+      { id: "2", label: "Revenir au menu", action: "menu" },
     ],
   },
   default: {
     id: "",
     type: "bot",
-    text: "I'm not sure I understood that. Let me help you with some options:",
+    text: "Je ne suis pas sûr d’avoir bien compris. Voici quelques options pour t’aider :",
     options: [
-      { id: "1", label: "Event Information", action: "event_info" },
-      { id: "2", label: "Registration Help", action: "registration" },
-      { id: "3", label: "Sponsorship", action: "sponsorship" },
-      { id: "4", label: "Contact Team", action: "contact" },
+      { id: "1", label: "Infos sur l’événement", action: "event_info" },
+      { id: "2", label: "Comment participer", action: "registration" },
+      { id: "3", label: "Contact / aide", action: "contact" },
     ],
   },
 }
 
 export function ChatbotWidget() {
-  const { language } = useLanguage()
   const [isOpen, setIsOpen] = useState(false)
   const [messages, setMessages] = useState<Message[]>([initialMessage])
   const [inputValue, setInputValue] = useState("")
@@ -171,18 +145,7 @@ export function ChatbotWidget() {
 
     // Handle special actions
     if (action === "redirect_register") {
-      window.location.href = "/register"
-      return
-    }
-    if (action === "whatsapp") {
-      window.open("https://wa.me/261328175438?text=Hello!%20I%20have%20a%20question%20about%20STEAM%20HUB", "_blank")
-    }
-    if (action === "full_agenda") {
-      window.location.href = "/agenda"
-      return
-    }
-    if (action === "sponsor_packages") {
-      window.location.href = "/partners"
+      window.location.href = "/participer"
       return
     }
 
@@ -219,15 +182,13 @@ export function ChatbotWidget() {
       let response = botResponses.default
       const lowerInput = inputValue.toLowerCase()
 
-      if (lowerInput.includes("register") || lowerInput.includes("ticket") || lowerInput.includes("sign up")) {
+      if (lowerInput.includes("participer") || lowerInput.includes("billet") || lowerInput.includes("inscription")) {
         response = botResponses.registration
-      } else if (lowerInput.includes("sponsor") || lowerInput.includes("partner")) {
-        response = botResponses.sponsorship
-      } else if (lowerInput.includes("contact") || lowerInput.includes("email") || lowerInput.includes("phone")) {
+      } else if (lowerInput.includes("contact") || lowerInput.includes("email") || lowerInput.includes("téléphone")) {
         response = botResponses.contact
-      } else if (lowerInput.includes("event") || lowerInput.includes("when") || lowerInput.includes("where")) {
+      } else if (lowerInput.includes("événement") || lowerInput.includes("event") || lowerInput.includes("où") || lowerInput.includes("quand")) {
         response = botResponses.event_info
-      } else if (lowerInput.includes("agenda") || lowerInput.includes("schedule") || lowerInput.includes("session")) {
+      } else if (lowerInput.includes("programme") || lowerInput.includes("agenda") || lowerInput.includes("journée")) {
         response = botResponses.agenda
       }
 
@@ -240,23 +201,10 @@ export function ChatbotWidget() {
     }, 1000)
   }
 
-  const openWhatsApp = () => {
-    window.open("https://wa.me/261328175438?text=Hello!%20I%20have%20a%20question%20about%20STEAM%20HUB", "_blank")
-  }
-
   return (
     <>
       {/* Floating Button */}
       <div className="fixed bottom-6 right-6 z-50 flex flex-col items-end gap-3">
-        {/* WhatsApp Button */}
-        <button
-          onClick={openWhatsApp}
-          className="w-12 h-12 bg-green-500 rounded-full flex items-center justify-center shadow-lg hover:bg-green-600 transition-colors"
-          aria-label="Contact via WhatsApp"
-        >
-          <Phone className="w-6 h-6 text-white" />
-        </button>
-
         {/* Chatbot Button */}
         <button
           onClick={() => setIsOpen(!isOpen)}
@@ -277,8 +225,8 @@ export function ChatbotWidget() {
               <Bot className="w-6 h-6 text-primary-foreground" />
             </div>
             <div className="flex-1">
-              <h3 className="font-bold text-primary-foreground">STEAM HUB Assistant</h3>
-              <p className="text-xs text-primary-foreground/70">Online | Typically replies instantly</p>
+              <h3 className="font-bold text-primary-foreground">Assistant PASS AVENIR</h3>
+              <p className="text-xs text-primary-foreground/70">En ligne · Réponses rapides</p>
             </div>
             <button onClick={() => setIsOpen(false)} className="p-1 hover:bg-primary-foreground/10 rounded">
               <X className="w-5 h-5 text-primary-foreground" />
@@ -355,7 +303,7 @@ export function ChatbotWidget() {
                 value={inputValue}
                 onChange={(e) => setInputValue(e.target.value)}
                 onKeyPress={(e) => e.key === "Enter" && handleSendMessage()}
-                placeholder="Type your message..."
+                placeholder="Écris ton message..."
                 className="flex-1 px-4 py-2.5 bg-muted border border-border rounded-full text-sm focus:outline-none focus:ring-2 focus:ring-primary/50"
               />
               <button
