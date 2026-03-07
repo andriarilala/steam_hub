@@ -892,6 +892,33 @@ export default function AdminTicketsPage() {
     }
   };
 
+  const handleValidateTicket = async (ticket: TicketOrder) => {
+    if (ticket.status === "completed") return;
+
+    if (!confirm("Valider cet achat et envoyer le billet par email ?")) return;
+
+    setSaving(true);
+    try {
+      const res = await fetch("/api/admin/tickets", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id: ticket.id, status: "completed" }),
+      });
+
+      const d = await res.json().catch(() => ({}));
+      if (res.ok) {
+        showToast("Billet validé. Email en cours d'envoi.");
+        load();
+      } else {
+        showToast((d as any).error || "Erreur lors de la validation du billet");
+      }
+    } catch {
+      showToast("Erreur de connexion");
+    } finally {
+      setSaving(false);
+    }
+  };
+
   const handleManualCheckIn = async (code: string, isPhysical: boolean) => {
     if (!confirm(`Voulez-vous valider manuellement ce billet ${isPhysical ? 'physique' : 'numérique'} ?`)) return;
 
@@ -1530,6 +1557,15 @@ export default function AdminTicketsPage() {
                             </td>
                             <td className="px-6 py-4 text-right">
                               <div className="flex items-center justify-end gap-2">
+                                {ticket.status === "pending" && (
+                                  <button
+                                    onClick={() => handleValidateTicket(ticket)}
+                                    className="px-2 py-1 bg-emerald-50 text-emerald-700 rounded-lg text-[11px] font-bold uppercase border border-emerald-200 hover:bg-emerald-100 transition-colors"
+                                    title="Valider l'achat et envoyer le billet"
+                                  >
+                                    Valider
+                                  </button>
+                                )}
                                 {ticket.status === "completed" && !isUsed && (
                                   <button
                                     onClick={() => handleManualCheckIn(ticket.qrCode, false)}

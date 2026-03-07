@@ -54,24 +54,25 @@ async function seedDemoData() {
     await prisma.event.createMany({
       data: [
         {
-          title: "Opening Keynote: Africa's Digital Future",
+          title: "PASS AVENIR – Journée découverte des métiers",
           description:
-            "An inspiring look at the future of technology across the continent.",
-          date: new Date("2025-03-15T09:00:00Z"),
-          type: "Keynote",
+            "Une journée pour découvrir des métiers, rencontrer des professionnels et préparer ton avenir.",
+          date: new Date("2026-03-28T06:00:00Z"),
+          type: "Journée",
         },
         {
-          title: "Workshop: Building Your Personal Brand",
+          title: "Ateliers métiers & échanges avec des professionnels",
           description:
-            "Hands-on workshop on how to create and market your personal brand.",
-          date: new Date("2025-03-15T14:00:00Z"),
-          type: "Workshop",
+            "Des ateliers interactifs et des stands pour poser tes questions aux professionnels et découvrir différents parcours.",
+          date: new Date("2026-03-28T09:00:00Z"),
+          type: "Atelier",
         },
         {
-          title: "Networking: Tech Leaders Meetup",
-          description: "An evening to mingle with industry leaders and peers.",
-          date: new Date("2025-03-15T17:00:00Z"),
-          type: "Networking",
+          title: "Temps d’échanges et orientation",
+          description:
+            "Un moment pour discuter avec l’équipe PASS AVENIR et clarifier ton projet d’études ou professionnel.",
+          date: new Date("2026-03-28T12:00:00Z"),
+          type: "Rencontre",
         },
       ],
     });

@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "../../auth/[...nextauth]/route";
 import { prisma } from "@/lib/prisma";
+import { sendTicketEmail } from "@/lib/email";
 import { z } from "zod";
 import { randomUUID } from "crypto";
 
@@ -156,6 +157,19 @@ export async function PATCH(req: NextRequest) {
   if (!id) return NextResponse.json({ error: "id required" }, { status: 400 });
 
   try {
+    // Charger le ticket actuel pour détecter un changement de statut
+    const existing = await prisma.ticketOrder.findUnique({
+      where: { id },
+      include: {
+        user: { select: { id: true, name: true, email: true } },
+        event: { select: { id: true, title: true, date: true, location: true } },
+      },
+    });
+
+    if (!existing) {
+      return NextResponse.json({ error: "Ticket not found" }, { status: 404 });
+    }
+
     const data = TicketSchema.partial().parse(rest);
 
     // If a new userId is provided, verify the user exists
@@ -184,9 +198,36 @@ export async function PATCH(req: NextRequest) {
       },
       include: {
         user: { select: { id: true, name: true, email: true } },
-        event: { select: { id: true, title: true, date: true } },
+        event: { select: { id: true, title: true, date: true, location: true } },
       },
     });
+
+    // Si le statut vient de passer à "completed", déclencher l'envoi de billet par email
+    if (existing.status !== "completed" && ticket.status === "completed") {
+      try {
+        await sendTicketEmail({
+          to: ticket.user.email,
+          name: ticket.user.name,
+          ticket: {
+            id: ticket.id,
+            ticketNumber: ticket.ticketNumber,
+            qrCode: ticket.qrCode,
+            quantity: ticket.quantity,
+            ticketType: ticket.ticketType,
+            reference: ticket.reference,
+            event: ticket.event
+              ? {
+                  title: ticket.event.title,
+                  date: ticket.event.date,
+                  location: ticket.event.location ?? null,
+                }
+              : null,
+          },
+        });
+      } catch (e) {
+        console.error("[TICKET_EMAIL_FAILED]", e);
+      }
+    }
 
     return NextResponse.json(ticket);
   } catch (error: any) {
