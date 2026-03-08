@@ -73,6 +73,7 @@ interface PhysicalTicket {
   usedAt: string | null;
   createdAt: string;
   event: { title: string } | null;
+  holderName?: string | null;
 }
 
 interface EventOption {
@@ -212,184 +213,28 @@ function wrapText(
 }
 
 async function generateTicketImageBase64(ticket: TicketOrder): Promise<string> {
-  const W = 1000,
-    H = 500,
-    PAD = 50;
-  const canvas = document.createElement("canvas");
-  canvas.width = W;
-  canvas.height = H;
-  const ctx = canvas.getContext("2d")!;
-
-  // ── Background ─────────────────────────────────────────────────────────────
-  ctx.fillStyle = "#0082a3"; // Exact teal from image
-  ctx.fillRect(0, 0, W, H);
-
-  // ── Header: logo Pass Avenir (image) ───────────────────────────────────────
-  try {
-    const passLogo = await loadImage("/passavenir.png");
-    const logoH = 70;
-    const logoW = (passLogo.width / passLogo.height) * logoH;
-    const logoX = PAD;
-    const logoY = 52;
-
-    ctx.save();
-    ctx.shadowColor = "rgba(0,0,0,0.45)";
-    ctx.shadowBlur = 10;
-    ctx.shadowOffsetY = 2;
-    ctx.drawImage(passLogo, logoX, logoY, logoW, logoH);
-    ctx.restore();
-  } catch {
-    // Si le logo ne charge pas, on ne dessine rien plutôt que le texte PASS AVENIR
-  }
-
-  // Top Right Info
-  const ticketIdString = ticket.ticketNumber || `#${ticket.id.slice(0, 8).toUpperCase()}`;
-  const statusLabel = (ticket.ticketType || "STUDENT").toUpperCase();
-
-  // Badge
-  ctx.fillStyle = "#9ce4f2"; // Light cyan bg
-  const badgeW = 120;
-  const badgeH = 38;
-  roundRect(ctx, W - PAD - badgeW, 45, badgeW, badgeH, 10);
-  ctx.fill();
-
-  ctx.fillStyle = "#0082a3"; // Teal text for badge
-  ctx.font = "bold 15px sans-serif";
-  ctx.textAlign = "center";
-  ctx.fillText(statusLabel, W - PAD - badgeW / 2, 70);
-
-  // Ticket number — clearly visible to the left of the badge
-  ctx.fillStyle = "rgba(255,255,255,0.85)";
-  ctx.font = "bold 14px monospace";
-  ctx.textAlign = "right";
-  ctx.fillText(ticketIdString, W - PAD - badgeW - 16, 69);
-
-  // ── Dividers ───────────────────────────────────────────────────────────────
-  const drawDashedLine = (x1: number, y1: number, x2: number, y2: number) => {
-    ctx.save();
-    ctx.strokeStyle = "rgba(255,255,255,0.12)";
-    ctx.setLineDash([5, 8]);
-    ctx.lineWidth = 1;
-    ctx.beginPath();
-    ctx.moveTo(x1, y1);
-    ctx.lineTo(x2, y2);
-    ctx.stroke();
-    ctx.restore();
+  // On génère désormais le billet numérique avec le même design
+  // que le billet physique pour avoir un rendu identique.
+  const physicalLike: PhysicalTicket = {
+    id: ticket.id,
+    ticketNumber:
+      ticket.ticketNumber || ticket.id.slice(0, 8).toUpperCase(),
+    eventId: ticket.eventId,
+    ticketType: ticket.ticketType,
+    batchId: "DIGITAL",
+    status:
+      ticket.status === "cancelled"
+        ? "cancelled"
+        : ticket.usedAt
+          ? "used"
+          : "active",
+    usedAt: ticket.usedAt,
+    createdAt: ticket.createdAt,
+    event: ticket.event ? { title: ticket.event.title } : null,
+    holderName: ticket.user.name || ticket.user.email,
   };
 
-  drawDashedLine(PAD, 130, W - PAD, 130); // Top divider
-
-  // ── Left Side Content ──────────────────────────────────────────────────────
-  let y = 175;
-  const label = (text: string) => {
-    ctx.fillStyle = "rgba(255,255,255,0.5)";
-    ctx.font = "bold 11px sans-serif";
-    ctx.textAlign = "left";
-    ctx.fillText(text.toUpperCase(), PAD, y);
-    y += 24;
-  };
-  const val = (text: string, size = 28, bold = true) => {
-    ctx.fillStyle = "#ffffff";
-    ctx.font = `${bold ? "bold " : ""} ${size}px sans-serif`;
-    ctx.textAlign = "left";
-    const lastY = wrapText(ctx, text, PAD, y, W * 0.58, size + 8);
-    y = lastY + 42;
-  };
-
-  label("ÉVÉNEMENT");
-  val(ticket.event?.title ?? "Opening Keynote: Africa's Digital Future", 22);
-
-  label("DATE & HEURE");
-  const eventDate = ticket.event ? new Date(ticket.event.date) : new Date();
-  const dateStr = eventDate.toLocaleDateString("fr-FR", {
-    weekday: "long",
-    day: "numeric",
-    month: "long",
-    year: "numeric"
-  });
-  val(dateStr, 17, true);
-  y -= 18; // Tighter spacing for time
-  val("18:00", 17, false);
-
-  label("TITULAIRE");
-  val(ticket.user.name || ticket.user.email, 17, true);
-
-  // ── Bottom Logos Section ──────────────────────────────────────────────────
-  const logoAreaY = H - 100;
-  const steamX = PAD;
-  const drawSophisticatedLogo = (x: number, y: number) => {
-    ctx.save();
-    ctx.translate(x, y);
-    const colors = ["#fdb813", "#4db848", "#00aeef", "#ec008c", "#8dc63f", "#1e96d4"];
-    ctx.fillStyle = "#f26422";
-    ctx.beginPath(); ctx.arc(0, 0, 13, 0, Math.PI * 2); ctx.fill();
-    for (let i = 0; i < 8; i++) {
-      const angle = (i * Math.PI * 2) / 8;
-      const lineLen = i % 2 === 0 ? 38 : 26;
-      const nx = Math.cos(angle) * lineLen;
-      const ny = Math.sin(angle) * lineLen;
-      ctx.strokeStyle = "rgba(255,255,255,0.12)";
-      ctx.lineWidth = 1.5;
-      ctx.beginPath(); ctx.moveTo(0, 0); ctx.lineTo(nx, ny); ctx.stroke();
-      ctx.fillStyle = colors[i % colors.length];
-      ctx.beginPath(); ctx.arc(nx, ny, 6, 0, Math.PI * 2); ctx.fill();
-    }
-    ctx.restore();
-  };
-  drawSophisticatedLogo(steamX + 28, logoAreaY + 13);
-  ctx.textAlign = "left";
-  ctx.font = "900 36px sans-serif";
-  ctx.fillStyle = "rgba(255,255,255,0.18)";
-  ctx.fillText("STEAM", steamX + 78, logoAreaY + 29);
-  ctx.fillStyle = "rgba(253,184,19,0.5)";
-  ctx.fillText("HUB", steamX + 230, logoAreaY + 29);
-
-  ctx.strokeStyle = "rgba(255,255,255,0.18)";
-  ctx.lineWidth = 1;
-  ctx.beginPath();
-  ctx.moveTo(steamX + 330, logoAreaY + 2);
-  ctx.lineTo(steamX + 330, logoAreaY + 46);
-  ctx.stroke();
-
-  try {
-    const mjsImg = await loadImage("/logo_mjs.png");
-    const mjsH = 80;
-    const mjsW = (mjsImg.width / mjsImg.height) * mjsH;
-    ctx.drawImage(mjsImg, steamX + 370, logoAreaY - 14, mjsW, mjsH);
-  } catch {
-    ctx.fillStyle = "rgba(255,255,255,0.4)";
-    ctx.font = "bold 22px sans-serif";
-    ctx.textAlign = "left";
-    ctx.fillText("MJS", steamX + 370, logoAreaY + 32);
-  }
-
-  // ── Right SideContent (QR Section) ─────────────────────────────────────────
-  const contentDividerX = W * 0.64;
-  drawDashedLine(contentDividerX, 150, contentDividerX, H - 120);
-
-  const qrBoxSize = 280;
-  const qrBoxX = contentDividerX + (W - contentDividerX - qrBoxSize) / 2;
-  const qrBoxY = 160;
-
-  // QR Light Box
-  ctx.fillStyle = "#9ce4f2";
-  roundRect(ctx, qrBoxX, qrBoxY, qrBoxSize, qrBoxSize, 28);
-  ctx.fill();
-
-  const qrSize = 230;
-  const qrX = qrBoxX + (qrBoxSize - qrSize) / 2;
-  const qrY = qrBoxY + (qrBoxSize - qrSize) / 2;
-
-  try {
-    const qrImg = await loadImage(buildQRUrl(ticket));
-    ctx.drawImage(qrImg, qrX, qrY, qrSize, qrSize);
-  } catch {
-    ctx.fillStyle = "rgba(0,0,0,0.05)";
-    ctx.fillRect(qrX, qrY, qrSize, qrSize);
-  }
-
-
-  return canvas.toDataURL("image/png");
+  return generatePhysicalTicketImageBase64(physicalLike);
 }
 
 async function generatePhysicalTicketImageBase64(
@@ -537,12 +382,36 @@ async function generatePhysicalTicketImageBase64(
   value(ticket.batchId);
 
   label("Titulaire");
-  ctx.strokeStyle = "#e5e7eb";
-  ctx.lineWidth = 1.4;
-  ctx.beginPath();
-  ctx.moveTo(leftX, infoY + 8);
-  ctx.lineTo(leftX + leftW - 80, infoY + 8);
-  ctx.stroke();
+  const holderText = ticket.holderName || "";
+  if (holderText) {
+    ctx.textAlign = "left";
+    ctx.fillStyle = "#0f172a";
+    ctx.font =
+      "500 15px system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif";
+    const lastY = wrapText(
+      ctx,
+      holderText,
+      leftX,
+      infoY,
+      leftW - 56,
+      20,
+    );
+    infoY = lastY + 26;
+
+    ctx.strokeStyle = "#e5e7eb";
+    ctx.lineWidth = 1.4;
+    ctx.beginPath();
+    ctx.moveTo(leftX, lastY + 12);
+    ctx.lineTo(leftX + leftW - 80, lastY + 12);
+    ctx.stroke();
+  } else {
+    ctx.strokeStyle = "#e5e7eb";
+    ctx.lineWidth = 1.4;
+    ctx.beginPath();
+    ctx.moveTo(leftX, infoY + 8);
+    ctx.lineTo(leftX + leftW - 80, infoY + 8);
+    ctx.stroke();
+  }
 
   // ── Zone QR (stub droite), centré verticalement ──────────────────────────
   const qrBoxSize = 230;
