@@ -1,6 +1,7 @@
 "use client"
 
 import Link from "next/link"
+import Image from "next/image"
 import { Navigation } from "@/components/navigation"
 import { Footer } from "@/components/footer"
 import EventCountdown from "@/components/event-countdown"
@@ -11,16 +12,23 @@ export default function HomePage() {
       <Navigation />
 
       {/* Hero / Header */}
-      <section className="px-4 sm:px-6 lg:px-8 pt-24 pb-12">
-        <div className="max-w-4xl mx-auto text-center flex flex-col items-center gap-8">
-          <div>
-            <p className="text-xs font-semibold tracking-[0.25em] uppercase text-emerald-300/70 mb-4">
+      <section className="px-4 sm:px-6 lg:px-8 pt-24 pb-8">
+        <div className="max-w-4xl mx-auto text-center flex flex-col items-center gap-3">
+          <div className="space-y-0.5 sm:space-y-1.5">
+            <p className="text-sm sm:text-base leading-snug font-semibold tracking-[0.25em] uppercase text-emerald-300/70">
               Salon de découverte des métiers
             </p>
-            <h1 className="text-3xl sm:text-4xl md:text-5xl font-black tracking-tight mb-4">
-              PASS AVENIR
-            </h1>
-            <p className="text-base sm:text-lg text-slate-200/80 max-w-2xl mx-auto">
+            <div className="flex justify-center">
+              <Image
+                src="/passavenir.png"
+                alt="Logo Pass Avenir"
+                width={260}
+                height={90}
+                className="drop-shadow-lg"
+                priority
+              />
+            </div>
+            <p className="text-base sm:text-xl leading-snug sm:leading-snug text-slate-200/80 max-w-3xl mx-auto">
               Une journée pour découvrir des métiers, rencontrer des professionnels et préparer ton avenir.
               Ateliers, stands, rencontres inspirantes… tout est réuni pour t’aider à clarifier ton projet
               professionnel.
