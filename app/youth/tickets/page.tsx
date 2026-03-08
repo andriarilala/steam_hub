@@ -64,7 +64,7 @@ function buildQRUrl(ticket: TicketOrder, user: any): string {
   ]
     .filter(Boolean)
     .join("\n");
-  return `https://api.qrserver.com/v1/create-qr-code/?size=300x300&margin=10&data=${encodeURIComponent(data)}`;
+  return `https://api.qrserver.com/v1/create-qr-code/?size=400x400&margin=10&data=${encodeURIComponent(data)}`;
 }
 
 function loadImage(src: string): Promise<HTMLImageElement> {
@@ -124,8 +124,8 @@ function wrapText(
 }
 
 async function generateTicketImageBase64(ticket: TicketOrder, user: any): Promise<string> {
-  const W = 1000,
-    H = 500,
+  const W = 880,
+    H = 420,
     PAD = 50;
   const canvas = document.createElement("canvas");
   canvas.width = W;
@@ -137,26 +137,30 @@ async function generateTicketImageBase64(ticket: TicketOrder, user: any): Promis
   ctx.fillRect(0, 0, W, H);
 
   // ── Header: "Pass Avenir" Wordmark ──────────────────────────────────────────
+  // On centre le bloc logo Pass Avenir verticalement par rapport au haut/bas
+  // Marge haute ≈ marge basse des logos du bas
+  const topMargin = 10;
+
   // "Pass" — white, light weight, with shadow for readability
   ctx.save();
   ctx.shadowColor = "rgba(0,0,0,0.45)";
   ctx.shadowBlur = 10;
   ctx.shadowOffsetY = 2;
   ctx.textAlign = "left";
-  ctx.font = "300 32px sans-serif";
+  ctx.font = "300 44px sans-serif";
   ctx.fillStyle = "rgba(255,255,255,0.96)";
-  ctx.fillText("Pass", PAD, 78);
+  ctx.fillText("Pass", PAD, topMargin + 42);
   // "Avenir" — bold cyan
-  ctx.font = "bold 32px sans-serif";
+  ctx.font = "bold 44px sans-serif";
   ctx.fillStyle = "#9ce4f2";
   const passW = ctx.measureText("Pass ").width;
-  ctx.fillText("Avenir", PAD + passW - 2, 78);
+  ctx.fillText("Avenir", PAD + passW - 4, topMargin + 42);
   ctx.restore();
   // Subtle tagline
-  ctx.font = "10px sans-serif";
+  ctx.font = "12px sans-serif";
   ctx.fillStyle = "rgba(255,255,255,0.32)";
   ctx.letterSpacing = "2px";
-  ctx.fillText("VOTRE PASS NUMÉRIQUE", PAD, 92);
+  ctx.fillText("VOTRE PASS NUMÉRIQUE", PAD, topMargin + 64);
   ctx.letterSpacing = "0px";
 
   // Top Right Info
@@ -194,27 +198,32 @@ async function generateTicketImageBase64(ticket: TicketOrder, user: any): Promis
     ctx.restore();
   };
 
-  drawDashedLine(PAD, 130, W - PAD, 130); // Top divider
+  drawDashedLine(PAD, topMargin + 88, W - PAD, topMargin + 88); // Top divider
 
   // ── Left Side Content ──────────────────────────────────────────────────────
-  let y = 175;
+  // On place le bloc texte vers le milieu vertical de la zone utile
+  const contentTop = topMargin + 88;
+  const contentBottom = H - 130; // même base que logoAreaY
+  const contentCenter = (contentTop + contentBottom) / 2;
+
+  let y = contentCenter - 70;
   const label = (text: string) => {
     ctx.fillStyle = "rgba(255,255,255,0.5)";
-    ctx.font = "bold 11px sans-serif";
+    ctx.font = "bold 14px sans-serif";
     ctx.textAlign = "left";
     ctx.fillText(text.toUpperCase(), PAD, y);
-    y += 24;
+    y += 30;
   };
   const val = (text: string, size = 28, bold = true) => {
     ctx.fillStyle = "#ffffff";
     ctx.font = `${bold ? "bold " : ""} ${size}px sans-serif`;
     ctx.textAlign = "left";
-    const lastY = wrapText(ctx, text, PAD, y, W * 0.58, size + 8);
-    y = lastY + 42;
+    const lastY = wrapText(ctx, text, PAD, y, W * 0.58, size + 10);
+    y = lastY + 46;
   };
 
   label("ÉVÉNEMENT");
-  val(ticket.event?.title ?? "Opening Keynote: Africa's Digital Future", 22);
+  val(ticket.event?.title ?? "Opening Keynote: Africa's Digital Future", 28);
 
   label("DATE & HEURE");
   const eventDate = ticket.event ? new Date(ticket.event.date) : new Date();
@@ -224,15 +233,15 @@ async function generateTicketImageBase64(ticket: TicketOrder, user: any): Promis
     month: "long",
     year: "numeric"
   });
-  val(dateStr, 17, true);
-  y -= 18; // Tighter spacing for time
-  val("18:00", 17, false);
+  val(dateStr, 22, true);
+  y -= 22; // Tighter spacing for time
+  val("18:00", 22, false);
 
   label("TITULAIRE");
-  val(user?.name ?? "Aina User", 17, true);
+  val(user?.name ?? "Aina User", 24, true);
 
   // ── Bottom Logos Section ───────────────────────────────────────────────────
-  const logoAreaY = H - 100;
+  const logoAreaY = H - 130;
 
   // Left: STEAM HUB sophisticated logo
   const drawSophisticatedLogo = (x: number, y: number) => {
@@ -287,18 +296,18 @@ async function generateTicketImageBase64(ticket: TicketOrder, user: any): Promis
 
   // ── Right SideContent (QR Section) ─────────────────────────────────────────
   const contentDividerX = W * 0.64;
-  drawDashedLine(contentDividerX, 150, contentDividerX, H - 120);
+  drawDashedLine(contentDividerX, 145, contentDividerX, H - 105);
 
-  const qrBoxSize = 280;
+  const qrBoxSize = 240;
   const qrBoxX = contentDividerX + (W - contentDividerX - qrBoxSize) / 2;
-  const qrBoxY = 160;
+  const qrBoxY = 145;
 
   // QR Light Box
   ctx.fillStyle = "#9ce4f2";
   roundRect(ctx, qrBoxX, qrBoxY, qrBoxSize, qrBoxSize, 28);
   ctx.fill();
 
-  const qrSize = 230;
+  const qrSize = 220;
   const qrX = qrBoxX + (qrBoxSize - qrSize) / 2;
   const qrY = qrBoxY + (qrBoxSize - qrSize) / 2;
 

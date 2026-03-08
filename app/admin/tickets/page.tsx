@@ -224,25 +224,23 @@ async function generateTicketImageBase64(ticket: TicketOrder): Promise<string> {
   ctx.fillStyle = "#0082a3"; // Exact teal from image
   ctx.fillRect(0, 0, W, H);
 
-  // ── Header: "Pass Avenir" Wordmark ──────────────────────────────────────────
-  ctx.save();
-  ctx.shadowColor = "rgba(0,0,0,0.45)";
-  ctx.shadowBlur = 10;
-  ctx.shadowOffsetY = 2;
-  ctx.textAlign = "left";
-  ctx.font = "300 32px sans-serif";
-  ctx.fillStyle = "rgba(255,255,255,0.96)";
-  ctx.fillText("Pass", PAD, 78);
-  ctx.font = "bold 32px sans-serif";
-  ctx.fillStyle = "#9ce4f2";
-  const passWidth = ctx.measureText("Pass ").width;
-  ctx.fillText("Avenir", PAD + passWidth - 2, 78);
-  ctx.restore();
-  ctx.font = "10px sans-serif";
-  ctx.fillStyle = "rgba(255,255,255,0.32)";
-  ctx.letterSpacing = "2px";
-  ctx.fillText("VOTRE PASS NUMÉRIQUE", PAD, 92);
-  ctx.letterSpacing = "0px";
+  // ── Header: logo Pass Avenir (image) ───────────────────────────────────────
+  try {
+    const passLogo = await loadImage("/passavenir.png");
+    const logoH = 70;
+    const logoW = (passLogo.width / passLogo.height) * logoH;
+    const logoX = PAD;
+    const logoY = 52;
+
+    ctx.save();
+    ctx.shadowColor = "rgba(0,0,0,0.45)";
+    ctx.shadowBlur = 10;
+    ctx.shadowOffsetY = 2;
+    ctx.drawImage(passLogo, logoX, logoY, logoW, logoH);
+    ctx.restore();
+  } catch {
+    // Si le logo ne charge pas, on ne dessine rien plutôt que le texte PASS AVENIR
+  }
 
   // Top Right Info
   const ticketIdString = ticket.ticketNumber || `#${ticket.id.slice(0, 8).toUpperCase()}`;
@@ -394,104 +392,165 @@ async function generateTicketImageBase64(ticket: TicketOrder): Promise<string> {
   return canvas.toDataURL("image/png");
 }
 
-async function generatePhysicalTicketImageBase64(ticket: PhysicalTicket): Promise<string> {
-  const W = 1000, H = 500, PAD = 50;
+async function generatePhysicalTicketImageBase64(
+  ticket: PhysicalTicket,
+): Promise<string> {
+  const W = 1000;
+  const H = 400;
+  const PAD = 0; // pas de marge externe, uniquement le billet
+
   const canvas = document.createElement("canvas");
-  canvas.width = W; canvas.height = H;
+  canvas.width = W;
+  canvas.height = H;
   const ctx = canvas.getContext("2d")!;
 
-  // ── Background: Warm Amber for Physical ────────────────────────────────────
-  ctx.fillStyle = "#f59e0b";
-  ctx.fillRect(0, 0, W, H);
+  // ── Fond global ───────────────────────────────────────────────────────────
+  // Pas de second background : on garde uniquement le billet
+  ctx.clearRect(0, 0, W, H);
 
-  // Texture / Pattern
-  ctx.fillStyle = "rgba(255,255,255,0.05)";
-  for (let i = 0; i < W; i += 20) {
-    ctx.fillRect(i, 0, 1, H);
-  }
+  // ── Carte principale (layout type "flex") ────────────────────────────────
+  const cardX = PAD;
+  const cardY = PAD;
+  const cardW = W - PAD * 2;
+  const cardH = H - PAD * 2;
 
-  // ── Header: "Pass Avenir" ──────────────────────────────────────────────────
+  // Ombre portée légère
   ctx.save();
-  ctx.shadowColor = "rgba(0,0,0,0.3)";
-  ctx.shadowBlur = 8;
-  ctx.textAlign = "left";
-  ctx.font = "300 32px sans-serif";
+  ctx.shadowColor = "rgba(15,23,42,0.18)";
+  ctx.shadowBlur = 18;
+  ctx.shadowOffsetY = 8;
+  // Billet en blanc pur
   ctx.fillStyle = "#ffffff";
-  ctx.fillText("Pass", PAD, 78);
-  ctx.font = "bold 32px sans-serif";
-  ctx.fillStyle = "#fef3c7";
-  const passWidth = ctx.measureText("Pass ").width;
-  ctx.fillText("Avenir", PAD + passWidth - 2, 78);
+  roundRect(ctx, cardX, cardY, cardW, cardH, 20);
+  ctx.fill();
   ctx.restore();
 
-  ctx.font = "bold 10px sans-serif";
-  ctx.fillStyle = "rgba(0,0,0,0.25)";
-  ctx.letterSpacing = "2px";
-  ctx.fillText("BILLET PHYSIQUE / VENTE TERRAIN", PAD, 92);
-  ctx.letterSpacing = "0px";
+  // Zones gauche/droite
+  const leftW = cardW * 0.6;
+  const rightW = cardW - leftW;
+  const leftX = cardX + 28;
+  const rightX = cardX + leftW;
 
-  // Top Right: Badge
+  // Ligne de séparation en pointillés
+  const sepTop = cardY + 26;
+  const sepBot = cardY + cardH - 26;
+  ctx.save();
+  ctx.strokeStyle = "#d4d4d8"; // #ccc-ish
+  ctx.setLineDash([6, 6]);
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  ctx.moveTo(rightX, sepTop);
+  ctx.lineTo(rightX, sepBot);
+  ctx.stroke();
+  ctx.restore();
+
+  // Encoches (demi-cercles blancs)
+  const notchR = 14;
+  ctx.fillStyle = "#ffffff";
+  ctx.beginPath();
+  ctx.arc(rightX, sepTop, notchR, Math.PI, 0);
+  ctx.fill();
+  ctx.beginPath();
+  ctx.arc(rightX, sepBot, notchR, 0, Math.PI);
+  ctx.fill();
+
+  // ── Badge type de billet (en haut à droite) ───────────────────────────────
   const ticketIdString = ticket.ticketNumber;
   const statusLabel = (ticket.ticketType || "STANDARD").toUpperCase();
 
-  ctx.fillStyle = "#ffffff";
-  const badgeW = 120; const badgeH = 38;
-  roundRect(ctx, W - PAD - badgeW, 45, badgeW, badgeH, 10);
+  const badgeW = 120;
+  const badgeH = 34;
+  const badgeX = cardX + cardW - badgeW - 24;
+  const badgeY = cardY + 18;
+
+  ctx.fillStyle = "#fdfaf5"; // blanc cassé
+  ctx.strokeStyle = "#e4e4e7";
+  ctx.lineWidth = 1.2;
+  roundRect(ctx, badgeX, badgeY, badgeW, badgeH, 16);
   ctx.fill();
-
-  ctx.fillStyle = "#f59e0b";
-  ctx.font = "bold 15px sans-serif";
-  ctx.textAlign = "center";
-  ctx.fillText(statusLabel, W - PAD - badgeW / 2, 70);
-
-  ctx.fillStyle = "rgba(255,255,255,0.9)";
-  ctx.font = "bold 16px monospace";
-  ctx.textAlign = "right";
-  ctx.fillText(ticketIdString, W - PAD - badgeW - 16, 69);
-
-  // ── Left Content ───────────────────────────────────────────────────────────
-  let y = 185;
-  const label = (text: string) => {
-    ctx.fillStyle = "rgba(0,0,0,0.3)";
-    ctx.font = "bold 11px sans-serif";
-    ctx.textAlign = "left";
-    ctx.fillText(text, PAD, y);
-    y += 24;
-  };
-  const val = (text: string, size = 24) => {
-    ctx.fillStyle = "#ffffff";
-    ctx.font = `bold ${size}px sans-serif`;
-    wrapText(ctx, text, PAD, y, W * 0.55, size + 6);
-    y += 45;
-  };
-
-  label("ÉVÉNEMENT");
-  val(ticket.event?.title || "Accès Toutes Zones", 22);
-
-  label("TYPE DE BILLET");
-  val(statusLabel, 20);
-
-  label("LOT (BATCH)");
-  val(ticket.batchId, 16);
-
-  label("TITULAIRE");
-  ctx.strokeStyle = "rgba(255,255,255,0.5)";
-  ctx.lineWidth = 2;
-  ctx.beginPath();
-  ctx.moveTo(PAD, y + 5);
-  ctx.lineTo(PAD + 250, y + 5);
   ctx.stroke();
-  ctx.fillStyle = "rgba(255,255,255,0.4)";
-  ctx.font = "italic 12px sans-serif";
-  ctx.fillText("(À remplir lors de la vente)", PAD, y + 25);
 
-  // ── QR Section ─────────────────────────────────────────────────────────────
-  const qrBoxSize = 260;
-  const qrX = W - PAD - qrBoxSize;
-  const qrY = 160;
+  ctx.textAlign = "center";
+  ctx.fillStyle = "#0f172a";
+  ctx.font =
+    "600 12px system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif";
+  ctx.fillText(statusLabel, badgeX + badgeW / 2, badgeY + 22);
 
-  ctx.fillStyle = "#ffffff";
-  roundRect(ctx, qrX, qrY, qrBoxSize, qrBoxSize, 20);
+  // Identifiant du billet sous le badge
+  ctx.textAlign = "right";
+  ctx.fillStyle = "#4b5563";
+  ctx.font =
+    "700 15px system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif";
+  ctx.fillText(ticketIdString, badgeX - 10, badgeY + 22);
+
+  // ── Logo PASS AVENIR en haut à gauche ─────────────────────────────────────
+  // On place le logo clairement en haut avec une marge raisonnable
+  try {
+    let passLogo: HTMLImageElement;
+    try {
+      // Nouveau fichier fourni : passavenir.png
+      passLogo = await loadImage("/passavenir.png");
+    } catch {
+      // Fallback sur l'ancien logo si nécessaire
+      passLogo = await loadImage("/logo.png");
+    }
+    const logoH = 200; // grand mais adapté à H = 400
+    const logoW = (passLogo.width / passLogo.height) * logoH;
+    const logoX = leftX;
+    const logoY = cardY - 40; // marge haute visible
+    ctx.drawImage(passLogo, logoX, logoY, logoW, logoH);
+  } catch {
+    ctx.textAlign = "left";
+    ctx.fillStyle = "#0f172a";
+    ctx.font =
+      "800 26px system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif";
+    ctx.fillText("PASS AVENIR", leftX, cardY + 60);
+  }
+
+  // ── Informations principales (labels + valeurs) ──────────────────────────
+  // On place le début du bloc texte autour du milieu de la carte
+  let infoY = cardY + cardH / 2 - 60;
+  const label = (text: string) => {
+    ctx.textAlign = "left";
+    ctx.fillStyle = "#888888";
+    ctx.font =
+      "600 10px system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif";
+    ctx.fillText(text.toUpperCase(), leftX, infoY);
+    infoY += 18;
+  };
+  const value = (text: string) => {
+    ctx.textAlign = "left";
+    ctx.fillStyle = "#0f172a";
+    ctx.font =
+      "500 15px system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif";
+    const lastY = wrapText(ctx, text, leftX, infoY, leftW - 56, 20);
+    infoY = lastY + 26;
+  };
+
+  label("Événement");
+  value(ticket.event?.title || "Accès toutes zones");
+
+  label("Type de billet");
+  value(statusLabel);
+
+  label("Lot (batch)");
+  value(ticket.batchId);
+
+  label("Titulaire");
+  ctx.strokeStyle = "#e5e7eb";
+  ctx.lineWidth = 1.4;
+  ctx.beginPath();
+  ctx.moveTo(leftX, infoY + 8);
+  ctx.lineTo(leftX + leftW - 80, infoY + 8);
+  ctx.stroke();
+
+  // ── Zone QR (stub droite), centré verticalement ──────────────────────────
+  const qrBoxSize = 230;
+  const qrBoxX = rightX + (rightW - qrBoxSize) / 2;
+  const qrBoxY = cardY + (cardH - qrBoxSize) / 2;
+
+  ctx.fillStyle = "#f9fafb";
+  roundRect(ctx, qrBoxX, qrBoxY, qrBoxSize, qrBoxSize, 18);
   ctx.fill();
 
   try {
@@ -503,23 +562,94 @@ async function generatePhysicalTicketImageBase64(ticket: PhysicalTicket): Promis
       `Batch: ${ticket.batchId}`,
       `Code: ${ticket.ticketNumber}`,
     ].join("\n");
-    const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=250x250&margin=10&data=${encodeURIComponent(qrData)}`;
+    const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=220x220&margin=10&data=${encodeURIComponent(
+      qrData,
+    )}`;
     const qrImg = await loadImage(qrUrl);
-    ctx.drawImage(qrImg, qrX + 15, qrY + 15, qrBoxSize - 30, qrBoxSize - 30);
+    ctx.drawImage(
+      qrImg,
+      qrBoxX + 10,
+      qrBoxY + 10,
+      qrBoxSize - 20,
+      qrBoxSize - 20,
+    );
   } catch {
-    ctx.fillStyle = "#f3f4f6";
-    ctx.fillRect(qrX + 20, qrY + 20, qrBoxSize - 40, qrBoxSize - 40);
+    ctx.fillStyle = "#e5e7eb";
+    ctx.fillRect(
+      qrBoxX + 18,
+      qrBoxY + 18,
+      qrBoxSize - 36,
+      qrBoxSize - 36,
+    );
   }
 
-  // Watermark
-  ctx.save();
-  ctx.translate(W / 2, H / 2);
-  ctx.rotate(-Math.PI / 6);
-  ctx.font = "bold 80px sans-serif";
-  ctx.fillStyle = "rgba(255,255,255,0.07)";
+  // Légende sous le QR
   ctx.textAlign = "center";
-  ctx.fillText("TERRAIN", 0, 0);
-  ctx.restore();
+  ctx.fillStyle = "#6b7280";
+  ctx.font =
+    "500 12px system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif";
+  ctx.fillText(
+    "Présenter ce code à l'entrée",
+    qrBoxX + qrBoxSize / 2,
+    qrBoxY + qrBoxSize + 22,
+  );
+
+  // ── Branding bas : trois logos regroupés en bas à gauche ────────────────
+  const brandingY = cardY + cardH - 25;
+  const brandingStartX = cardX + 32;
+  let currentX = brandingStartX;
+
+  // Logo STEAM HUB (PNG), premier logo en bas
+  try {
+    const steamLogo = await loadImage("/logo.png");
+    const h = 52;
+    const wLogo = (steamLogo.width / steamLogo.height) * h;
+    ctx.drawImage(steamLogo, currentX, brandingY - h + 6, wLogo, h);
+    currentX += wLogo + 26;
+  } catch {
+    ctx.textAlign = "left";
+    ctx.fillStyle = "#0f172a";
+    ctx.font =
+      "800 14px system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif";
+    const steamLabel = "STEAM HUB";
+    ctx.fillText(steamLabel, currentX, brandingY);
+    currentX += ctx.measureText(steamLabel).width + 30;
+  }
+
+  // Logo ARAH PROD, bien visible
+  try {
+    let arahLogo: HTMLImageElement;
+    try {
+      arahLogo = await loadImage("/arah.png");
+    } catch {
+      arahLogo = await loadImage("/arah-prod-logo.png");
+    }
+    const h = 56;
+    const wLogo = (arahLogo.width / arahLogo.height) * h;
+    ctx.drawImage(arahLogo, currentX, brandingY - h + 6, wLogo, h);
+    currentX += wLogo + 30;
+  } catch {
+    ctx.textAlign = "left";
+    ctx.fillStyle = "#9ca3af";
+    ctx.font =
+      "500 12px system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif";
+    ctx.fillText("ARAH PROD", currentX, brandingY);
+    currentX += ctx.measureText("ARAH PROD").width + 30;
+  }
+
+  // Logo MJS, dans la même ligne
+  try {
+    const mjsLogo = await loadImage("/logo_mjs.png");
+    const h = 60; // légèrement plus grand
+    const wLogo = (mjsLogo.width / mjsLogo.height) * h;
+    ctx.drawImage(mjsLogo, currentX, brandingY - h + 6, wLogo, h);
+  } catch {
+    ctx.textAlign = "left";
+    ctx.fillStyle = "#9ca3af";
+    ctx.font =
+      "500 12px system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif";
+    ctx.fillText("MJS", currentX, brandingY);
+  }
 
   return canvas.toDataURL("image/png");
 }
@@ -570,19 +700,26 @@ export default function AdminTicketsPage() {
   const [previewDataUrl, setPreviewDataUrl] = useState<string | null>(null);
   const [toast, setToast] = useState("");
   const [confirmDelete, setConfirmDelete] = useState<string | null>(null);
-  const [confirmDeletePhysical, setConfirmDeletePhysical] = useState<string | null>(null);
-  const [confirmDeleteBatch, setConfirmDeleteBatch] = useState<string | null>(null);
+  const [confirmDeletePhysical, setConfirmDeletePhysical] =
+    useState<string | null>(null);
+  const [confirmDeleteBatch, setConfirmDeleteBatch] =
+    useState<string | null>(null);
 
   // Physical tickets state
-  const [activeTab, setActiveTab] = useState<"digital" | "physical">("digital");
+  const [activeTab, setActiveTab] = useState<"digital" | "physical">(
+    "digital",
+  );
   const [physicalTickets, setPhysicalTickets] = useState<PhysicalTicket[]>([]);
-  const [selectedPhysicalTicket, setSelectedPhysicalTicket] = useState<PhysicalTicket | null>(null);
+  const [selectedPhysicalTicket, setSelectedPhysicalTicket] =
+    useState<PhysicalTicket | null>(null);
   const [batchModal, setBatchModal] = useState(false);
   const [batchForm, setBatchForm] = useState({
     eventId: "",
     ticketType: "standard",
     quantity: 50,
-    batchId: `BATCH-${new Date().toISOString().split('T')[0]}-${Math.floor(Math.random() * 1000)}`
+    batchId: `BATCH-${new Date().toISOString().split("T")[0]}-${Math.floor(
+      Math.random() * 1000,
+    )}`,
   });
   const [loadingPhysical, setLoadingPhysical] = useState(false);
   const [batchFilter, setBatchFilter] = useState("");
@@ -605,7 +742,7 @@ export default function AdminTicketsPage() {
     fetch("/api/admin/events")
       .then((r) => r.json())
       .then((d) => setEvents(Array.isArray(d) ? d : []))
-      .catch(() => { });
+      .catch(() => {});
 
     // Fetch ALL users across all pages so the dropdown is complete
     const fetchAllUsers = async () => {
@@ -634,7 +771,7 @@ export default function AdminTicketsPage() {
     const params = new URLSearchParams({
       page: String(page),
       sortField,
-      sortOrder
+      sortOrder,
     });
     if (search) params.set("search", search);
     if (statusFilter) params.set("status", statusFilter);
@@ -655,7 +792,7 @@ export default function AdminTicketsPage() {
     setLoadingPhysical(true);
     const params = new URLSearchParams({
       sortField: physicalSortField,
-      sortOrder: physicalSortOrder
+      sortOrder: physicalSortOrder,
     });
     if (search) params.set("search", search);
     if (batchFilter) params.set("batchId", batchFilter);
@@ -681,12 +818,15 @@ export default function AdminTicketsPage() {
       return;
     }
     const s = new Set<string>();
-    tickets.forEach(t => {
-      if (t.ticketNumber?.toLowerCase().includes(search.toLowerCase())) s.add(t.ticketNumber);
-      if (t.user.name?.toLowerCase().includes(search.toLowerCase())) s.add(t.user.name);
+    tickets.forEach((t) => {
+      if (t.ticketNumber?.toLowerCase().includes(search.toLowerCase()))
+        s.add(t.ticketNumber);
+      if (t.user.name?.toLowerCase().includes(search.toLowerCase()))
+        s.add(t.user.name);
     });
-    physicalTickets.forEach(t => {
-      if (t.ticketNumber?.toLowerCase().includes(search.toLowerCase())) s.add(t.ticketNumber);
+    physicalTickets.forEach((t) => {
+      if (t.ticketNumber?.toLowerCase().includes(search.toLowerCase()))
+        s.add(t.ticketNumber);
     });
     setSuggestions(Array.from(s).slice(0, 5));
   }, [search, tickets, physicalTickets]);
@@ -701,7 +841,9 @@ export default function AdminTicketsPage() {
       }
     } else {
       if (physicalSortField === field) {
-        setPhysicalSortOrder(physicalSortOrder === "asc" ? "desc" : "asc");
+        setPhysicalSortOrder(
+          physicalSortOrder === "asc" ? "desc" : "asc",
+        );
       } else {
         setPhysicalSortField(field);
         setPhysicalSortOrder("asc");
@@ -709,10 +851,24 @@ export default function AdminTicketsPage() {
     }
   };
 
-  const SortIcon = ({ field, activeField, activeOrder }: { field: string, activeField: string, activeOrder: string }) => {
-    if (field !== activeField) return <ChevronDown className="w-3 h-3 opacity-20" />;
-    return activeOrder === "asc" ? <ChevronUp className="w-3 h-3 text-blue-600" /> : <ChevronDown className="w-3 h-3 text-blue-600" />;
+  const SortIcon = ({
+    field,
+    activeField,
+    activeOrder,
+  }: {
+    field: string;
+    activeField: string;
+    activeOrder: string;
+  }) => {
+    if (field !== activeField)
+      return <ChevronDown className="w-3 h-3 opacity-20" />;
+    return activeOrder === "asc" ? (
+      <ChevronUp className="w-3 h-3 text-blue-600" />
+    ) : (
+      <ChevronDown className="w-3 h-3 text-blue-600" />
+    );
   };
+
   useEffect(() => {
     setPage(1);
   }, [search, statusFilter, eventFilter]);
@@ -755,7 +911,9 @@ export default function AdminTicketsPage() {
         dataUrl = await generateTicketImageBase64(t as TicketOrder);
         setSelectedTicket(t as TicketOrder);
       } else {
-        dataUrl = await generatePhysicalTicketImageBase64(t as PhysicalTicket);
+        dataUrl = await generatePhysicalTicketImageBase64(
+          t as PhysicalTicket,
+        );
         setSelectedPhysicalTicket(t as PhysicalTicket);
       }
       setPreviewDataUrl(dataUrl);
