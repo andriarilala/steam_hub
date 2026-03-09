@@ -12,12 +12,9 @@ export default function HomePage() {
       <Navigation />
 
       {/* Hero / Header */}
-      <section className="px-4 sm:px-6 lg:px-8 pt-24 pb-8">
+      <section className="px-4 sm:px-6 lg:px-8 pt-10 pb-8">
         <div className="max-w-4xl mx-auto text-center flex flex-col items-center gap-3">
           <div className="space-y-0.5 sm:space-y-1.5">
-            <p className="text-sm sm:text-base leading-snug font-semibold tracking-[0.25em] uppercase text-emerald-300/70">
-              Salon de découverte des métiers
-            </p>
             <div className="flex justify-center">
               <Image
                 src="/passavenir.png"
@@ -43,7 +40,7 @@ export default function HomePage() {
             href="/participer"
             className="mt-4 inline-flex items-center justify-center px-8 py-3 rounded-md bg-emerald-500 text-slate-950 font-semibold text-sm sm:text-base shadow-lg hover:bg-emerald-400 transition-colors"
           >
-            Participer / Acheter billet
+            Acheter mon billet
           </Link>
         </div>
       </section>

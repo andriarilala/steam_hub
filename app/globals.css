@@ -103,3 +103,16 @@
     @apply bg-background text-foreground;
   }
 }
+
+@keyframes pulse-zoom {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.05);
+  }
+}
+
+.animate-pulse-zoom {
+  animation: pulse-zoom 1.6s ease-in-out infinite;
+}
