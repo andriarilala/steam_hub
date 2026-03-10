@@ -269,12 +269,12 @@ export default function ParticiperPage() {
                 <div className="mt-4 text-sm sm:text-base text-slate-100">
                   <p className="mb-1 font-semibold text-[#E5E7EB]">Publication officielle :</p>
                   <a
-                    href="https://www.facebook.com/share/p/16KujUbxNE/"
+                    href="https://www.facebook.com/share/p/1AuggqYt8e/"
                     target="_blank"
                     rel="noreferrer"
                     className="text-[#22D3EE] hover:text-cyan-200 underline underline-offset-2 break-all"
                   >
-                    https://www.facebook.com/share/p/16KujUbxNE/
+                    https://www.facebook.com/share/p/1AuggqYt8e/
                   </a>
                 </div>
 
