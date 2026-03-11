@@ -117,8 +117,21 @@ export async function POST(req: NextRequest) {
   }
 
   try {
-    const count = await prisma.ticketOrder.count();
-    const ticketNumber = `PA ${String(count + 1).padStart(5, "0")}`;
+    const existingTickets = await prisma.ticketOrder.findMany({
+      where: { ticketNumber: { startsWith: "PA " } },
+      select: { ticketNumber: true },
+    });
+
+    const usedNumbers = new Set<number>();
+    for (const t of existingTickets) {
+      if (!t.ticketNumber) continue;
+      const n = parseInt(t.ticketNumber.replace(/[^0-9]/g, ""), 10);
+      if (!Number.isNaN(n)) usedNumbers.add(n);
+    }
+
+    let next = 1;
+    while (usedNumbers.has(next)) next++;
+    const ticketNumber = `PA ${String(next).padStart(5, "0")}`;
 
     const ticket = await prisma.ticketOrder.create({
       data: {
