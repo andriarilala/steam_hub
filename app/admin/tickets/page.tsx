@@ -1525,6 +1525,9 @@ export default function AdminTicketsPage() {
                           </button>
                         </th>
                         <th className="px-6 py-4 text-[11px] font-bold text-slate-400 uppercase tracking-wider">
+                          Référence paiement
+                        </th>
+                        <th className="px-6 py-4 text-[11px] font-bold text-slate-400 uppercase tracking-wider">
                           <button onClick={() => handleSort("status")} className="flex items-center gap-1 hover:text-slate-900 transition-colors">
                             Statut <SortIcon field="status" activeField={sortField} activeOrder={sortOrder} />
                           </button>
@@ -1560,6 +1563,11 @@ export default function AdminTicketsPage() {
                             <td className="px-6 py-4">
                               <span className="px-2 py-0.5 bg-slate-100 text-slate-600 rounded text-[10px] font-bold uppercase border border-slate-200">
                                 {TYPE_LABELS[ticket.ticketType] ?? ticket.ticketType}
+                              </span>
+                            </td>
+                            <td className="px-6 py-4">
+                              <span className="text-[11px] font-mono text-slate-500 break-all">
+                                {ticket.reference || "—"}
                               </span>
                             </td>
                             <td className="px-6 py-4">
