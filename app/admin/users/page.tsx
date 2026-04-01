@@ -8,6 +8,7 @@ import {
   ChevronRight,
   RefreshCw,
   UserCog,
+  Download,
 } from "lucide-react";
 import { ConfirmModal } from "@/components/ui/confirm-modal";
 
@@ -38,6 +39,15 @@ const ROLE_COLORS: Record<string, string> = {
   mentor: "bg-blue-50/50 text-blue-600 border border-blue-100",
   sponsor: "bg-amber-50 text-amber-700 border border-amber-200",
 };
+
+function escapeHtml(str: string) {
+  return str
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
+}
 
 export default function AdminUsersPage() {
   const [users, setUsers] = useState<User[]>([]);
@@ -115,6 +125,66 @@ export default function AdminUsersPage() {
     }
   };
 
+  const exportUsersToPdf = () => {
+    if (users.length === 0) {
+      showToast("No users to export");
+      return;
+    }
+
+    const printWindow = window.open("", "_blank");
+    if (!printWindow) return;
+
+    const rowsHtml = users
+      .map(
+        (u, index) => `
+          <tr>
+            <td>${index + 1}</td>
+            <td>${escapeHtml(u.name || "")}</td>
+            <td>${escapeHtml(u.email)}</td>
+          </tr>
+        `,
+      )
+      .join("");
+
+    const content = `
+      <html>
+        <head>
+          <meta charset="utf-8" />
+          <title>Liste des utilisateurs - Pass Avenir</title>
+          <style>
+            body { font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; padding: 40px; color: #334155; }
+            h1 { color: #0f172a; margin-bottom: 4px; font-size: 22px; }
+            p { margin-bottom: 20px; font-size: 13px; color: #64748b; }
+            table { width: 100%; border-collapse: collapse; font-size: 12px; }
+            th, td { border: 1px solid #e2e8f0; padding: 8px 10px; text-align: left; }
+            th { background: #f8fafc; font-weight: 600; text-transform: uppercase; font-size: 11px; color: #475569; }
+            td:nth-child(1) { width: 50px; text-align: center; }
+          </style>
+        </head>
+        <body>
+          <h1>PASS AVENIR - LISTE DES UTILISATEURS</h1>
+          <p>Exporté le: ${new Date().toLocaleString("fr-FR")} — Total: ${users.length} utilisateurs (page actuelle)</p>
+          <table>
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Nom</th>
+                <th>Email</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${rowsHtml}
+            </tbody>
+          </table>
+          <script>window.print();</script>
+        </body>
+      </html>
+    `;
+
+    printWindow.document.write(content);
+    printWindow.document.close();
+  };
+
   return (
     <div>
       {toast && (
@@ -128,12 +198,20 @@ export default function AdminUsersPage() {
           <h1 className="text-2xl font-bold text-slate-900 tracking-tight">Users</h1>
           <p className="text-sm text-slate-500 mt-1">{total} registered accounts</p>
         </div>
-        <button
-          onClick={load}
-          className="flex items-center gap-2 text-sm text-slate-500 hover:text-slate-700 border border-slate-200 bg-white px-3.5 py-2 rounded-lg transition-colors"
-        >
-          <RefreshCw className="w-3.5 h-3.5" /> Refresh
-        </button>
+        <div className="flex items-center gap-3">
+          <button
+            onClick={exportUsersToPdf}
+            className="flex items-center gap-2 text-sm text-slate-600 hover:text-slate-900 border border-slate-200 bg-white px-3.5 py-2 rounded-lg transition-colors"
+          >
+            <Download className="w-3.5 h-3.5" /> Export PDF
+          </button>
+          <button
+            onClick={load}
+            className="flex items-center gap-2 text-sm text-slate-500 hover:text-slate-700 border border-slate-200 bg-white px-3.5 py-2 rounded-lg transition-colors"
+          >
+            <RefreshCw className="w-3.5 h-3.5" /> Refresh
+          </button>
+        </div>
       </div>
 
       {/* Filters */}
