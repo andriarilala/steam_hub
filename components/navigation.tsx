@@ -24,7 +24,10 @@ export function Navigation() {
           <div className="hidden sm:flex items-center gap-3">
             <Link
               href="/participer"
-              className="bg-primary text-primary-foreground px-4 py-2 rounded-sm font-medium hover:opacity-90 transition-opacity"
+              className="text-white px-5 py-2.5 rounded-lg font-bold hover:shadow-lg transition-all duration-300"
+              style={{ backgroundColor: '#00B377' }}
+              onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#008F5A'}
+              onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#00B377'}
             >
               Participer
             </Link>
@@ -52,8 +55,11 @@ export function Navigation() {
             <div className="px-4 py-3 gap-2 flex flex-col">
               <Link
                 href="/participer"
-                className="flex-1 bg-primary text-primary-foreground px-4 py-2 rounded-sm font-medium hover:opacity-90 transition-opacity text-center"
+                className="flex-1 text-white px-4 py-2.5 rounded-lg font-bold hover:shadow-lg transition-all duration-300 text-center"
+                style={{ backgroundColor: '#00B377' }}
                 onClick={() => setIsOpen(false)}
+                onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#008F5A'}
+                onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#00B377'}
               >
                 Participer
               </Link>

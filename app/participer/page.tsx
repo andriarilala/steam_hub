@@ -50,7 +50,7 @@ export default function ParticiperPage() {
 
   const hasSubmittedSuccessfully = status === "success"
 
-  const UNIT_PRICE = 3000
+  const UNIT_PRICE = 5000
   const totalPrice = quantity * UNIT_PRICE
 
   return (
@@ -62,7 +62,7 @@ export default function ParticiperPage() {
           {!hasSubmittedSuccessfully ? (
             <>
               <h1 className="text-3xl sm:text-4xl font-black mb-4 bg-gradient-to-r from-emerald-300 via-sky-300 to-emerald-200 bg-clip-text text-transparent">
-                Participer à PASS AVENIR
+                Participer à AERO EXPO
               </h1>
               <div className="mb-6">
                 <div className="flex items-center justify-between">
@@ -99,11 +99,11 @@ export default function ParticiperPage() {
               <p className="text-sm sm:text-base text-slate-200/90 mb-4">
                 Achat par Mvola à envoyer au
                 {" "}
-                <span className="font-semibold text-white">034 58 144 56</span>
+                <span className="font-semibold text-white">03* ** *** **</span>
                 {" "}
                 au nom de
                 {" "}
-                <span className="font-semibold text-emerald-100">Heriniaina Mariano</span>.
+                <span className="font-semibold text-emerald-100">Aero Expo</span>.
               </p>
               <p className="text-sm sm:text-base text-slate-200/80 mb-8">
                 Une fois le paiement effectué, remplissez ce formulaire avec votre
@@ -218,22 +218,15 @@ export default function ParticiperPage() {
                 </div>
 
                 <p className="text-sm sm:text-base text-[#E5E7EB] mb-4">
-                  Félicitations ! En tant que participant au PASS AVENIR, vous pouvez tenter de gagner
+                  Félicitations ! En tant que participant à AERO EXPO, vous pouvez tenter de gagner
                   {" "}
-                  1 des 3 bourses offertes aux visiteurs
+                  
                   {" "}
-                  par
+                  
                   {" "}
-                  <a
-                    href="https://www.facebook.com/profile.php?id=61582094332677"
-                    target="_blank"
-                    rel="noreferrer"
-                    className="text-[#22D3EE] hover:text-cyan-200 underline-offset-2 hover:underline"
-                  >
-                    ILC - Institute of Languages and Careers
-                  </a>
+                  
                   {" "}
-                  au choix : cours de langues (English &amp; Deutsch) ou formation aux métiers du numérique.
+                   
                 </p>
 
                 <div className="space-y-2 text-sm sm:text-base text-slate-100/90">
@@ -244,19 +237,19 @@ export default function ParticiperPage() {
                     Suivez notre page Facebook :
                     {" "}
                     <a
-                      href="https://www.facebook.com/profile.php?id=100081934650238"
+                      href="https://www.facebook.com/profile.php?id=61575252123938"
                       target="_blank"
                       rel="noreferrer"
                       className="text-[#22D3EE] hover:text-cyan-200 underline-offset-2 hover:underline"
                     >
-                      STEAM Hub
+                      AERO EXPO
                     </a>
                     .
                   </p>
                   <p className="text-slate-200">
                     <span className="text-[#FBBF24]">✓</span>
                     {" "}
-                    Mentionnez 5 amis dans les commentaires de la publication officielle de PASS AVENIR en
+                    Mentionnez 5 amis dans les commentaires de la publication officielle d'AERO EXPO en
                     indiquant le métier qui te passionne.
                   </p>
                   <p className="text-slate-200">
@@ -269,12 +262,12 @@ export default function ParticiperPage() {
                 <div className="mt-4 text-sm sm:text-base text-slate-100">
                   <p className="mb-1 font-semibold text-[#E5E7EB]">Publication officielle :</p>
                   <a
-                    href="https://www.facebook.com/share/p/1AuggqYt8e/"
+                    href="https://www.facebook.com/photo/?fbid=122168921864841737&set=pb.61575252123938.-2207520000"
                     target="_blank"
                     rel="noreferrer"
                     className="text-[#22D3EE] hover:text-cyan-200 underline underline-offset-2 break-all"
                   >
-                    https://www.facebook.com/share/p/1AuggqYt8e/
+                    https://www.facebook.com/photo/?fbid=122168921864841737&set=pb.61575252123938.-2207520000
                   </a>
                 </div>
 

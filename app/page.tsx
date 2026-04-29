@@ -8,37 +8,42 @@ import EventCountdown from "@/components/event-countdown"
 
 export default function HomePage() {
   return (
-    <main className="min-h-screen flex flex-col bg-gradient-to-b from-slate-950 via-slate-900 to-slate-950 text-white">
+    <main className="min-h-screen flex flex-col text-white relative">
+      <div
+        className="absolute inset-0 bg-cover bg-center bg-no-repeat -z-20"
+        style={{ backgroundImage: "url('/background.png')" }}
+      />
+      <div className="absolute inset-0 backdrop-blur-[4px] bg-black/20 -z-10" />
       <Navigation />
 
       {/* Hero / Header */}
-      <section className="px-4 sm:px-6 lg:px-8 pt-10 pb-8">
+      <section className="px-4 sm:px-6 lg:px-8 pt-16 sm:pt-20 pb-6">
         <div className="max-w-4xl mx-auto text-center flex flex-col items-center gap-3">
           <div className="space-y-0.5 sm:space-y-1.5">
             <div className="flex justify-center">
               <Image
-                src="/passavenir.png"
-                alt="Logo Pass Avenir"
-                width={260}
-                height={90}
+                src="/logo_plane.png"
+                alt="Logo Salon Aero Expo 2026"
+                width={600}
+                height={300}
                 className="drop-shadow-lg"
                 priority
               />
             </div>
-            <p className="text-base sm:text-xl leading-snug sm:leading-snug text-slate-200/80 max-w-3xl mx-auto">
-              Une journée pour découvrir des métiers, rencontrer des professionnels et préparer ton avenir.
-              Ateliers, stands, rencontres inspirantes… tout est réuni pour t’aider à clarifier ton projet
-              professionnel.
-            </p>
           </div>
 
           {/* Compte à rebours */}
-          <EventCountdown />
+          <div className="mt-8 sm:mt-10 flex-grow flex flex-col justify-center">
+            <EventCountdown />
+          </div>
 
           {/* Bouton principal */}
           <Link
             href="/participer"
-            className="mt-4 inline-flex items-center justify-center px-8 py-3 rounded-md bg-emerald-500 text-slate-950 font-semibold text-sm sm:text-base shadow-lg hover:bg-emerald-400 transition-colors"
+            className="mt-6 sm:mt-8 mb-8 inline-flex items-center justify-center px-10 py-4 rounded-lg font-bold text-lg sm:text-xl text-white shadow-[0_0_20px_rgba(0,179,119,0.4)] hover:shadow-[0_0_30px_rgba(0,143,90,0.6)] transition-all duration-300 transform hover:scale-105"
+            style={{ backgroundColor: '#00B377' }}
+            onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#008F5A'}
+            onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#00B377'}
           >
             Acheter mon billet
           </Link>

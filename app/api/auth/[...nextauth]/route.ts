@@ -54,10 +54,10 @@ async function seedDemoData() {
     await prisma.event.createMany({
       data: [
         {
-          title: "PASS AVENIR – Journée découverte des métiers",
+          title: "AERO EXPO – La technologie au cœur de l'aéronautique",
           description:
-            "Une journée pour découvrir des métiers, rencontrer des professionnels et préparer ton avenir.",
-          date: new Date("2026-03-28T06:00:00Z"),
+            "2ème édition du Salon Aéro Expo. Une journée pour découvrir les métiers de l'aéronautique, rencontrer des professionnels et explorer les technologies innovantes.",
+          date: new Date("2026-05-30T06:00:00Z"),
           type: "Journée",
         },
         {

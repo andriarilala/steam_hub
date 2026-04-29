@@ -19,9 +19,9 @@ interface QuickOption {
 const initialMessage: Message = {
   id: "1",
   type: "bot",
-  text: "Bonjour, je suis l’assistant PASS AVENIR. Comment puis-je vous aider ?",
+  text: "Bonjour, je suis l'assistant AERO EXPO 2026. Comment puis-je vous aider ?",
   options: [
-    { id: "1", label: "Infos sur l’événement", action: "event_info" },
+    { id: "1", label: "Infos sur l'événement", action: "event_info" },
     { id: "2", label: "Comment participer", action: "registration" },
     { id: "3", label: "Contact / aide", action: "contact" },
   ],
@@ -32,9 +32,9 @@ const botResponses: Record<string, Message> = {
     id: "",
     type: "bot",
     text:
-      "PASS AVENIR est une journée pour découvrir des métiers, rencontrer des professionnels et préparer ton avenir. Tu veux des précisions sur le programme, le lieu ou l’horaire ?",
+      "AERO EXPO 2026 – La technologie au cœur de l'aéronautique. C'est la 2ème édition du salon dédié aux métiers de l'aéronautique, aux technologies innovantes et aux rencontres avec des professionnels du secteur.\n\n📅 30 & 31 Mai 2026\n📍 Escadron Hélicoptère Ivato, ex-bani",
     options: [
-      { id: "1", label: "Programme de la journée", action: "agenda" },
+      { id: "1", label: "Programme du salon", action: "agenda" },
       { id: "2", label: "Lieu et accès", action: "venue" },
       { id: "3", label: "Qui peut venir ?", action: "audience" },
       { id: "4", label: "Revenir au menu", action: "menu" },
@@ -63,7 +63,7 @@ const botResponses: Record<string, Message> = {
     id: "",
     type: "bot",
     text:
-      "La journée PASS AVENIR est rythmée par des stands, des ateliers, des rencontres avec des professionnels et des temps d’échanges pour t’aider à clarifier ton projet.",
+      "Le salon AERO EXPO 2026 propose :\n\n🛩️ Expositions d'aéronefs et drones\n🔧 Ateliers techniques et métiers de l'aéronautique\n🎤 Conférences sur les technologies innovantes\n🤝 Rencontres avec des professionnels et entreprises du secteur\n✈️ Démonstrations et simulations de vol",
     options: [
       { id: "1", label: "Infos pratiques", action: "venue" },
       { id: "2", label: "Revenir au menu", action: "menu" },
@@ -73,7 +73,7 @@ const botResponses: Record<string, Message> = {
     id: "",
     type: "bot",
     text:
-      "L’événement se tient à Antananarivo (lieu précis communiqué sur l’affiche et le site). Tu y trouveras des stands, des espaces de rencontre et des ateliers tout au long de la journée.",
+      "📍 Lieu : Escadron Hélicoptère Ivato, ex-bani\n\nLe site dispose d'ample espace pour les expositions, les ateliers et les rencontres. Parking disponible sur place.\n\n🕘 Ouverture : 9h00",
     options: [
       { id: "1", label: "Programme", action: "agenda" },
       { id: "2", label: "Revenir au menu", action: "menu" },
@@ -83,7 +83,7 @@ const botResponses: Record<string, Message> = {
     id: "",
     type: "bot",
     text:
-      "PASS AVENIR s’adresse surtout aux collégiens, lycéens et jeunes qui veulent mieux comprendre les métiers et parler avec des professionnels.",
+      "AERO EXPO 2026 s'adresse à tous :\n\n✈️ Passionnés d'aviation\n🎓 Étudiants en aéronautique\n🔧 Professionnels du secteur\n🏢 Entreprises et industriels\n👨‍👩‍👧‍👦 Grand public curieux de découvrir les métiers de l'air",
     options: [
       { id: "1", label: "Comment participer", action: "registration" },
       { id: "2", label: "Revenir au menu", action: "menu" },
@@ -92,9 +92,9 @@ const botResponses: Record<string, Message> = {
   menu: {
     id: "",
     type: "bot",
-    text: "Que veux-tu savoir sur PASS AVENIR ?",
+    text: "Que veux-tu savoir sur AERO EXPO 2026 ?",
     options: [
-      { id: "1", label: "Infos sur l’événement", action: "event_info" },
+      { id: "1", label: "Infos sur l'événement", action: "event_info" },
       { id: "2", label: "Comment participer", action: "registration" },
       { id: "3", label: "Contact / aide", action: "contact" },
     ],
@@ -225,7 +225,7 @@ export function ChatbotWidget() {
               <Bot className="w-6 h-6 text-primary-foreground" />
             </div>
             <div className="flex-1">
-              <h3 className="font-bold text-primary-foreground">Assistant PASS AVENIR</h3>
+              <h3 className="font-bold text-primary-foreground">Assistant AERO EXPO 2026</h3>
               <p className="text-xs text-primary-foreground/70">En ligne · Réponses rapides</p>
             </div>
             <button onClick={() => setIsOpen(false)} className="p-1 hover:bg-primary-foreground/10 rounded">
