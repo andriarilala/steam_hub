@@ -54,7 +54,7 @@ const botResponses: Record<string, Message> = {
     id: "",
     type: "bot",
     text:
-      "Pour toute question sur l’événement, tu peux nous contacter :\n\n- Email : steamhubinitiative@gmail.com\n- Infoline : +261 38 57 53 87 / +261 34 97 59 468\n- Facebook : ww.facebook.com/SteamHub\n\nSouhaites-tu revenir au menu ?",
+      "Pour toute question sur l’événement, tu peux nous contacter :\n\n- Email : contact@printeoagency.com\n- Infoline : +261 34 28 686 76\n- Facebook : ww.facebook.com/SteamHub\n\nSouhaites-tu revenir au menu ?",
     options: [
       { id: "1", label: "Revenir au menu", action: "menu" },
     ],
